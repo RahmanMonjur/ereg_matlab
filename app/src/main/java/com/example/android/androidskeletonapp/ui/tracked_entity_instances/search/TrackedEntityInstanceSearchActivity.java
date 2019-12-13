@@ -103,9 +103,9 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
 
         return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
                 .byOrgUnits().in(organisationUids)
-                .byOrgUnitMode().eq(OrganisationUnitMode.DESCENDANTS)
+                //.byOrgUnitMode().eq(OrganisationUnitMode.DESCENDANTS)
                 //.byProgram().eq(program.uid())
-                .byQuery().eq(etFirstName.getText().toString())
+                .byQuery().like(etFirstName.getText().toString())
                 .onlineFirst().getPaged(15);
     }
 

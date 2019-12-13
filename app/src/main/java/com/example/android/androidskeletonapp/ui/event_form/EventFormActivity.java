@@ -65,7 +65,7 @@ public class EventFormActivity extends AppCompatActivity {
     private String eventUid;
 
     private enum IntentExtra {
-        EVENT_UID, PROGRAM_UID, OU_UID, TYPE
+        EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, OU_UID, TYPE
     }
 
     public enum FormType {
