@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -12,7 +13,9 @@ import androidx.paging.PagedList;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
+import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.OnTrackedEntityInstanceSelectionListener;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstanceAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,6 +39,7 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
     private TextView downloadDataText;
     private TextView notificator;
     private TrackedEntityInstanceAdapter adapter;
+    private static EditText etFirstName;
 
     public static Intent getIntent(Context context) {
         return new Intent(context,TrackedEntityInstanceSearchActivity.class);
@@ -51,6 +55,7 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
         downloadDataText = findViewById(R.id.downloadDataText);
         progressBar = findViewById(R.id.trackedEntityInstanceProgressBar);
         FloatingActionButton downloadButton = findViewById(R.id.downloadDataButton);
+        etFirstName = findViewById(R.id.txtParamFirstName);
 
         adapter = new TrackedEntityInstanceAdapter(this, null);
 
@@ -99,13 +104,16 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
         return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
                 .byOrgUnits().in(organisationUids)
                 .byOrgUnitMode().eq(OrganisationUnitMode.DESCENDANTS)
-                .byProgram().eq(program.uid())
-                .byQuery().eq("Waldo")
+                //.byProgram().eq(program.uid())
+                .byQuery().eq(etFirstName.getText().toString())
                 .onlineFirst().getPaged(15);
     }
 
     @Override
     public void onTrackedEntityInstanceSelected(String programUid, String teiUid) {
-
+        ActivityStarter.startActivity(this,
+                ProgramStagesActivity
+                        .getProgramStagesActivityIntent(this, programUid, teiUid),
+                false);
     }
 }
