@@ -15,6 +15,7 @@ import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncAndCardHolder;
 import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncHolder;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
@@ -40,23 +41,27 @@ import static com.example.android.androidskeletonapp.data.service.ImageHelper.ge
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setBackgroundColor;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setState;
 
-public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithSyncHolder> {
+public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithSyncAndCardHolder> {
 
     private DataSource<?, TrackedEntityInstance> source;
+    private OnTrackedEntityInstanceSelectionListener listener;
+    private String programUid;
 
-    public TrackedEntityInstanceAdapter() {
+    public TrackedEntityInstanceAdapter(OnTrackedEntityInstanceSelectionListener listener, String programUid) {
         super(new DiffByIdItemCallback<>());
+        this.listener = listener;
+        this.programUid = programUid;
     }
 
     @NonNull
     @Override
-    public ListItemWithSyncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ListItemWithSyncAndCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new ListItemWithSyncHolder(itemView);
+        return new ListItemWithSyncAndCardHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListItemWithSyncHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListItemWithSyncAndCardHolder holder, int position) {
         TrackedEntityInstance trackedEntityInstance = getItem(position);
         List<TrackedEntityAttributeValue> values = trackedEntityInstance.trackedEntityAttributeValues();
         holder.title.setText(valueAt(values, teiTitle(trackedEntityInstance)));
@@ -106,6 +111,10 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         setBackgroundColor(R.color.colorAccentDark, holder.icon);
         setState(trackedEntityInstance.state(), holder.syncIcon);
         setConflicts(trackedEntityInstance.uid(), holder);
+
+        holder.card.setOnClickListener(view -> listener
+                .onTrackedEntityInstanceSelected(programUid, trackedEntityInstance.uid()));
+
     }
 
     private Observable<D2Progress> syncTei(String teiUid) {

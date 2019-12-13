@@ -13,6 +13,7 @@ import androidx.paging.PagedList;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
+import com.example.android.androidskeletonapp.ui.tracked_entity_instances.OnTrackedEntityInstanceSelectionListener;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstanceAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,7 +30,7 @@ import java.util.List;
 
 import static com.example.android.androidskeletonapp.data.service.AttributeHelper.attributeForSearch;
 
-public class TrackedEntityInstanceSearchActivity extends ListActivity {
+public class TrackedEntityInstanceSearchActivity extends ListActivity implements OnTrackedEntityInstanceSelectionListener {
 
     private ProgressBar progressBar;
     private TextView downloadDataText;
@@ -51,7 +52,7 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity {
         progressBar = findViewById(R.id.trackedEntityInstanceProgressBar);
         FloatingActionButton downloadButton = findViewById(R.id.downloadDataButton);
 
-        adapter = new TrackedEntityInstanceAdapter();
+        adapter = new TrackedEntityInstanceAdapter(this, null);
 
         downloadButton.setOnClickListener(view -> {
             view.setEnabled(Boolean.FALSE);
@@ -101,5 +102,10 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity {
                 .byProgram().eq(program.uid())
                 .byQuery().eq("Waldo")
                 .onlineFirst().getPaged(15);
+    }
+
+    @Override
+    public void onTrackedEntityInstanceSelected(String programUid, String teiUid) {
+
     }
 }

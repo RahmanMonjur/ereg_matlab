@@ -36,8 +36,10 @@ public class ProgramsAdapter extends PagedListAdapter<Program, ListItemWithStyle
     public void onBindViewHolder(@NonNull ListItemWithStyleHolder holder, int position) {
         Program program = getItem(position);
         holder.title.setText(program.displayName());
-        holder.subtitle1.setText(program.programType() == ProgramType.WITH_REGISTRATION ?
-                "Program with registration" : "Program without registration");
+        holder.subtitle1.setText(program.description());
+
+        //holder.subtitle1.setText(program.programType() == ProgramType.WITH_REGISTRATION ?
+        //        "Program with registration" : "Program without registration");
         StyleBinderHelper.bindStyle(holder, program.style());
 
         holder.card.setOnClickListener(view -> programSelectionListener

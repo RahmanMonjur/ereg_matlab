@@ -12,6 +12,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.enrollment_form.EnrollmentFormActivity;
+import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
@@ -25,12 +26,20 @@ import io.reactivex.schedulers.Schedulers;
 
 import static android.text.TextUtils.isEmpty;
 
-public class TrackedEntityInstancesActivity extends ListActivity {
+public class TrackedEntityInstancesActivity extends ListActivity  implements OnTrackedEntityInstanceSelectionListener {
 
     private CompositeDisposable compositeDisposable;
     private String selectedProgram;
     private final int ENROLLMENT_RQ = 1210;
     private TrackedEntityInstanceAdapter adapter;
+
+    @Override
+    public void onTrackedEntityInstanceSelected(String programUid, String teiUid) {
+        ActivityStarter.startActivity(this,
+                ProgramStagesActivity
+                        .getProgramStagesActivityIntent(this, programUid, teiUid),
+                false);
+    }
 
     private enum IntentExtra {
         PROGRAM
@@ -82,7 +91,7 @@ public class TrackedEntityInstancesActivity extends ListActivity {
     }
 
     private void observeTrackedEntityInstances() {
-        adapter = new TrackedEntityInstanceAdapter();
+        adapter = new TrackedEntityInstanceAdapter(this, selectedProgram);
         recyclerView.setAdapter(adapter);
 
         getTeiRepository().getPaged(20).observe(this, trackedEntityInstancePagedList -> {

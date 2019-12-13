@@ -44,6 +44,7 @@
     <string name="zero">0</string>
     <!-- Strings related to programs -->
     <string name="title_activity_programs">Your programs</string>
+    <string name="title_activity_program_stage">Program Stages</string>
     <string name="program_name">Program Name</string>
     <string name="program_icon">Program Icon</string>
     <string name="program_stages">2 Program stages</string>

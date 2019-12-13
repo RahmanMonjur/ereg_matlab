@@ -2,14 +2,20 @@ package com.example.android.androidskeletonapp.data.service;
 
 import com.example.android.androidskeletonapp.data.Sdk;
 
+import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
 import org.hisp.dhis.android.core.common.State;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
 import java.util.Collections;
 
 public class SyncStatusHelper {
 
     public static int programCount() {
-        return Sdk.d2().programModule().programs().blockingCount();
+        return Sdk.d2().programModule().programs()
+                .byOrganisationUnitList(UidsHelper.getUidsList(
+                        Sdk.d2().organisationUnitModule().organisationUnits()
+                        .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_TEI_SEARCH).blockingGet()))
+                .blockingCount();
     }
 
     public static int dataSetCount() {
