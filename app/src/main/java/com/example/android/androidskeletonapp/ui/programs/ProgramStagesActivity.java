@@ -4,16 +4,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
+import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.events.EventsActivity;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstancesActivity;
+import com.google.common.collect.Lists;
 
 import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.program.ProgramType;
+
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -63,10 +69,27 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     @Override
     public void onProgramStageSelected(String programUid, String programStageUid, String teiUid) {
 
-        ActivityStarter.startActivity(this,
+        Integer eventsNumber = Sdk.d2().eventModule().events()
+                .byProgramUid().eq(programUid)
+                .byProgramStageUid().eq(programStageUid)
+                .byTrackedEntityInstanceUids(Lists.newArrayList(teiUid))
+                .blockingCount();
+
+        if (eventsNumber>0) {
+            ActivityStarter.startActivity(this,
                     EventsActivity
                             .getIntent(this, programUid, programStageUid, teiUid),
                     false);
+        }
+        else {
+            ActivityStarter.startActivity(this,
+                    EventFormActivity
+                            .getFormActivityIntent(this, programUid, programStageUid, teiUid,
+                                    Sdk.d2().organisationUnitModule().organisationUnits()
+                                            .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet().uid(),
+                                    EventFormActivity.FormType.CREATE),
+                    false);
+        }
     }
 
 

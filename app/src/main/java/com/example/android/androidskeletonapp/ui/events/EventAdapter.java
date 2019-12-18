@@ -78,6 +78,7 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
                             activity,
                             event.uid(),
                             event.program(),
+                            event.programStage(),
                             event.organisationUnit(),
                             EventFormActivity.FormType.CHECK
                     ),false

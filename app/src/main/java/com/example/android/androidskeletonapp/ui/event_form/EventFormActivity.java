@@ -72,11 +72,12 @@ public class EventFormActivity extends AppCompatActivity {
         CREATE, CHECK
     }
 
-    public static Intent getFormActivityIntent(Context context, String eventUid, String programUid,
+    public static Intent getFormActivityIntent(Context context, String eventUid, String programUid, String programStageUid,
                                                String orgUnitUid, FormType type) {
         Intent intent = new Intent(context, EventFormActivity.class);
         intent.putExtra(IntentExtra.EVENT_UID.name(), eventUid);
         intent.putExtra(IntentExtra.PROGRAM_UID.name(), programUid);
+        intent.putExtra(IntentExtra.PROGRAM_STAGE_UID.name(), programStageUid);
         intent.putExtra(IntentExtra.OU_UID.name(), orgUnitUid);
         intent.putExtra(IntentExtra.TYPE.name(), type.name());
         return intent;

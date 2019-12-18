@@ -71,7 +71,7 @@ public class ProgramsActivity extends ListActivity implements OnProgramSelection
         else
             ActivityStarter.startActivity(this,
                     EventsActivity.getIntent(this,
-                            programUid),
+                            programUid, null, null),
                     false);
     }
 

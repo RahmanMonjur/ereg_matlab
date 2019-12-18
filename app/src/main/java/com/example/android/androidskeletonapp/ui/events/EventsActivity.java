@@ -34,6 +34,7 @@ import static android.text.TextUtils.isEmpty;
 public class EventsActivity extends ListActivity {
     private String selectedProgram;
     private String selectedProgramStage;
+    private String selectedTei;
     private CompositeDisposable compositeDisposable;
     private EventAdapter adapter;
     private final int EVENT_RQ = 1210;
@@ -64,6 +65,7 @@ public class EventsActivity extends ListActivity {
         setUp(R.layout.activity_events, R.id.eventsToolbar, R.id.eventsRecyclerView);
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         selectedProgramStage = getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name());
+        selectedTei = getIntent().getStringExtra(IntentExtra.TEI.name());
         compositeDisposable = new CompositeDisposable();
         observeEvents();
 
@@ -87,34 +89,24 @@ public class EventsActivity extends ListActivity {
                                                         .byCategoryComboUid().eq(program.categoryComboUid())
                                                         .one().blockingGet().uid() : null;
 
-                                        Integer eventNumbers = Sdk.d2().eventModule().events()
+                                        return Sdk.d2().eventModule().events()
                                                 .byProgramUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name()))
                                                 .byProgramStageUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
-                                                .blockingCount();
-
-                                        if (eventNumbers > 0 ) {
-                                            return "";
-                                        }
-                                        else {
-                                            return Sdk.d2().eventModule().events()
-                                                    .byProgramUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name()))
-                                                    .byProgramStageUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
-                                                    .blockingAdd(
-                                                            EventCreateProjection.builder()
-                                                                    .organisationUnit(orgUnit)
-                                                                    .program(program.uid())
-                                                                    .programStage(stage)
-                                                                    .attributeOptionCombo(attrOptionCombo)
-                                                                    .build()
-                                                    );
-                                        }
+                                                .blockingAdd(
+                                                        EventCreateProjection.builder()
+                                                                .organisationUnit(orgUnit)
+                                                                .program(program.uid())
+                                                                .programStage(stage)
+                                                                .attributeOptionCombo(attrOptionCombo)
+                                                                .build());
 
                                     })
-                                    .filter(eventUid->!eventUid.isEmpty())
+                                    .filter(eventUid -> !eventUid.isEmpty())
                                     .map(eventUid ->
                                             EventFormActivity.getFormActivityIntent(EventsActivity.this,
                                                     eventUid,
                                                     selectedProgram,
+                                                    selectedProgramStage,
                                                     Sdk.d2().organisationUnitModule().organisationUnits()
                                                             .one().blockingGet().uid(), EventFormActivity.FormType.CREATE))
                                     .subscribeOn(Schedulers.io())
@@ -146,7 +138,8 @@ public class EventsActivity extends ListActivity {
         EventCollectionRepository eventRepository =
                 Sdk.d2().eventModule().events().withTrackedEntityDataValues();
         if (!isEmpty(selectedProgram)) {
-            return eventRepository.byProgramUid().eq(selectedProgram);
+            return eventRepository.byProgramUid().eq(selectedProgram)
+                    .byProgramStageUid().eq(selectedProgramStage).byTrackedEntityInstanceUids(Lists.newArrayList(selectedTei));
         } else {
             return eventRepository;
         }
