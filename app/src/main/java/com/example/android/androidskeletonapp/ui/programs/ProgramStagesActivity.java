@@ -57,7 +57,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(organisationUnitUids -> Sdk.d2().programModule().programStages().byProgramUid().eq(programUid)
-                        .orderByName(RepositoryScope.OrderByDirection.ASC)
+                        .orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
                         .getPaged(20))
                 .subscribe(programs -> programs.observe(this, programPagedList -> {
                     adapter.submitList(programPagedList);

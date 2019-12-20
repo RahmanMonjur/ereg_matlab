@@ -52,7 +52,10 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
                 .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
                 .blockingCount();
 
-        holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
+        if (programStageInstancesCount>0)
+            holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
+        else
+            holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");
 
         //holder.subtitle1.setText(program.programType() == ProgramType.WITH_REGISTRATION ?
         //        "Program with registration" : "Program without registration");
