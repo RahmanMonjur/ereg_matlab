@@ -65,19 +65,20 @@ public class EventFormActivity extends AppCompatActivity {
     private String eventUid;
 
     private enum IntentExtra {
-        EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, OU_UID, TYPE
+        EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, TEI_UID, OU_UID, TYPE
     }
 
     public enum FormType {
         CREATE, CHECK
     }
 
-    public static Intent getFormActivityIntent(Context context, String eventUid, String programUid, String programStageUid,
+    public static Intent getFormActivityIntent(Context context, String eventUid, String programUid, String programStageUid, String teiUid,
                                                String orgUnitUid, FormType type) {
         Intent intent = new Intent(context, EventFormActivity.class);
         intent.putExtra(IntentExtra.EVENT_UID.name(), eventUid);
         intent.putExtra(IntentExtra.PROGRAM_UID.name(), programUid);
         intent.putExtra(IntentExtra.PROGRAM_STAGE_UID.name(), programStageUid);
+        intent.putExtra(IntentExtra.TEI_UID.name(), teiUid);
         intent.putExtra(IntentExtra.OU_UID.name(), orgUnitUid);
         intent.putExtra(IntentExtra.TYPE.name(), type.name());
         return intent;

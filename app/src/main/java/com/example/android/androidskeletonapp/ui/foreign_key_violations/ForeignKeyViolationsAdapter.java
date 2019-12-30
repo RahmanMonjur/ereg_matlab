@@ -26,7 +26,7 @@ public class ForeignKeyViolationsAdapter extends PagedListAdapter<ForeignKeyViol
     @Override
     public ListItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.list_item_with_delete_sync, parent, false);
         return new ListItemHolder(itemView);
     }
 

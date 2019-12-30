@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".ui.main.GlobalClass"
         android:allowBackup="true"
         android:icon="@mipmap/ic_dhis_launcher"
         android:label="@string/app_name"
@@ -42,6 +43,10 @@
         <activity
             android:name=".ui.programs.ProgramsActivity"
             android:label="@string/title_activity_programs"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.main.OrgUnitsActivity"
+            android:label="Choose organisation unit"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.tracked_entity_instances.TrackedEntityInstancesActivity"

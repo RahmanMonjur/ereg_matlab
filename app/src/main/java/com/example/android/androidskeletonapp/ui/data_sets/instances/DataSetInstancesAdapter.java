@@ -34,7 +34,7 @@ public class DataSetInstancesAdapter extends PagedListAdapter<DataSetInstance, L
     @Override
     public ListItemWithSyncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.list_item_with_delete_sync, parent, false);
         return new ListItemWithSyncHolder(itemView);
     }
 

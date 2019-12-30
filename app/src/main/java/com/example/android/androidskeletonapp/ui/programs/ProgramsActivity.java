@@ -10,11 +10,14 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.events.EventsActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstancesActivity;
 
 import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
 import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
 import org.hisp.dhis.android.core.program.ProgramType;
+
+import java.util.Collections;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -23,6 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ProgramsActivity extends ListActivity implements OnProgramSelectionListener {
 
     private Disposable disposable;
+    GlobalClass globalVars;
 
     public static Intent getProgramActivityIntent(Context context){
         return new Intent(context,ProgramsActivity.class);
@@ -31,7 +35,8 @@ public class ProgramsActivity extends ListActivity implements OnProgramSelection
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUp(R.layout.activity_programs, R.id.programsToolbar, R.id.programsRecyclerView);
+        globalVars = (GlobalClass) getApplicationContext();
+        recyclerSetup(R.layout.activity_programs, R.id.programsToolbar, R.id.programsRecyclerView);
         observePrograms();
     }
 
@@ -43,7 +48,7 @@ public class ProgramsActivity extends ListActivity implements OnProgramSelection
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(organisationUnitUids -> Sdk.d2().programModule().programs()
-                        .byOrganisationUnitList(UidsHelper.getUidsList(organisationUnitUids))
+                        .byOrganisationUnitList(Collections.singletonList(globalVars.getOrgUid().uid()))
                         .orderByName(RepositoryScope.OrderByDirection.ASC)
                         .getPaged(20))
                 .subscribe(programs -> programs.observe(this, programPagedList -> {

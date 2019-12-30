@@ -4,8 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.paging.PagedList;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
@@ -14,6 +19,11 @@ import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.enrollment_form.EnrollmentFormActivity;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
+import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
+import org.hisp.dhis.android.core.program.Program;
+import org.hisp.dhis.android.core.program.ProgramType;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
 
@@ -32,6 +42,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     private String selectedProgram;
     private final int ENROLLMENT_RQ = 1210;
     private TrackedEntityInstanceAdapter adapter;
+    private static EditText etFirstName;
 
     @Override
     public void onTrackedEntityInstanceSelected(String programUid, String teiUid) {
@@ -54,7 +65,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUp(R.layout.activity_tracked_entity_instances, R.id.trackedEntityInstancesToolbar,
+        recyclerSetup(R.layout.activity_tracked_entity_instances, R.id.trackedEntityInstancesToolbar,
                 R.id.trackedEntityInstancesRecyclerView);
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         compositeDisposable = new CompositeDisposable();
@@ -88,6 +99,16 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                                 Throwable::printStackTrace
                         )
         ));
+
+        etFirstName = findViewById(R.id.txtParamFirstName);
+        ImageButton searchButton = findViewById(R.id.btnSearchTei);
+        searchButton.setOnClickListener(view -> {
+            getTrackedEntityInstanceQuery().observe(this, trackedEntityInstancePagedList -> {
+                adapter.submitList(trackedEntityInstancePagedList);
+                findViewById(R.id.trackedEntityInstancesNotificator).setVisibility(
+                        trackedEntityInstancePagedList.isEmpty() ? View.VISIBLE : View.GONE);
+            });
+        });
     }
 
     private void observeTrackedEntityInstances() {
@@ -104,7 +125,9 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
     private TrackedEntityInstanceCollectionRepository getTeiRepository() {
         TrackedEntityInstanceCollectionRepository teiRepository =
-                Sdk.d2().trackedEntityModule().trackedEntityInstances().withTrackedEntityAttributeValues();
+                Sdk.d2().trackedEntityModule()
+                        .trackedEntityInstances()
+                        .withTrackedEntityAttributeValues();
         if (!isEmpty(selectedProgram)) {
             List<String> programUids = new ArrayList<>();
             programUids.add(selectedProgram);
@@ -112,6 +135,14 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         } else {
             return teiRepository;
         }
+    }
+
+    private LiveData<PagedList<TrackedEntityInstance>> getTrackedEntityInstanceQuery() {
+        adapter = new TrackedEntityInstanceAdapter(this, selectedProgram);
+        recyclerView.setAdapter(adapter);
+        return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
+                .byQuery().like(etFirstName.getText().toString())
+                .offlineFirst().getPaged(15);
     }
 
     @Override

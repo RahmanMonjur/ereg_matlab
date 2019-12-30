@@ -9,7 +9,7 @@ public abstract class ListActivity extends AppCompatActivity {
 
     protected RecyclerView recyclerView;
 
-    protected void setUp(int contentViewId, int toolbarId, int recyclerViewId) {
+    protected void recyclerSetup(int contentViewId, int toolbarId, int recyclerViewId) {
         setContentView(contentViewId);
         Toolbar toolbar = findViewById(toolbarId);
         setSupportActionBar(toolbar);

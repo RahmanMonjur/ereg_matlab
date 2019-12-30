@@ -9,14 +9,14 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 import com.example.android.androidskeletonapp.R;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithStyleHolder;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithCardHolder;
 
 import org.hisp.dhis.android.core.common.ObjectStyle;
 import org.hisp.dhis.android.core.common.State;
 
 public class StyleBinderHelper {
 
-    public static void bindStyle(ListItemWithStyleHolder holder, ObjectStyle style) {
+    public static void bindStyle(ListItemWithCardHolder holder, ObjectStyle style) {
         if (style != null) {
             if (style.icon() == null) {
                 int emptyColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.colorEmpty);
@@ -35,17 +35,17 @@ public class StyleBinderHelper {
 
             if (style.color() == null || style.color().length() == 4) {
                 int emptyColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.colorEmpty);
-                holder.cardFrame.setBackgroundColor(emptyColor);
+                holder.cardFrameSimple.setBackgroundColor(emptyColor);
             } else {
                 String color = style.color().startsWith("#") ? style.color() : "#" + style.color();
                 int programColor = Color.parseColor(color);
-                holder.cardFrame.setBackgroundColor(programColor);
+                holder.cardFrameSimple.setBackgroundColor(programColor);
             }
         } else {
             int emptyColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.colorEmpty);
             holder.icon.setImageResource(0);
             holder.icon.setBackgroundColor(emptyColor);
-            holder.cardFrame.setBackgroundColor(emptyColor);
+            holder.cardFrameSimple.setBackgroundColor(emptyColor);
         }
     }
 

@@ -10,12 +10,11 @@ import androidx.paging.PagedListAdapter;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.service.StyleBinderHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithStyleHolder;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithCardHolder;
 
 import org.hisp.dhis.android.core.program.Program;
-import org.hisp.dhis.android.core.program.ProgramType;
 
-public class ProgramsAdapter extends PagedListAdapter<Program, ListItemWithStyleHolder> {
+public class ProgramsAdapter extends PagedListAdapter<Program, ListItemWithCardHolder> {
 
     private final OnProgramSelectionListener programSelectionListener;
 
@@ -26,14 +25,14 @@ public class ProgramsAdapter extends PagedListAdapter<Program, ListItemWithStyle
 
     @NonNull
     @Override
-    public ListItemWithStyleHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ListItemWithCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_with_style, parent, false);
-        return new ListItemWithStyleHolder(itemView);
+                .inflate(R.layout.list_item_simple, parent, false);
+        return new ListItemWithCardHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListItemWithStyleHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
         Program program = getItem(position);
         holder.title.setText(program.displayName());
         holder.subtitle1.setText(program.description());
@@ -42,7 +41,7 @@ public class ProgramsAdapter extends PagedListAdapter<Program, ListItemWithStyle
         //        "Program with registration" : "Program without registration");
         StyleBinderHelper.bindStyle(holder, program.style());
 
-        holder.card.setOnClickListener(view -> programSelectionListener
+        holder.cardSimple.setOnClickListener(view -> programSelectionListener
                 .onProgramSelected(program.uid(), program.programType()));
     }
 }

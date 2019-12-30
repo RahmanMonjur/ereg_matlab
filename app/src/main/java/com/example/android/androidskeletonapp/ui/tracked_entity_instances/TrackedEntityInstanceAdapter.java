@@ -15,8 +15,7 @@ import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncAndCardHolder;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncHolder;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithCardAndSyncHolder;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
 import org.hisp.dhis.android.core.arch.call.D2Progress;
@@ -33,15 +32,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.android.androidskeletonapp.data.service.AttributeHelper.teiSubtitle1;
 import static com.example.android.androidskeletonapp.data.service.AttributeHelper.teiSubtitle2First;
 import static com.example.android.androidskeletonapp.data.service.AttributeHelper.teiSubtitle2Second;
-import static com.example.android.androidskeletonapp.data.service.AttributeHelper.teiTitle;
 import static com.example.android.androidskeletonapp.data.service.ImageHelper.getBitmap;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setBackgroundColor;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setState;
 
-public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithSyncAndCardHolder> {
+public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithCardAndSyncHolder> {
 
     private DataSource<?, TrackedEntityInstance> source;
     private OnTrackedEntityInstanceSelectionListener listener;
@@ -55,19 +52,22 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
 
     @NonNull
     @Override
-    public ListItemWithSyncAndCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new ListItemWithSyncAndCardHolder(itemView);
+    public ListItemWithCardAndSyncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_with_all_features, parent, false);
+        return new ListItemWithCardAndSyncHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListItemWithSyncAndCardHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListItemWithCardAndSyncHolder holder, int position) {
         TrackedEntityInstance trackedEntityInstance = getItem(position);
         List<TrackedEntityAttributeValue> values = trackedEntityInstance.trackedEntityAttributeValues();
-        holder.title.setText(valueAt(values, teiTitle(trackedEntityInstance)));
-        holder.subtitle1.setText(valueAt(values, teiSubtitle1(trackedEntityInstance)));
-        holder.subtitle2.setText(setSubtitle2(values, trackedEntityInstance));
-        holder.rightText.setText(DateFormatHelper.formatDate(trackedEntityInstance.created()));
+        holder.title.setText(valueAt(values, "QWTcaK2mXeD") + " - " + valueAt(values, "etJ8MaVKH2g"));
+        holder.subtitle1.setText(valueAt(values, "N8skKU3roph") + " - " + valueAt(values, "KSSF2lnMKca"));
+        holder.subtitle2.setText(valueAt(values, "I056EjniPUi") + " - " + valueAt(values, "aQEvaiBpohU"));
+        //holder.title.setText(valueAt(values, teiTitle(trackedEntityInstance)));
+        //holder.subtitle1.setText(valueAt(values, teiSubtitle1(trackedEntityInstance)));
+        //holder.subtitle2.setText(setSubtitle2(values, trackedEntityInstance));
+        holder.rightText.setText(DateFormatHelper.formatSimpleDate(trackedEntityInstance.created()));
         setImage(trackedEntityInstance, holder);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
@@ -112,7 +112,7 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         setState(trackedEntityInstance.state(), holder.syncIcon);
         setConflicts(trackedEntityInstance.uid(), holder);
 
-        holder.card.setOnClickListener(view -> listener
+        holder.lnkDetail.setOnClickListener(view -> listener
                 .onTrackedEntityInstanceSelected(programUid, trackedEntityInstance.uid()));
 
     }
@@ -151,14 +151,14 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         }
     }
 
-    private void setConflicts(String trackedEntityInstanceUid, ListItemWithSyncHolder holder) {
+    private void setConflicts(String trackedEntityInstanceUid, ListItemWithCardAndSyncHolder holder) {
         TrackerImportConflictsAdapter adapter = new TrackerImportConflictsAdapter();
         holder.recyclerView.setAdapter(adapter);
         adapter.setTrackerImportConflicts(Sdk.d2().importModule().trackerImportConflicts()
                 .byTrackedEntityInstanceUid().eq(trackedEntityInstanceUid).blockingGet());
     }
 
-    private void setImage(TrackedEntityInstance trackedEntityInstance, ListItemWithSyncHolder holder) {
+    private void setImage(TrackedEntityInstance trackedEntityInstance, ListItemWithCardAndSyncHolder holder) {
         Bitmap teiImage = getBitmap(trackedEntityInstance);
         if (teiImage != null) {
             holder.icon.setVisibility(View.INVISIBLE);

@@ -6,19 +6,17 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.paging.PagedListAdapter;
-import androidx.recyclerview.widget.DiffUtil;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.StyleBinderHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithStyleHolder;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithCardHolder;
 import com.google.common.collect.Lists;
 
-import org.hisp.dhis.android.core.program.Program;
 import org.hisp.dhis.android.core.program.ProgramStage;
 
-public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListItemWithStyleHolder> {
+public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListItemWithCardHolder> {
 
 
 
@@ -37,14 +35,14 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
 
     @NonNull
     @Override
-    public ListItemWithStyleHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ListItemWithCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_with_style, parent, false);
-        return new ListItemWithStyleHolder(itemView);
+                .inflate(R.layout.list_item_simple, parent, false);
+        return new ListItemWithCardHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListItemWithStyleHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
         ProgramStage programStage = getItem(position);
         holder.title.setText(programStage.displayName());
         Integer programStageInstancesCount = Sdk.d2().eventModule().events()
@@ -61,7 +59,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
         //        "Program with registration" : "Program without registration");
         StyleBinderHelper.bindStyle(holder, programStage.style());
 
-        holder.card.setOnClickListener(view -> programStageSelectionListener
+        holder.cardSimple.setOnClickListener(view -> programStageSelectionListener
                 .onProgramStageSelected(programUid, programStage.uid(), trackedEntityInstanceUid));
     }
 }

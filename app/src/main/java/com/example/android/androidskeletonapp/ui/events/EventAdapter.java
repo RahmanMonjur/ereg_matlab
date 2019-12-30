@@ -14,7 +14,9 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
+import com.example.android.androidskeletonapp.ui.base.ListItemWithCardAndSyncHolder;
 import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncHolder;
+import com.example.android.androidskeletonapp.ui.base.SimpleListWithSyncHolder;
 import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
@@ -31,7 +33,7 @@ import java.util.List;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setBackgroundColor;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setState;
 
-public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder> {
+public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHolder> {
 
     private final AppCompatActivity activity;
     private DataSource<?, Event> source;
@@ -43,19 +45,19 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
 
     @NonNull
     @Override
-    public ListItemWithSyncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new ListItemWithSyncHolder(itemView);
+    public SimpleListWithSyncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_simple_with_all_features, parent, false);
+        return new SimpleListWithSyncHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListItemWithSyncHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SimpleListWithSyncHolder holder, int position) {
         Event event = getItem(position);
         List<TrackedEntityDataValue> values = new ArrayList<>(event.trackedEntityDataValues());
         holder.title.setText(orgUnit(event.organisationUnit()).displayName());
-        holder.subtitle1.setText(valueAt(values, event.programStage()));
-        holder.subtitle2.setText(optionCombo(event.attributeOptionCombo()).displayName());
-        holder.rightText.setText(DateFormatHelper.formatDate(event.eventDate()));
+        //holder.subtitle1.setText(valueAt(values, event.programStage()));
+        //holder.subtitle2.setText(optionCombo(event.attributeOptionCombo()).displayName());
+        holder.rightText.setText(DateFormatHelper.formatSimpleDate(event.eventDate()));
         holder.icon.setImageResource(R.drawable.ic_programs_black_24dp);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
@@ -71,7 +73,7 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
         setState(event.state(), holder.syncIcon);
         setConflicts(event.uid(), holder);
 
-        holder.itemView.setOnClickListener(view->{
+        holder.lnkDetail.setOnClickListener(view->{
             ActivityStarter.startActivity(
                     activity,
                     EventFormActivity.getFormActivityIntent(
@@ -79,6 +81,7 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
                             event.uid(),
                             event.program(),
                             event.programStage(),
+                            null,
                             event.organisationUnit(),
                             EventFormActivity.FormType.CHECK
                     ),false
@@ -100,7 +103,6 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
                 return String.format("%s: %s", programStageDataElement.displayName(), dataValue.value());
             }
         }
-
         return null;
     }
 
@@ -108,7 +110,7 @@ public class EventAdapter extends PagedListAdapter<Event, ListItemWithSyncHolder
         return Sdk.d2().categoryModule().categoryOptionCombos().uid(attrOptionCombo).blockingGet();
     }
 
-    private void setConflicts(String trackedEntityInstanceUid, ListItemWithSyncHolder holder) {
+    private void setConflicts(String trackedEntityInstanceUid, SimpleListWithSyncHolder holder) {
         TrackerImportConflictsAdapter adapter = new TrackerImportConflictsAdapter();
         holder.recyclerView.setAdapter(adapter);
         adapter.setTrackerImportConflicts(Sdk.d2().importModule().trackerImportConflicts()

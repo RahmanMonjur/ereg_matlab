@@ -8,23 +8,63 @@
     tools:context=".ui.tracked_entity_instances.TrackedEntityInstancesActivity"
     tools:showIn="@layout/activity_tracked_entity_instances">
 
-    <TextView
-        android:id="@+id/trackedEntityInstancesNotificator"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/no_tracked_entity_instances_found"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:focusableInTouchMode="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/trackedEntityInstancesRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        tools:listitem="@layout/list_item_with_style" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite">
+            <EditText
+                android:id="@+id/txtParamFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="34dp"
+                android:gravity="left"
+                android:hint="Input any value to be more specific"/>
+
+            <ImageButton
+                android:id="@+id/btnSearchTei"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="right"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/circle_shape"
+                app:srcCompat="@drawable/ic_search"
+                android:backgroundTint="@color/colorWarn"
+                app:tint="@color/colorWhite" />
+        </FrameLayout>
+
+
+
+        <TextView
+            android:id="@+id/trackedEntityInstancesNotificator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/no_tracked_entity_instances_found"
+            android:textSize="16sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/trackedEntityInstancesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            tools:listitem="@layout/list_item_simple" />
+
+
+    </LinearLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/enrollmentButton"
@@ -33,5 +73,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add_white" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

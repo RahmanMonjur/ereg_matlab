@@ -62,7 +62,7 @@ public class EventsActivity extends ListActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUp(R.layout.activity_events, R.id.eventsToolbar, R.id.eventsRecyclerView);
+        recyclerSetup(R.layout.activity_events, R.id.eventsToolbar, R.id.eventsRecyclerView);
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         selectedProgramStage = getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name());
         selectedTei = getIntent().getStringExtra(IntentExtra.TEI.name());
@@ -107,6 +107,7 @@ public class EventsActivity extends ListActivity {
                                                     eventUid,
                                                     selectedProgram,
                                                     selectedProgramStage,
+                                                    selectedTei,
                                                     Sdk.d2().organisationUnitModule().organisationUnits()
                                                             .one().blockingGet().uid(), EventFormActivity.FormType.CREATE))
                                     .subscribeOn(Schedulers.io())

@@ -48,7 +48,7 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUp(R.layout.activity_tracked_entity_instance_search, R.id.trackedEntityInstancesToolbar,
+        recyclerSetup(R.layout.activity_tracked_entity_instance_search, R.id.trackedEntityInstancesToolbar,
                 R.id.trackedEntityInstanceRecyclerView);
 
         notificator = findViewById(R.id.dataNotificator);

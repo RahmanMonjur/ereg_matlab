@@ -5,33 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ui.events.EventsActivity"
-    tools:showIn="@layout/activity_events">
+    tools:context=".ui.programs.ProgramsActivity"
+    tools:showIn="@layout/activity_orgunits">
 
     <TextView
-        android:id="@+id/eventsNotificator"
+        android:id="@+id/programsNotificator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="16sp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="@string/no_events_found"
-        android:textSize="16sp" />
+        android:text="@string/no_programs_found" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventsRecyclerView"
+        android:id="@+id/programsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        tools:listitem="@layout/list_item_simple" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/eventButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_white" />
+        android:clipToPadding="false"
+        tools:listitem="@layout/list_item_simple"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

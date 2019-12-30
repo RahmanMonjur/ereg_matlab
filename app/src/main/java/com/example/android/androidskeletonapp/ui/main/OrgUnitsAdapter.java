@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.data_sets;
+package com.example.android.androidskeletonapp.ui.main;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +12,15 @@ import com.example.android.androidskeletonapp.data.service.StyleBinderHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
 import com.example.android.androidskeletonapp.ui.base.ListItemWithCardHolder;
 
-import org.hisp.dhis.android.core.dataset.DataSet;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
-public class DataSetsAdapter extends PagedListAdapter<DataSet, ListItemWithCardHolder> {
+public class OrgUnitsAdapter extends PagedListAdapter<OrganisationUnit, ListItemWithCardHolder> {
 
-    DataSetsAdapter() {
+    private final OnOrgUnitSelectionListener orgUnitListener;
+
+    OrgUnitsAdapter(OnOrgUnitSelectionListener listener){
         super(new DiffByIdItemCallback<>());
+        this.orgUnitListener = listener;
     }
 
     @NonNull
@@ -30,9 +33,11 @@ public class DataSetsAdapter extends PagedListAdapter<DataSet, ListItemWithCardH
 
     @Override
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
-        DataSet dataSet = getItem(position);
-        holder.title.setText(dataSet.displayName());
-        holder.subtitle1.setText(dataSet.periodType().name());
-        StyleBinderHelper.bindStyle(holder, dataSet.style());
+        OrganisationUnit orgunit = getItem(position);
+        holder.title.setText(orgunit.displayName());
+        holder.subtitle1.setText("");
+        StyleBinderHelper.bindStyle(holder, null);
+
+        holder.cardSimple.setOnClickListener(view -> orgUnitListener.onOrgUnitSelected(orgunit));
     }
 }
