@@ -13,6 +13,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.google.common.collect.Lists;
 
 import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
@@ -38,6 +39,7 @@ public class EventsActivity extends ListActivity {
     private CompositeDisposable compositeDisposable;
     private EventAdapter adapter;
     private final int EVENT_RQ = 1210;
+    GlobalClass globalVars;
 
     private enum IntentExtra {
         PROGRAM,
@@ -63,6 +65,7 @@ public class EventsActivity extends ListActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_events, R.id.eventsToolbar, R.id.eventsRecyclerView);
+        globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         selectedProgramStage = getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name());
         selectedTei = getIntent().getStringExtra(IntentExtra.TEI.name());
@@ -77,39 +80,45 @@ public class EventsActivity extends ListActivity {
                     compositeDisposable.add(
                             Sdk.d2().programModule().programs().uid(selectedProgram).get()
                                     .map(program -> {
+                                        /*
+                                        // Commenting It Because Collecting OrgUnitUid from Global Class
                                         String orgUnit = Sdk.d2().organisationUnitModule().organisationUnits()
                                                 .byProgramUids(Collections.singletonList(selectedProgram))
                                                 .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
                                                 .one().blockingGet().uid();
+                                        */
+                                        /*
+                                        // Commenting it because the code snippet is taking the first program stage only
                                         String stage = Sdk.d2().programModule().programStages()
                                                 .byProgramUid().eq(program.uid())
                                                 .one().blockingGet().uid();
+                                        */
                                         String attrOptionCombo = program.categoryCombo() != null ?
                                                 Sdk.d2().categoryModule().categoryOptionCombos()
                                                         .byCategoryComboUid().eq(program.categoryComboUid())
                                                         .one().blockingGet().uid() : null;
 
                                         return Sdk.d2().eventModule().events()
-                                                .byProgramUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name()))
+                                                .byProgramUid().eq(selectedProgram)
                                                 .byProgramStageUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
                                                 .blockingAdd(
                                                         EventCreateProjection.builder()
-                                                                .organisationUnit(orgUnit)
+                                                                .organisationUnit(globalVars.getOrgUid().uid())
                                                                 .program(program.uid())
-                                                                .programStage(stage)
+                                                                .programStage(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
                                                                 .attributeOptionCombo(attrOptionCombo)
                                                                 .build());
 
                                     })
-                                    .filter(eventUid -> !eventUid.isEmpty())
+                                    //.filter(eventUid -> !eventUid.isEmpty())
                                     .map(eventUid ->
                                             EventFormActivity.getFormActivityIntent(EventsActivity.this,
                                                     eventUid,
                                                     selectedProgram,
                                                     selectedProgramStage,
                                                     selectedTei,
-                                                    Sdk.d2().organisationUnitModule().organisationUnits()
-                                                            .one().blockingGet().uid(), EventFormActivity.FormType.CREATE))
+                                                    globalVars.getOrgUid().uid(),
+                                                    EventFormActivity.FormType.CREATE))
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(

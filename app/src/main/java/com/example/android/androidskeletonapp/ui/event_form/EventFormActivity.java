@@ -108,6 +108,7 @@ public class EventFormActivity extends AppCompatActivity {
                 Sdk.d2(),
                 eventUid,
                 getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()),
+                getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()),
                 getIntent().getStringExtra(IntentExtra.OU_UID.name())))
             this.engineService = new RuleEngineService();
 
@@ -135,7 +136,7 @@ public class EventFormActivity extends AppCompatActivity {
             } catch (D2Error d2Error) {
                 d2Error.printStackTrace();
             } finally {
-                if (!value.equals(currentValue)) {
+                if (value != null && !value.equals(currentValue)) {
                     engineInitialization.onNext(true);
                 }
             }

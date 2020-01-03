@@ -38,10 +38,10 @@ public class EventFormService {
         return instance;
     }
 
-    public boolean init(D2 d2, String eventUid, String programUid, String ouUid) {
+    public boolean init(D2 d2, String eventUid, String programUid, String programStageUid, String ouUid) {
         this.d2 = d2;
-        ProgramStage programStage = d2.programModule().programStages()
-                .byProgramUid().eq(programUid).one().blockingGet();
+        //ProgramStage programStage = d2.programModule().programStages()
+        //        .byProgramUid().eq(programUid).one().blockingGet();
         String defaultOptionCombo = d2.categoryModule().categoryOptionCombos()
                 .byDisplayName().eq("default").one().blockingGet().uid();
         try {
@@ -49,7 +49,7 @@ public class EventFormService {
                 eventUid = d2.eventModule().events().blockingAdd(
                         EventCreateProjection.builder()
                                 .attributeOptionCombo(defaultOptionCombo)
-                                .programStage(programStage.uid())
+                                .programStage(programStageUid)
                                 .program(programUid)
                                 .organisationUnit(ouUid)
                                 .build()

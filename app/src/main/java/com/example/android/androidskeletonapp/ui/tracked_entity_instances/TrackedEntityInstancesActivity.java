@@ -17,6 +17,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.enrollment_form.EnrollmentFormActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
 import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
@@ -43,6 +44,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     private final int ENROLLMENT_RQ = 1210;
     private TrackedEntityInstanceAdapter adapter;
     private static EditText etFirstName;
+    GlobalClass globalVars;
 
     @Override
     public void onTrackedEntityInstanceSelected(String programUid, String teiUid) {
@@ -67,6 +69,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_tracked_entity_instances, R.id.trackedEntityInstancesToolbar,
                 R.id.trackedEntityInstancesRecyclerView);
+        globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         compositeDisposable = new CompositeDisposable();
         observeTrackedEntityInstances();
@@ -79,8 +82,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                         .map(program -> Sdk.d2().trackedEntityModule().trackedEntityInstances()
                                 .blockingAdd(
                                         TrackedEntityInstanceCreateProjection.builder()
-                                                .organisationUnit(Sdk.d2().organisationUnitModule().organisationUnits()
-                                                        .one().blockingGet().uid())
+                                                .organisationUnit(globalVars.getOrgUid().uid())
                                                 .trackedEntityType(program.trackedEntityType().uid())
                                                 .build()
                                 ))
@@ -88,7 +90,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                                 TrackedEntityInstancesActivity.this,
                                 teiUid,
                                 selectedProgram,
-                                Sdk.d2().organisationUnitModule().organisationUnits().one().blockingGet().uid()
+                                globalVars.getOrgUid().uid()
                                 ))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())

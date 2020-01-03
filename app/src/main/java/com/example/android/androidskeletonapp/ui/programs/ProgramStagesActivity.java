@@ -12,6 +12,7 @@ import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.events.EventsActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstancesActivity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
@@ -30,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ProgramStagesActivity extends ListActivity implements OnProgramStageSelectionListener {
 
+    GlobalClass globalVars;
     private Disposable disposable;
     private String selectedProgramStage;
     private enum IntentExtra {
@@ -49,6 +51,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_program_stages, R.id.programStageToolbar, R.id.programStageRecyclerView);
+        globalVars = (GlobalClass) getApplicationContext();
         observeProgramStages(getIntent().getStringExtra(IntentExtra.PROGRAM.name()), getIntent().getStringExtra(IntentExtra.TEI.name()));
     }
 
@@ -88,11 +91,11 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                     false);
         }
         else {
+
             ActivityStarter.startActivity(this,
                     EventFormActivity
                             .getFormActivityIntent(this, null, programUid, programStageUid, teiUid,
-                                    Sdk.d2().organisationUnitModule().organisationUnits()
-                                            .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet().uid(),
+                                    globalVars.getOrgUid().uid(),
                                     EventFormActivity.FormType.CREATE),
                     false);
         }
