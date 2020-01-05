@@ -33,7 +33,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
 
     GlobalClass globalVars;
     private Disposable disposable;
-    private String selectedProgramStage;
+    private String selectedEnrollment;
     private enum IntentExtra {
         PROGRAM,
         TEI
@@ -52,12 +52,13 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_program_stages, R.id.programStageToolbar, R.id.programStageRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
+        selectedEnrollment = Sdk.d2().enrollmentModule().enrollments().byProgram().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name()))
+                .byTrackedEntityInstance().eq(getIntent().getStringExtra(IntentExtra.TEI.name())).one().blockingGet().uid();
         observeProgramStages(getIntent().getStringExtra(IntentExtra.PROGRAM.name()), getIntent().getStringExtra(IntentExtra.TEI.name()));
     }
 
     private void observeProgramStages(String programUid, String teiUid) {
         ProgramStagesAdapter adapter = new ProgramStagesAdapter(this, programUid, teiUid);
-
 
         disposable = Sdk.d2().organisationUnitModule().organisationUnits().get()
                 .subscribeOn(Schedulers.io())
@@ -94,11 +95,19 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
 
             ActivityStarter.startActivity(this,
                     EventFormActivity
-                            .getFormActivityIntent(this, null, programUid, programStageUid, teiUid,
+                            .getFormActivityIntent(this, null, programUid, programStageUid, selectedEnrollment,
                                     globalVars.getOrgUid().uid(),
                                     EventFormActivity.FormType.CREATE),
                     false);
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        observeProgramStages(getIntent().getStringExtra(IntentExtra.PROGRAM.name()), getIntent().getStringExtra(IntentExtra.TEI.name()));
+        //Toast.makeText(this, "testing", Toast.LENGTH_SHORT).show();
+
     }
 
 

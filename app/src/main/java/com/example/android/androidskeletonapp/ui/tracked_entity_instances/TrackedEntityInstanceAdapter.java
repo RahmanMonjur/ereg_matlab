@@ -79,6 +79,7 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
                 d2Error.printStackTrace();
             }
         });
+        /*
         if (trackedEntityInstance.state() == State.TO_POST ||
                 trackedEntityInstance.state() == State.TO_UPDATE) {
             holder.sync.setVisibility(View.VISIBLE);
@@ -108,6 +109,37 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
             holder.sync.setVisibility(View.GONE);
             holder.sync.setOnClickListener(null);
         }
+        */
+
+        // Assigning Sync button's functionalities to Sync Icon, and will ignore Sync button
+        holder.sync.setVisibility(View.GONE);
+        if (trackedEntityInstance.state() == State.TO_POST ||
+                trackedEntityInstance.state() == State.TO_UPDATE) {
+            holder.syncIcon.setOnClickListener(v -> {
+                RotateAnimation rotateAnim = new RotateAnimation(0f, 359f,
+                        Animation.RELATIVE_TO_SELF, 0.5f,
+                        Animation.RELATIVE_TO_SELF, 0.5f);
+                rotateAnim.setDuration(2500);
+                rotateAnim.setRepeatMode(Animation.INFINITE);
+                holder.syncIcon.startAnimation(rotateAnim);
+
+                Disposable disposable = syncTei(trackedEntityInstance.uid())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                data -> {
+                                },
+                                Throwable::printStackTrace,
+                                () -> {
+                                    holder.syncIcon.clearAnimation();
+                                    invalidateSource();
+                                }
+                        );
+            });
+        } else {
+            holder.syncIcon.setOnClickListener(null);
+        }
+
         setBackgroundColor(R.color.colorAccentDark, holder.icon);
         setState(trackedEntityInstance.state(), holder.syncIcon);
         setConflicts(trackedEntityInstance.uid(), holder);

@@ -36,6 +36,7 @@ public class EventsActivity extends ListActivity {
     private String selectedProgram;
     private String selectedProgramStage;
     private String selectedTei;
+    public String selectedEnrollment;
     private CompositeDisposable compositeDisposable;
     private EventAdapter adapter;
     private final int EVENT_RQ = 1210;
@@ -69,6 +70,8 @@ public class EventsActivity extends ListActivity {
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         selectedProgramStage = getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name());
         selectedTei = getIntent().getStringExtra(IntentExtra.TEI.name());
+        selectedEnrollment = Sdk.d2().enrollmentModule().enrollments().byProgram().eq(selectedProgram)
+                .byTrackedEntityInstance().eq(selectedTei).one().blockingGet().uid();
         compositeDisposable = new CompositeDisposable();
         observeEvents();
 
@@ -116,7 +119,7 @@ public class EventsActivity extends ListActivity {
                                                     eventUid,
                                                     selectedProgram,
                                                     selectedProgramStage,
-                                                    selectedTei,
+                                                    selectedEnrollment,
                                                     globalVars.getOrgUid().uid(),
                                                     EventFormActivity.FormType.CREATE))
                                     .subscribeOn(Schedulers.io())

@@ -38,7 +38,7 @@ public class EventFormService {
         return instance;
     }
 
-    public boolean init(D2 d2, String eventUid, String programUid, String programStageUid, String ouUid) {
+    public boolean init(D2 d2, String eventUid, String programUid, String programStageUid, String ouUid, String enrollmentUid) {
         this.d2 = d2;
         //ProgramStage programStage = d2.programModule().programStages()
         //        .byProgramUid().eq(programUid).one().blockingGet();
@@ -48,6 +48,7 @@ public class EventFormService {
             if (eventUid == null)
                 eventUid = d2.eventModule().events().blockingAdd(
                         EventCreateProjection.builder()
+                                .enrollment(enrollmentUid)
                                 .attributeOptionCombo(defaultOptionCombo)
                                 .programStage(programStageUid)
                                 .program(programUid)

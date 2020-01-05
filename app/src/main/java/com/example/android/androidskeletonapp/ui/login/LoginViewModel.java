@@ -64,7 +64,8 @@ public class LoginViewModel extends ViewModel {
         if (serverUrl == null) {
             return false;
         }
-        return Patterns.WEB_URL.matcher(serverUrl).matches();
+        //return Patterns.WEB_URL.matcher(serverUrl).matches();
+        return  true;
     }
 
     private boolean isUserNameValid(String username) {
