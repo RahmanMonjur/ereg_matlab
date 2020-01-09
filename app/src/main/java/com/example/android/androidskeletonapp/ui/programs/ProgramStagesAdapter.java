@@ -50,7 +50,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
                 .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
                 .blockingCount();
 
-        if (programStageInstancesCount>0)
+        if (programStageInstancesCount>1)
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
         else
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");

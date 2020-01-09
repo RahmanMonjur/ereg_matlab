@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -16,14 +15,10 @@ import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
-import com.example.android.androidskeletonapp.ui.enrollment_form.EnrollmentFormActivity;
+import com.example.android.androidskeletonapp.ui.data_entry.EnrollmentFormActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
-import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
-import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
-import org.hisp.dhis.android.core.program.Program;
-import org.hisp.dhis.android.core.program.ProgramType;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
@@ -71,6 +66,8 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                 R.id.trackedEntityInstancesRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
+        getSupportActionBar().setTitle(Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName() + " - Enrolled Participants");
+
         compositeDisposable = new CompositeDisposable();
         observeTrackedEntityInstances();
 
@@ -114,7 +111,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     }
 
     private void observeTrackedEntityInstances() {
-        adapter = new TrackedEntityInstanceAdapter(this, selectedProgram);
+        adapter = new TrackedEntityInstanceAdapter( this, this, selectedProgram);
         recyclerView.setAdapter(adapter);
 
         getTeiRepository().getPaged(20).observe(this, trackedEntityInstancePagedList -> {
@@ -140,7 +137,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     }
 
     private LiveData<PagedList<TrackedEntityInstance>> getTrackedEntityInstanceQuery() {
-        adapter = new TrackedEntityInstanceAdapter(this, selectedProgram);
+        adapter = new TrackedEntityInstanceAdapter( this,this, selectedProgram);
         recyclerView.setAdapter(adapter);
         return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
                 .byQuery().like(etFirstName.getText().toString())

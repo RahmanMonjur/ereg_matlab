@@ -57,7 +57,7 @@ public class TrackedEntityInstanceSearchActivity extends ListActivity implements
         FloatingActionButton downloadButton = findViewById(R.id.downloadDataButton);
         etFirstName = findViewById(R.id.txtParamFirstName);
 
-        adapter = new TrackedEntityInstanceAdapter(this, null);
+        adapter = new TrackedEntityInstanceAdapter(this,this, null);
 
         downloadButton.setOnClickListener(view -> {
             view.setEnabled(Boolean.FALSE);

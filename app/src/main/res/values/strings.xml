@@ -27,10 +27,10 @@
     <string name="title_activity_main">Home</string>
     <string name="welcome">"Welcome!"</string>
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet"</string>
-    <string name="syncing_metadata">Syncing metadata…</string>
-    <string name="syncing_data">Syncing data…</string>
-    <string name="sync_metadata">Sync metadata</string>
-    <string name="sync_data">Sync data</string>
+    <string name="syncing_metadata">Updating metadata…</string>
+    <string name="syncing_data">Downloading data…</string>
+    <string name="sync_metadata">Update metadata</string>
+    <string name="sync_data">Download data</string>
     <string name="upload_data">Upload data</string>
     <string name="uploading_data">Uploading data…</string>
     <string name="wiping_data">Wiping data…</string>

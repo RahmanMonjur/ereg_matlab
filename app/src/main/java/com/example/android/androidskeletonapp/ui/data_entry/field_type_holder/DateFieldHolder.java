@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.enrollment_form;
+package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.app.DatePickerDialog;
 import android.view.View;

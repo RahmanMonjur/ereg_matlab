@@ -1,5 +1,6 @@
 package com.example.android.androidskeletonapp.ui.tracked_entity_instances;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.paging.DataSource;
 import androidx.paging.PagedListAdapter;
 
@@ -40,12 +43,14 @@ import static com.example.android.androidskeletonapp.data.service.StyleBinderHel
 
 public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithCardAndSyncHolder> {
 
+    private final AppCompatActivity activity;
     private DataSource<?, TrackedEntityInstance> source;
     private OnTrackedEntityInstanceSelectionListener listener;
     private String programUid;
 
-    public TrackedEntityInstanceAdapter(OnTrackedEntityInstanceSelectionListener listener, String programUid) {
+    public TrackedEntityInstanceAdapter(AppCompatActivity activity, OnTrackedEntityInstanceSelectionListener listener, String programUid) {
         super(new DiffByIdItemCallback<>());
+        this.activity = activity;
         this.listener = listener;
         this.programUid = programUid;
     }
@@ -71,13 +76,22 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         setImage(trackedEntityInstance, holder);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
-            try {
-                Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(trackedEntityInstance.uid()).blockingDelete();
-                invalidateSource();
-                notifyDataSetChanged();
-            } catch (D2Error d2Error) {
-                d2Error.printStackTrace();
-            }
+            new AlertDialog.Builder(this.activity)
+                    .setTitle("Delete Confirmation")
+                    .setMessage("Do you really want to delete?")
+                    .setIcon(android.R.drawable.ic_delete)
+                    .setPositiveButton("Yes, I want to delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            try {
+                                Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(trackedEntityInstance.uid()).blockingDelete();
+                                invalidateSource();
+                                notifyDataSetChanged();
+                            } catch (D2Error d2Error) {
+                                d2Error.printStackTrace();
+                            }
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+
         });
         /*
         if (trackedEntityInstance.state() == State.TO_POST ||

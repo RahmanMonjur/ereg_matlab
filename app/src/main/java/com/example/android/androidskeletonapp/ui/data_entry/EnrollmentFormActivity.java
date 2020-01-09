@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.enrollment_form;
+package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
 import android.content.Context;
@@ -25,6 +25,7 @@ import com.example.android.androidskeletonapp.data.service.forms.EnrollmentFormS
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
 import com.example.android.androidskeletonapp.data.service.forms.RuleEngineService;
 import com.example.android.androidskeletonapp.databinding.ActivityEnrollmentFormBinding;
+import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.FormAdapter;
 
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
 import org.hisp.dhis.android.core.arch.helpers.FileResourceDirectoryHelper;
@@ -149,7 +150,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
             } catch (D2Error d2Error) {
                 d2Error.printStackTrace();
             } finally {
-                if (!value.equals(currentValue)) {
+                if (value != null && !value.equals(currentValue)) {
                     engineInitialization.onNext(true);
                 }
             }

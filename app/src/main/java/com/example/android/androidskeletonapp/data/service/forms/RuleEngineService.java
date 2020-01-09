@@ -23,6 +23,7 @@ import org.hisp.dhis.rules.RuleEngineContext;
 import org.hisp.dhis.rules.RuleExpressionEvaluator;
 import org.hisp.dhis.rules.models.Rule;
 import org.hisp.dhis.rules.models.RuleAction;
+import org.hisp.dhis.rules.models.RuleActionAssign;
 import org.hisp.dhis.rules.models.RuleActionHideField;
 import org.hisp.dhis.rules.models.RuleAttributeValue;
 import org.hisp.dhis.rules.models.RuleDataValue;
@@ -116,7 +117,8 @@ public class RuleEngineService {
             initialFlowable = Flowable.zip(
                     getRuleVariables(),
                     getRules(),
-                    getOtherEvents(eventUid),
+                    getEvents(enrollmentUid, eventUid),
+                    //getOtherEvents(eventUid),
                     ruleEnrollment(),
                     this::setUp);
 
@@ -215,6 +217,16 @@ public class RuleEngineService {
                 .toList().toFlowable();
     }
 
+    private Flowable<List<RuleEvent>> getEvents(String enrollmentUid, String eventUid) {
+        return Flowable.fromCallable(() -> d2.eventModule().events()
+                .byEnrollmentUid().eq(enrollmentUid)
+                .byUid().notIn(eventUid)
+                .byStatus().in(EventStatus.ACTIVE, EventStatus.COMPLETED)
+                .blockingGet()).flatMapIterable(events -> events)
+                .map(this::transformToRuleEvent)
+                .toList().toFlowable();
+    }
+
     private Flowable<List<RuleEvent>> getOtherEvents(String eventUid) {
         return Flowable.fromCallable(() -> d2.eventModule().events().uid(eventUid).blockingGet())
                 .flatMap(event ->
@@ -273,12 +285,17 @@ public class RuleEngineService {
         List<Rule> rules = new ArrayList<>();
         for (ProgramRule rule : programRules) {
             List<RuleAction> ruleActions = transformToRuleAction(rule.programRuleActions());
-            rules.add(
-                    Rule.create(rule.programStage() != null ?
-                            rule.programStage().uid() :
-                            null, rule.priority(), rule.condition(), ruleActions, rule.name())
-            );
+            try {
+                rules.add(
+                        Rule.create(rule.programStage() != null ?
+                                rule.programStage().uid() :
+                                null, rule.priority(), rule.condition(), ruleActions, rule.name())
+                );
+            } catch (Exception e){
+                System.out.println("Error in ProgramRule: " + rule.uid());
+            }
         }
+
         return rules;
     }
 
@@ -288,9 +305,9 @@ public class RuleEngineService {
         for (ProgramRuleAction pra : programRuleActions) {
             switch (pra.programRuleActionType()) {
                 case HIDEFIELD:
-                    String field = pra.dataElement() != null ?
+                    String hideField = pra.dataElement() != null ?
                             pra.dataElement().uid() : pra.trackedEntityAttribute().uid();
-                    ruleActions.add(RuleActionHideField.create(pra.content(), field));
+                    ruleActions.add(RuleActionHideField.create(pra.content(), hideField));
                     break;
             }
         }

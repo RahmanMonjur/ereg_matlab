@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.event_form;
+package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
 import android.content.Context;
@@ -24,7 +24,7 @@ import com.example.android.androidskeletonapp.data.service.forms.EventFormServic
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
 import com.example.android.androidskeletonapp.data.service.forms.RuleEngineService;
 import com.example.android.androidskeletonapp.databinding.ActivityEnrollmentFormBinding;
-import com.example.android.androidskeletonapp.ui.enrollment_form.FormAdapter;
+import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.FormAdapter;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
@@ -93,6 +93,7 @@ public class EventFormActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle(Sdk.d2().programModule().programStages().byUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name())).one().blockingGet().displayName());
 
         eventUid = getIntent().getStringExtra(IntentExtra.EVENT_UID.name());
 
@@ -147,7 +148,6 @@ public class EventFormActivity extends AppCompatActivity {
     private FormAdapter.OnImageSelectionClick getImageListener() {
         return fieldUid -> {
             fieldWaitingImage = fieldUid;
-
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);

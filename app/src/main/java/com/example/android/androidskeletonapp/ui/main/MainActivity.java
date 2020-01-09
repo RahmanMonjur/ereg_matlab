@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -122,9 +123,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         syncStatusText = findViewById(R.id.notificator);
         progressBar = findViewById(R.id.syncProgressBar);
 
+        if(SyncStatusHelper.programCount() + SyncStatusHelper.dataSetCount() == 0){
+            downloadInitialMetadata();
+        }
+
         syncMetadataButton.setOnClickListener(view -> {
             setSyncing();
-            Snackbar.make(view, "Syncing metadata", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Updating metadata", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             syncStatusText.setText(R.string.syncing_metadata);
             syncMetadata();
@@ -132,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         syncDataButton.setOnClickListener(view -> {
             setSyncing();
-            Snackbar.make(view, "Syncing data", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Downloading data", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             syncStatusText.setText(R.string.syncing_data);
             downloadData();
@@ -145,6 +150,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             syncStatusText.setText(R.string.uploading_data);
             uploadData();
         });
+    }
+
+    private void downloadInitialMetadata(){
+        setSyncing();
+        syncStatusText.setText("Downloading initial metadata...");
+        syncMetadata();
     }
 
     private void setSyncing() {
@@ -232,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .doOnError(Throwable::printStackTrace)
                 .doOnComplete(() -> {
                     setSyncingFinished();
-                    ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
+                    //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
                 })
                 .subscribe());
     }
@@ -252,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete(() -> {
                             setSyncingFinished();
-                            ActivityStarter.startActivity(this, TrackedEntityInstancesActivity.getTrackedEntityInstancesActivityIntent(this, null), false);
+                            //ActivityStarter.startActivity(this, TrackedEntityInstancesActivity.getTrackedEntityInstancesActivityIntent(this, null), false);
                         })
                         .doOnError(Throwable::printStackTrace)
                         .subscribe());

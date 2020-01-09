@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.enrollment_form;
+package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-class OptionImageHolder extends FieldHolder {
+class OptionSetFieldHolder extends FieldHolder {
 
     private final Spinner spinner;
     private List<Option> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
 
-    OptionImageHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    OptionSetFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
         this.spinner = itemView.findViewById(R.id.spinner);
     }
@@ -36,17 +36,15 @@ class OptionImageHolder extends FieldHolder {
 
         setUpSpinner(fieldItem.getOptionSetUid());
 
-        //initial value
         if (fieldCurrentValue != null)
             setInitialValue(fieldCurrentValue);
-        else
-            spinner.setSelection(0);
     }
 
     private void setUpSpinner(String optionSetUid) {
         optionList = Sdk.d2().optionModule().options().byOptionSetUid().eq(optionSetUid).blockingGet();
         List<String> optionListNames = new ArrayList<>();
-        optionListNames.add(label.getText().toString());
+        optionListNames.add("Please select from list");
+        //optionListNames.add(label.getText().toString());
         for (Option option : optionList) optionListNames.add(option.displayName());
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));

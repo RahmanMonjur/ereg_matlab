@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.enrollment_form;
+package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-class OptionSetFieldHolder extends FieldHolder {
+class OptionImageHolder extends FieldHolder {
 
     private final Spinner spinner;
     private List<Option> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
 
-    OptionSetFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    OptionImageHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
         this.spinner = itemView.findViewById(R.id.spinner);
     }
@@ -36,8 +36,11 @@ class OptionSetFieldHolder extends FieldHolder {
 
         setUpSpinner(fieldItem.getOptionSetUid());
 
+        //initial value
         if (fieldCurrentValue != null)
             setInitialValue(fieldCurrentValue);
+        else
+            spinner.setSelection(0);
     }
 
     private void setUpSpinner(String optionSetUid) {

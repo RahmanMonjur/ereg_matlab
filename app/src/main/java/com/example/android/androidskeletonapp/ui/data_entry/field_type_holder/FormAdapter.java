@@ -1,4 +1,4 @@
-package com.example.android.androidskeletonapp.ui.enrollment_form;
+package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -48,7 +48,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
         } else if (viewType == OPTIONSETIMAGE) {
             return new OptionSetImageFieldHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_field_optionset_image, parent, false), valueSavedListener);
-        } else
+        } else {
             switch (ValueType.values()[viewType]) {
                 case DATE:
                     return new DateFieldHolder(LayoutInflater.from(parent.getContext())
@@ -65,6 +65,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                     return new TextFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_field, parent, false), valueSavedListener);
             }
+        }
     }
 
     @Override

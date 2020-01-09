@@ -3,7 +3,6 @@ package com.example.android.androidskeletonapp.ui.events;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -12,19 +11,12 @@ import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
-import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
+import com.example.android.androidskeletonapp.ui.data_entry.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.google.common.collect.Lists;
 
-import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
-import org.hisp.dhis.android.core.event.Event;
 import org.hisp.dhis.android.core.event.EventCollectionRepository;
 import org.hisp.dhis.android.core.event.EventCreateProjection;
-import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
-import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
-
-import java.util.Collections;
-import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -73,6 +65,9 @@ public class EventsActivity extends ListActivity {
         selectedEnrollment = Sdk.d2().enrollmentModule().enrollments().byProgram().eq(selectedProgram)
                 .byTrackedEntityInstance().eq(selectedTei).one().blockingGet().uid();
         compositeDisposable = new CompositeDisposable();
+
+        getSupportActionBar().setTitle(Sdk.d2().programModule().programStages().byUid().eq(selectedProgramStage).one().blockingGet().displayName());
+
         observeEvents();
 
         if (isEmpty(selectedProgram))
@@ -106,6 +101,7 @@ public class EventsActivity extends ListActivity {
                                                 .byProgramStageUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
                                                 .blockingAdd(
                                                         EventCreateProjection.builder()
+                                                                .enrollment(selectedEnrollment)
                                                                 .organisationUnit(globalVars.getOrgUid().uid())
                                                                 .program(program.uid())
                                                                 .programStage(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))

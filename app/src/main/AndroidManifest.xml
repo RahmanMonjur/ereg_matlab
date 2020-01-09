@@ -57,7 +57,7 @@
             android:label="@string/title_activity_tracked_entity_search"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.enrollment_form.EnrollmentFormActivity"
+            android:name=".ui.data_entry.EnrollmentFormActivity"
             android:label="@string/title_activity_enrollment_form"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -80,7 +80,7 @@
             android:name=".ui.code_executor.CodeExecutorActivity"
             android:label="@string/code_executor"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.event_form.EventFormActivity"
+        <activity android:name=".ui.data_entry.EventFormActivity"
             android:label="@string/title_activity_event_form"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.events.EventsActivity"

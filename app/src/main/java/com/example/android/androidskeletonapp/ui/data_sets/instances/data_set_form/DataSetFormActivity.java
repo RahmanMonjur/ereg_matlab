@@ -15,7 +15,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.forms.DataSetFormService;
 import com.example.android.androidskeletonapp.data.service.forms.EventFormService;
 import com.example.android.androidskeletonapp.databinding.ActivityEnrollmentFormBinding;
-import com.example.android.androidskeletonapp.ui.enrollment_form.FormAdapter;
+import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.FormAdapter;
 
 import org.hisp.dhis.android.core.datavalue.DataValueObjectRepository;
 import org.hisp.dhis.android.core.maintenance.D2Error;

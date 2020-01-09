@@ -1,10 +1,12 @@
 package com.example.android.androidskeletonapp.ui.events;
 
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.paging.DataSource;
 import androidx.paging.PagedListAdapter;
@@ -14,10 +16,8 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithCardAndSyncHolder;
-import com.example.android.androidskeletonapp.ui.base.ListItemWithSyncHolder;
 import com.example.android.androidskeletonapp.ui.base.SimpleListWithSyncHolder;
-import com.example.android.androidskeletonapp.ui.event_form.EventFormActivity;
+import com.example.android.androidskeletonapp.ui.data_entry.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
 import org.hisp.dhis.android.core.category.CategoryOptionCombo;
@@ -61,13 +61,22 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
         holder.icon.setImageResource(R.drawable.ic_programs_black_24dp);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
-            try {
-                Sdk.d2().eventModule().events().uid(event.uid()).blockingDelete();
-                invalidateSource();
-                notifyDataSetChanged();
-            } catch (D2Error d2Error) {
-                d2Error.printStackTrace();
-            }
+            new AlertDialog.Builder(this.activity)
+                    .setTitle("Delete Confirmation")
+                    .setMessage("Do you really want to delete?")
+                    .setIcon(android.R.drawable.ic_delete)
+                    .setPositiveButton("Yes, I want to delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            try {
+                                Sdk.d2().eventModule().events().uid(event.uid()).blockingDelete();
+                                invalidateSource();
+                                notifyDataSetChanged();
+                            } catch (D2Error d2Error) {
+                                d2Error.printStackTrace();
+                            }
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+
         });
         setBackgroundColor(R.color.colorAccentDark, holder.icon);
         setState(event.state(), holder.syncIcon);
@@ -124,4 +133,6 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
     public void invalidateSource() {
         source.invalidate();
     }
+
+
 }
