@@ -1,5 +1,6 @@
 package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,5 +23,7 @@ class FieldHolder extends RecyclerView.ViewHolder {
 
     void bind(FormField fieldItem) {
         label.setText(fieldItem.getFormLabel());
+        label.setTextSize(16);
+        label.setTextColor(Color.BLACK);
     }
 }

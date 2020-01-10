@@ -16,6 +16,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.OrientationHelper;
 
 import com.example.android.androidskeletonapp.BuildConfig;
 import com.example.android.androidskeletonapp.R;
@@ -33,6 +35,7 @@ import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 import org.hisp.dhis.rules.RuleEngine;
 import org.hisp.dhis.rules.models.RuleAction;
+import org.hisp.dhis.rules.models.RuleActionAssign;
 import org.hisp.dhis.rules.models.RuleActionHideField;
 import org.hisp.dhis.rules.models.RuleEffect;
 
@@ -48,6 +51,7 @@ import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.text.TextUtils.isEmpty;
+import static androidx.recyclerview.widget.OrientationHelper.HORIZONTAL;
 
 public class EventFormActivity extends AppCompatActivity {
 
@@ -93,7 +97,9 @@ public class EventFormActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle(Sdk.d2().programModule().programStages().byUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name())).one().blockingGet().displayName());
+        getSupportActionBar().setTitle(Sdk.d2().programModule().programStages()
+                .byUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()))
+                .one().blockingGet().displayName());
 
         eventUid = getIntent().getStringExtra(IntentExtra.EVENT_UID.name());
 
@@ -102,6 +108,9 @@ public class EventFormActivity extends AppCompatActivity {
         adapter = new FormAdapter(getValueListener(), getImageListener());
         binding.buttonEnd.setOnClickListener(this::finishEnrollment);
         binding.formRecycler.setAdapter(adapter);
+        DividerItemDecoration itemDecor = new DividerItemDecoration(binding.formRecycler.getContext(), OrientationHelper.VERTICAL);
+        binding.formRecycler.addItemDecoration(itemDecor);
+
 
         engineInitialization = PublishProcessor.create();
 
@@ -214,7 +223,6 @@ public class EventFormActivity extends AppCompatActivity {
 
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
-
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
@@ -223,7 +231,9 @@ public class EventFormActivity extends AppCompatActivity {
                     if (key.contains(((RuleActionHideField) ruleAction).field()))
                         fields.remove(key);
             }
+            else if (ruleEffect.ruleAction() instanceof RuleActionAssign){
 
+            }
         }
 
         return new ArrayList<>(fields.values());

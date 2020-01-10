@@ -24,7 +24,15 @@ import org.hisp.dhis.rules.RuleExpressionEvaluator;
 import org.hisp.dhis.rules.models.Rule;
 import org.hisp.dhis.rules.models.RuleAction;
 import org.hisp.dhis.rules.models.RuleActionAssign;
+import org.hisp.dhis.rules.models.RuleActionCreateEvent;
+import org.hisp.dhis.rules.models.RuleActionDisplayText;
+import org.hisp.dhis.rules.models.RuleActionErrorOnCompletion;
 import org.hisp.dhis.rules.models.RuleActionHideField;
+import org.hisp.dhis.rules.models.RuleActionHideSection;
+import org.hisp.dhis.rules.models.RuleActionSetMandatoryField;
+import org.hisp.dhis.rules.models.RuleActionShowError;
+import org.hisp.dhis.rules.models.RuleActionShowWarning;
+import org.hisp.dhis.rules.models.RuleActionWarningOnCompletion;
 import org.hisp.dhis.rules.models.RuleAttributeValue;
 import org.hisp.dhis.rules.models.RuleDataValue;
 import org.hisp.dhis.rules.models.RuleEnrollment;
@@ -284,8 +292,8 @@ public class RuleEngineService {
     private List<Rule> transformToRule(List<ProgramRule> programRules) {
         List<Rule> rules = new ArrayList<>();
         for (ProgramRule rule : programRules) {
-            List<RuleAction> ruleActions = transformToRuleAction(rule.programRuleActions());
             try {
+                List<RuleAction> ruleActions = transformToRuleAction(rule.programRuleActions());
                 rules.add(
                         Rule.create(rule.programStage() != null ?
                                 rule.programStage().uid() :
@@ -303,12 +311,63 @@ public class RuleEngineService {
         List<RuleAction> ruleActions = new ArrayList<>();
 
         for (ProgramRuleAction pra : programRuleActions) {
+            String a= "";
+            if (pra.programRule().uid().equals("xCCWK2tykCe")){
+                a = pra.uid();
+            }
             switch (pra.programRuleActionType()) {
                 case HIDEFIELD:
                     String hideField = pra.dataElement() != null ?
                             pra.dataElement().uid() : pra.trackedEntityAttribute().uid();
                     ruleActions.add(RuleActionHideField.create(pra.content(), hideField));
                     break;
+                case DISPLAYTEXT:
+                    ruleActions.add(RuleActionDisplayText.createForFeedback(pra.content(), pra.data()));
+                    break;
+                case DISPLAYKEYVALUEPAIR:
+                    ruleActions.add(RuleActionDisplayText.createForIndicators(pra.content(), pra.data()));
+                    break;
+                case HIDESECTION:
+                    String hideSection = pra.programStageSection() != null ?
+                            pra.programStageSection().uid() : "";
+                    ruleActions.add(RuleActionHideSection.create(hideSection));
+                    break;
+
+                case ASSIGN:
+                    String assignData = pra.data() != null ? pra.data() : "";
+                    String assignField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionAssign.create(pra.content(), assignData, assignField));
+                    break;
+                case SHOWWARNING:
+                    String warningData = pra.data() != null ? pra.data() : "";
+                    String warningField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionShowWarning.create(pra.content(), warningData, warningField));
+                    break;
+                case WARNINGONCOMPLETE:
+                    String warningcompData = pra.data() != null ? pra.data() : "";
+                    String warningcompField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionWarningOnCompletion.create(pra.content(), warningcompData, warningcompField));
+                    break;
+                case SHOWERROR:
+                    String showerrorData = pra.data() != null ? pra.data() : "";
+                    String showerrorField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionShowError.create(pra.content(), showerrorData, showerrorField));
+                    break;
+                case ERRORONCOMPLETE:
+                    String errorcompData = pra.data() != null ? pra.data() : "";
+                    String errorcompField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionErrorOnCompletion.create(pra.content(), errorcompData, errorcompField));
+                    break;
+                case CREATEEVENT:
+                    String createData = pra.data() != null ? pra.data() : "";
+                    String createField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionCreateEvent.create(pra.content(), createData, pra.programStage().uid()));
+                    break;
+                case SETMANDATORYFIELD:
+                    String mandatField = (pra.dataElement() != null ? pra.dataElement().uid() : (pra.trackedEntityAttribute() != null ? pra.trackedEntityAttribute().uid() : null));
+                    ruleActions.add(RuleActionSetMandatoryField.create(mandatField));
+                    break;
+
             }
         }
 

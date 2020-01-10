@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.data.service.forms;
 
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
+import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
 import org.hisp.dhis.android.core.dataelement.DataElement;
 import org.hisp.dhis.android.core.event.EventCreateProjection;
 import org.hisp.dhis.android.core.event.EventObjectRepository;
@@ -74,7 +75,9 @@ public class EventFormService {
         else
             return Flowable.fromCallable(() ->
                     d2.programModule().programStageDataElements()
-                            .byProgramStage().eq(eventRepository.blockingGet().programStage()).blockingGet()
+                            .byProgramStage().eq(eventRepository.blockingGet().programStage())
+                            //.orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
+                            .blockingGet()
             )
                     .flatMapIterable(programStageDataElements -> programStageDataElements)
                     .map(programStageDataElement -> {

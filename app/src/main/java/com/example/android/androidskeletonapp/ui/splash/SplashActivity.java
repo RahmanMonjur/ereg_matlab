@@ -16,6 +16,7 @@ import com.example.android.androidskeletonapp.ui.programs.ProgramsActivity;
 import com.facebook.stetho.Stetho;
 
 import org.hisp.dhis.android.core.D2Manager;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -42,7 +43,12 @@ public class SplashActivity extends AppCompatActivity {
                 .doOnSuccess(isLogged -> {
                     if (isLogged) {
                         if(globalVars.getOrgUid() == null) {
-                            ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this),true);
+                            if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount()==1) {
+                                globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
+                                ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
+                            } else {
+                                ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+                            }
                         }
                         else {
                             ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);

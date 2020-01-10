@@ -42,6 +42,7 @@ class OptionSetFieldHolder extends FieldHolder {
 
     private void setUpSpinner(String optionSetUid) {
         optionList = Sdk.d2().optionModule().options().byOptionSetUid().eq(optionSetUid).blockingGet();
+
         List<String> optionListNames = new ArrayList<>();
         optionListNames.add("Please select from list");
         //optionListNames.add(label.getText().toString());
