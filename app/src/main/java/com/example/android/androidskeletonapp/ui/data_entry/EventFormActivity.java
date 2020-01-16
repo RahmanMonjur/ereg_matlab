@@ -51,7 +51,6 @@ import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.text.TextUtils.isEmpty;
-import static androidx.recyclerview.widget.OrientationHelper.HORIZONTAL;
 
 public class EventFormActivity extends AppCompatActivity {
 
@@ -232,7 +231,17 @@ public class EventFormActivity extends AppCompatActivity {
                         fields.remove(key);
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionAssign){
+                for (String key : fields.keySet())
+                    if (key.contains(((RuleActionAssign) ruleAction).field())) {
+                        FormField fl = fields.get(key);
+                        fields.put(fl.getUid(),new FormField(
+                                fl.getUid(), fl.getOptionSetUid(),
+                                fl.getValueType(), fl.getFormLabel(),
+                                ruleEffect.data(),
+                                fl.getOptionCode(), fl.isEditable(),
+                                fl.getObjectStyle()));
 
+                    }
             }
         }
 

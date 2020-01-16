@@ -3,13 +3,18 @@ package com.example.android.androidskeletonapp.data.service.forms;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+
 import org.apache.commons.jexl2.JexlEngine;
 import org.hisp.dhis.android.core.D2;
+import org.hisp.dhis.android.core.arch.helpers.UidsHelper;
 import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.dataelement.DataElement;
 import org.hisp.dhis.android.core.enrollment.Enrollment;
 import org.hisp.dhis.android.core.event.Event;
 import org.hisp.dhis.android.core.event.EventStatus;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnitGroup;
 import org.hisp.dhis.android.core.program.Program;
 import org.hisp.dhis.android.core.program.ProgramRule;
 import org.hisp.dhis.android.core.program.ProgramRuleAction;
@@ -25,6 +30,7 @@ import org.hisp.dhis.rules.models.Rule;
 import org.hisp.dhis.rules.models.RuleAction;
 import org.hisp.dhis.rules.models.RuleActionAssign;
 import org.hisp.dhis.rules.models.RuleActionCreateEvent;
+import org.hisp.dhis.rules.models.RuleActionDisplayKeyValuePair;
 import org.hisp.dhis.rules.models.RuleActionDisplayText;
 import org.hisp.dhis.rules.models.RuleActionErrorOnCompletion;
 import org.hisp.dhis.rules.models.RuleActionHideField;
@@ -48,8 +54,11 @@ import org.hisp.dhis.rules.models.RuleVariablePreviousEvent;
 import org.hisp.dhis.rules.models.TriggerEnvironment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -70,6 +79,7 @@ public class RuleEngineService {
     private String programUid;
     private String eventUid;
     private String enrollmentUid;
+    private String orgUnit;
 
     public Flowable<RuleEngine> configure(D2 d2, String programUid, @Nullable String enrollmentUid,
                                           @Nullable String eventUid) {
@@ -78,6 +88,7 @@ public class RuleEngineService {
         this.enrollmentUid = enrollmentUid;
         this.eventUid = eventUid;
         this.stage = null;
+        this.orgUnit = !this.eventUid.isEmpty() ? d2.eventModule().events().uid(eventUid).blockingGet().organisationUnit() : "";
 
         jexlEngine = new JexlEngine();
 
@@ -85,7 +96,8 @@ public class RuleEngineService {
                 getRuleVariables(),
                 getRules(),
                 getEvents(enrollmentUid),
-                (ruleVariables, rules, events) -> RuleEngineContext.builder(new RuleExpressionEvaluator() {
+                getSupplementaryData(orgUnit),
+                (ruleVariables, rules, events, supplementaryData) -> RuleEngineContext.builder(new RuleExpressionEvaluator() {
                     @Nonnull
                     @Override
                     public String evaluate(@Nonnull String expression) {
@@ -94,7 +106,7 @@ public class RuleEngineService {
                 })
                         .ruleVariables(ruleVariables)
                         .rules(rules)
-                        .supplementaryData(new HashMap<>())
+                        .supplementaryData(supplementaryData)
                         .calculatedValueMap(new HashMap<>())
                         .constantsValue(new HashMap<>())
                         .build().toEngineBuilder()
@@ -110,6 +122,7 @@ public class RuleEngineService {
         this.enrollmentUid = d2.eventModule().events().uid(eventUid).blockingGet().enrollment();
         this.eventUid = eventUid;
         this.stage = null;
+        this.orgUnit = !this.eventUid.isEmpty() ? d2.eventModule().events().uid(eventUid).blockingGet().organisationUnit() : "";
 
         jexlEngine = new JexlEngine();
 
@@ -120,7 +133,8 @@ public class RuleEngineService {
                     getRuleVariables(),
                     getRules(),
                     getOtherEvents(eventUid),
-                    (ruleVariables, rules, events) -> setUp(ruleVariables, rules, events, null));
+                    getSupplementaryData(orgUnit),
+                    (ruleVariables, rules, events, supplementaryData) -> setUp(ruleVariables, rules, events, null, supplementaryData));
         else
             initialFlowable = Flowable.zip(
                     getRuleVariables(),
@@ -128,6 +142,7 @@ public class RuleEngineService {
                     getEvents(enrollmentUid, eventUid),
                     //getOtherEvents(eventUid),
                     ruleEnrollment(),
+                    getSupplementaryData(orgUnit),
                     this::setUp);
 
         return initialFlowable;
@@ -136,7 +151,8 @@ public class RuleEngineService {
     public RuleEngine setUp(List<RuleVariable> ruleVariables,
                             List<Rule> rules,
                             List<RuleEvent> events,
-                            RuleEnrollment enrollment) {
+                            RuleEnrollment enrollment,
+                            Map<String, List<String>> suplementaryData) {
         RuleEngine.Builder builder = RuleEngineContext.builder(new RuleExpressionEvaluator() {
             @Nonnull
             @Override
@@ -146,7 +162,7 @@ public class RuleEngineService {
         })
                 .ruleVariables(ruleVariables)
                 .rules(rules)
-                .supplementaryData(new HashMap<>())
+                .supplementaryData(suplementaryData)
                 .calculatedValueMap(new HashMap<>())
                 .constantsValue(new HashMap<>())
                 .build().toEngineBuilder()
@@ -226,11 +242,15 @@ public class RuleEngineService {
     }
 
     private Flowable<List<RuleEvent>> getEvents(String enrollmentUid, String eventUid) {
-        return Flowable.fromCallable(() -> d2.eventModule().events()
-                .byEnrollmentUid().eq(enrollmentUid)
-                .byUid().notIn(eventUid)
-                .byStatus().in(EventStatus.ACTIVE, EventStatus.COMPLETED)
-                .blockingGet()).flatMapIterable(events -> events)
+        return Flowable.fromCallable(() -> d2.eventModule().events().uid(eventUid).blockingGet())
+                .flatMap(event ->
+                        Flowable.fromCallable(() -> d2.eventModule().events()
+                                .byProgramUid().eq(event.program())
+                                .byEnrollmentUid().eq(enrollmentUid)
+                                .byUid().notIn(event.uid())
+                                .byStatus().in(EventStatus.ACTIVE, EventStatus.COMPLETED)
+                                .blockingGet()))
+                .flatMapIterable(events -> events)
                 .map(this::transformToRuleEvent)
                 .toList().toFlowable();
     }
@@ -291,7 +311,9 @@ public class RuleEngineService {
 
     private List<Rule> transformToRule(List<ProgramRule> programRules) {
         List<Rule> rules = new ArrayList<>();
+
         for (ProgramRule rule : programRules) {
+
             try {
                 List<RuleAction> ruleActions = transformToRuleAction(rule.programRuleActions());
                 rules.add(
@@ -311,10 +333,6 @@ public class RuleEngineService {
         List<RuleAction> ruleActions = new ArrayList<>();
 
         for (ProgramRuleAction pra : programRuleActions) {
-            String a= "";
-            if (pra.programRule().uid().equals("xCCWK2tykCe")){
-                a = pra.uid();
-            }
             switch (pra.programRuleActionType()) {
                 case HIDEFIELD:
                     String hideField = pra.dataElement() != null ?
@@ -325,7 +343,7 @@ public class RuleEngineService {
                     ruleActions.add(RuleActionDisplayText.createForFeedback(pra.content(), pra.data()));
                     break;
                 case DISPLAYKEYVALUEPAIR:
-                    ruleActions.add(RuleActionDisplayText.createForIndicators(pra.content(), pra.data()));
+                    ruleActions.add(RuleActionDisplayKeyValuePair.createForIndicators(pra.content(), pra.data()));
                     break;
                 case HIDESECTION:
                     String hideSection = pra.programStageSection() != null ?
@@ -450,5 +468,38 @@ public class RuleEngineService {
         } else {
             return RuleValueType.TEXT;
         }
+    }
+
+    private Flowable<Map<String, List<String>>> getSupplementaryData(String orgUnitUid){
+        Map<String, List<String>> supData = new HashMap<String, List<String>>();
+        /*
+        OrganisationUnit orgUnit = d2.organisationUnitModule().organisationUnits()
+                .withOrganisationUnitGroups().uid(orgUnitUid)
+                .blockingGet();
+
+        Iterator orgit = orgUnit.organisationUnitGroups().iterator();
+        while(orgit.hasNext()) {
+            OrganisationUnitGroup orgrp = (OrganisationUnitGroup) orgit.next();
+            if (orgrp.code() != null){
+                supData.put(orgrp.code(), Collections.singletonList(orgUnit.uid()));
+            }
+            supData.put(orgrp.uid(), Collections.singletonList(orgUnit.uid()));
+        }
+        return new HashMap<String, List<String>>();
+
+        */
+
+        return Flowable.fromCallable(() ->
+                d2.organisationUnitModule().organisationUnits()
+                        .withOrganisationUnitGroups()
+                        .byUid().eq(orgUnitUid)
+                        .blockingGet())
+                .flatMapIterable(orgUnits -> orgUnits)
+                .map(orgUnit -> new HashMap<>()
+
+                        //supData.put(orgUnit.code() == null ? orgUnit.uid(): orgUnit.code(), )
+
+                );
+
     }
 }
