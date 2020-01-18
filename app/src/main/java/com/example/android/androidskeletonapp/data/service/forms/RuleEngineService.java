@@ -53,7 +53,9 @@ import org.hisp.dhis.rules.models.RuleVariableNewestStageEvent;
 import org.hisp.dhis.rules.models.RuleVariablePreviousEvent;
 import org.hisp.dhis.rules.models.TriggerEnvironment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -108,7 +110,7 @@ public class RuleEngineService {
                         .rules(rules)
                         .supplementaryData(supplementaryData)
                         .calculatedValueMap(new HashMap<>())
-                        .constantsValue(new HashMap<>())
+                        .constantsValue(queryConstants())
                         .build().toEngineBuilder()
                         .triggerEnvironment(TriggerEnvironment.ANDROIDCLIENT)
                         .events(events)
@@ -164,7 +166,7 @@ public class RuleEngineService {
                 .rules(rules)
                 .supplementaryData(suplementaryData)
                 .calculatedValueMap(new HashMap<>())
-                .constantsValue(new HashMap<>())
+                .constantsValue(queryConstants())
                 .build().toEngineBuilder()
                 .triggerEnvironment(TriggerEnvironment.ANDROIDCLIENT)
                 .events(events);
@@ -436,8 +438,8 @@ public class RuleEngineService {
                     ruleVariables.add(RuleVariableNewestEvent.create(name, de.uid(), mimeType));
                     break;
                 case DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE:
-                    if (stage != null)
-                        ruleVariables.add(RuleVariableNewestStageEvent.create(name, de.uid(), stage, mimeType));
+                    if (prv.programStage() != null)
+                        ruleVariables.add(RuleVariableNewestStageEvent.create(name, de.uid(), prv.programStage().uid(), mimeType));
                     break;
                 case DATAELEMENT_PREVIOUS_EVENT:
                     ruleVariables.add(RuleVariablePreviousEvent.create(name, de.uid(), mimeType));
@@ -472,7 +474,7 @@ public class RuleEngineService {
 
     private Flowable<Map<String, List<String>>> getSupplementaryData(String orgUnitUid){
         Map<String, List<String>> supData = new HashMap<String, List<String>>();
-        /*
+
         OrganisationUnit orgUnit = d2.organisationUnitModule().organisationUnits()
                 .withOrganisationUnitGroups().uid(orgUnitUid)
                 .blockingGet();
@@ -481,14 +483,17 @@ public class RuleEngineService {
         while(orgit.hasNext()) {
             OrganisationUnitGroup orgrp = (OrganisationUnitGroup) orgit.next();
             if (orgrp.code() != null){
-                supData.put(orgrp.code(), Collections.singletonList(orgUnit.uid()));
+                supData.put(orgrp.code(), Arrays.asList(orgUnit.uid()));
             }
-            supData.put(orgrp.uid(), Collections.singletonList(orgUnit.uid()));
+            supData.put(orgrp.uid(), Arrays.asList(orgUnit.uid()));
         }
-        return new HashMap<String, List<String>>();
+        List<String> userRoleUids = UidsHelper.getUidsList(d2.userModule().userRoles().blockingGet());
+        supData.put("USER" , userRoleUids);
 
-        */
+        return Flowable.fromCallable(() -> supData);
 
+
+        /*
         return Flowable.fromCallable(() ->
                 d2.organisationUnitModule().organisationUnits()
                         .withOrganisationUnitGroups()
@@ -500,6 +505,17 @@ public class RuleEngineService {
                         //supData.put(orgUnit.code() == null ? orgUnit.uid(): orgUnit.code(), )
 
                 );
+        */
+        /*
+        return Flowable.fromCallable(() ->
+                new HashMap<>()
 
+        );
+
+        */
+    }
+
+    private Map<String, String> queryConstants(){
+        return new HashMap<>();
     }
 }
