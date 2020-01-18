@@ -2,6 +2,8 @@ package com.example.android.androidskeletonapp.data.service.forms;
 
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
+import org.hisp.dhis.android.core.common.ObjectStyle;
+import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.dataelement.DataElement;
 import org.hisp.dhis.android.core.event.EventCreateProjection;
 import org.hisp.dhis.android.core.event.EventObjectRepository;
@@ -66,11 +68,18 @@ public class EventFormService {
 
 
     public Flowable<Map<String, FormField>> getEventFormFields() {
-        if (d2 == null)
+        if (d2 == null) {
             return Flowable.error(new NullPointerException(
                     "D2 is null. EnrollmentForm has not been initialized, use init() function.")
             );
-        else
+        }
+        else {
+            fieldMap.put("EventDate", new FormField(
+                    "EventDate", null, ValueType.DATE, "Visit Date",
+                    null,
+                    null, true,
+                    ObjectStyle.builder().build()));
+
             return Flowable.fromCallable(() ->
                     d2.programModule().programStageDataElements()
                             .byProgramStage().eq(eventRepository.blockingGet().programStage())
@@ -112,6 +121,7 @@ public class EventFormService {
                     })
                     .toList().toFlowable()
                     .map(list -> fieldMap);
+        }
     }
 
     public void saveCoordinates(double lat, double lon) {
