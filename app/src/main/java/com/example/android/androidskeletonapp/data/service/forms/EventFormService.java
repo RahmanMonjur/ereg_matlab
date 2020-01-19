@@ -13,6 +13,7 @@ import org.hisp.dhis.android.core.program.ProgramStageSection;
 import org.hisp.dhis.android.core.program.ProgramStageSectionRenderingType;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,11 +75,12 @@ public class EventFormService {
             );
         }
         else {
+
             fieldMap.put("EventDate", new FormField(
                     "EventDate", null, ValueType.DATE, "Visit Date",
-                    null,
+                     eventRepository.blockingGet().eventDate().toString(),
                     null, true,
-                    ObjectStyle.builder().build()));
+                     ObjectStyle.builder().build()));
 
             return Flowable.fromCallable(() ->
                     d2.programModule().programStageDataElements()
