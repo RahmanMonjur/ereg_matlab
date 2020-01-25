@@ -1,7 +1,10 @@
 package com.example.android.androidskeletonapp.data.service.forms;
 
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
+import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
 import org.hisp.dhis.android.core.common.ObjectStyle;
 import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.dataelement.DataElement;
@@ -75,17 +78,18 @@ public class EventFormService {
             );
         }
         else {
-
+            fieldMap.clear();
             fieldMap.put("EventDate", new FormField(
                     "EventDate", null, ValueType.DATE, "Visit Date",
-                     eventRepository.blockingGet().eventDate().toString(),
+                    eventRepository.blockingExists() ?
+                            DateFormatHelper.formatSimpleDate(eventRepository.blockingGet().eventDate()) : null,
                     null, true,
                      ObjectStyle.builder().build()));
 
             return Flowable.fromCallable(() ->
                     d2.programModule().programStageDataElements()
                             .byProgramStage().eq(eventRepository.blockingGet().programStage())
-                            //.orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
+                            .orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
                             .blockingGet()
             )
                     .flatMapIterable(programStageDataElements -> programStageDataElements)

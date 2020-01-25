@@ -122,8 +122,6 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                 return OPTIONSETIMAGE;
         else
             return fields.get(position).getValueType().ordinal();
-
-
     }
 
     public void setListingRendering(boolean isListingRendering) {

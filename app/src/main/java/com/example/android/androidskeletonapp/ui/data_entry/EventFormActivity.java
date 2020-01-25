@@ -40,9 +40,14 @@ import org.hisp.dhis.rules.models.RuleActionHideField;
 import org.hisp.dhis.rules.models.RuleEffect;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -126,19 +131,21 @@ public class EventFormActivity extends AppCompatActivity {
 
     private FormAdapter.OnValueSaved getValueListener() {
         return (fieldUid, value) -> {
+
             TrackedEntityDataValueObjectRepository valueRepository =
                     Sdk.d2().trackedEntityModule().trackedEntityDataValues()
                             .value(
                                     EventFormService.getInstance().getEventUid(),
                                     fieldUid
                             );
+
             String currentValue = valueRepository.blockingExists() ?
                     valueRepository.blockingGet().value() : "";
             if (currentValue == null)
                 currentValue = "";
 
             try {
-                if (!isEmpty(value)) {
+                if (!isEmpty(value) && !fieldUid.equalsIgnoreCase("EventDate")) {
                     valueRepository.blockingSet(value);
                 } else {
                     valueRepository.blockingDeleteIfExist();
@@ -147,6 +154,14 @@ public class EventFormActivity extends AppCompatActivity {
                 d2Error.printStackTrace();
             } finally {
                 if (value != null && !value.equals(currentValue)) {
+                    if (fieldUid.equalsIgnoreCase("EventDate") && !value.equals("")) {
+                        try{
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date dateFromValue = sdf.parse(value);
+                            EventFormService.getInstance().saveEventDate(dateFromValue);
+                        }
+                        catch(ParseException ex){}
+                    }
                     engineInitialization.onNext(true);
                 }
             }
@@ -222,15 +237,10 @@ public class EventFormActivity extends AppCompatActivity {
 
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
+
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
-            if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
-                fields.remove(((RuleActionHideField) ruleAction).field());
-                for (String key : fields.keySet()) //For image options
-                    if (key.contains(((RuleActionHideField) ruleAction).field()))
-                        fields.remove(key);
-            }
-            else if (ruleEffect.ruleAction() instanceof RuleActionAssign){
+            if (ruleEffect.ruleAction() instanceof RuleActionAssign){
                 for (String key : fields.keySet())
                     if (key.contains(((RuleActionAssign) ruleAction).field())) {
                         FormField fl = fields.get(key);
@@ -240,8 +250,23 @@ public class EventFormActivity extends AppCompatActivity {
                                 ruleEffect.data(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));
-
+                        try {
+                            Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                                    .value(
+                                            EventFormService.getInstance().getEventUid(),
+                                            fl.getUid()
+                                    ).blockingSet(ruleEffect.data());
+                        } catch (Exception e) {}
                     }
+
+            }
+            if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
+                fields.remove(((RuleActionHideField) ruleAction).field());
+                /*
+                for (String key : fields.keySet()) //For image options
+                    if (key.contains(((RuleActionHideField) ruleAction).field()))
+                        fields.remove(key);
+                */
             }
         }
 

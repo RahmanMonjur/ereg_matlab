@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(SyncStatusHelper.programCount() + SyncStatusHelper.dataSetCount() == 0){
             downloadInitialMetadata();
+            downloadData();
         }
 
         syncMetadataButton.setOnClickListener(view -> {
