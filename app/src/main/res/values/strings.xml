@@ -49,6 +49,7 @@
     <string name="program_icon">Program Icon</string>
     <string name="program_stages">2 Program stages</string>
     <string name="no_programs_found">No programs found</string>
+    <string name="no_program_stages_found">No program stages found</string>
     <!-- Strings related to tracked entity instances search -->
     <string name="title_activity_tracked_entity_search">Tracked entities search</string>
     <string name="search_data">Search data</string>

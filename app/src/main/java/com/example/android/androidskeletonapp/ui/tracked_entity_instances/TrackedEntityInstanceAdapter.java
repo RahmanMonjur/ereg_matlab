@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -16,9 +17,12 @@ import androidx.paging.PagedListAdapter;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
 import com.example.android.androidskeletonapp.ui.base.ListItemWithCardAndSyncHolder;
+import com.example.android.androidskeletonapp.ui.data_entry.EnrollmentFormActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
 import org.hisp.dhis.android.core.arch.call.D2Progress;
@@ -47,12 +51,14 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     private DataSource<?, TrackedEntityInstance> source;
     private OnTrackedEntityInstanceSelectionListener listener;
     private String programUid;
+    GlobalClass globalVars;
 
     public TrackedEntityInstanceAdapter(AppCompatActivity activity, OnTrackedEntityInstanceSelectionListener listener, String programUid) {
         super(new DiffByIdItemCallback<>());
         this.activity = activity;
         this.listener = listener;
         this.programUid = programUid;
+        globalVars = (GlobalClass) this.activity.getApplicationContext();
     }
 
     @NonNull
@@ -153,6 +159,11 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         } else {
             holder.syncIcon.setOnClickListener(null);
         }
+
+        holder.cardImageView.setOnClickListener(v -> {
+            ActivityStarter.startActivity( this.activity,
+                    EnrollmentFormActivity.getFormActivityIntent(this.activity.getApplicationContext(),trackedEntityInstance.uid(),programUid, globalVars.getOrgUid().uid()), false);
+        });
 
         setBackgroundColor(R.color.colorAccentDark, holder.icon);
         setState(trackedEntityInstance.state(), holder.syncIcon);

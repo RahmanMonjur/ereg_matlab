@@ -16,6 +16,7 @@ import com.example.android.androidskeletonapp.R;
 public class ListItemWithCardAndSyncHolder extends BaseListItemHolder {
 
     public final CardView cardSyncDelete;
+    public final CardView cardImageView;
     public  final FrameLayout cardFrameSyncDelete;
     public final RelativeLayout lnkDetail;
     public final ImageView syncIcon;
@@ -26,6 +27,7 @@ public class ListItemWithCardAndSyncHolder extends BaseListItemHolder {
     public ListItemWithCardAndSyncHolder(@NonNull View view) {
         super(view);
         cardSyncDelete = view.findViewById(R.id.cardSyncDelete);
+        cardImageView = view.findViewById(R.id.itemBitmapCardView);
         lnkDetail = view.findViewById(R.id.lnkDetail);
         cardFrameSyncDelete = view.findViewById(R.id.cardFrameSyncDelete);
         syncIcon = view.findViewById(R.id.syncIcon);

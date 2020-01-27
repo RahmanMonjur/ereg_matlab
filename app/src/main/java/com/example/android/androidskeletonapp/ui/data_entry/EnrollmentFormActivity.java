@@ -29,15 +29,19 @@ import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.Fo
 
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
 import org.hisp.dhis.android.core.arch.helpers.FileResourceDirectoryHelper;
+import org.hisp.dhis.android.core.common.ObjectStyle;
+import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValueObjectRepository;
 import org.hisp.dhis.rules.RuleEngine;
 import org.hisp.dhis.rules.models.RuleAction;
+import org.hisp.dhis.rules.models.RuleActionAssign;
 import org.hisp.dhis.rules.models.RuleActionHideField;
 import org.hisp.dhis.rules.models.RuleEffect;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,6 +95,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
         adapter = new FormAdapter(getValueListener(), getImageListener());
         binding.buttonEnd.setOnClickListener(this::finishEnrollment);
+        binding.buttonCancel.setOnClickListener(this::clearForm);
         binding.formRecycler.setAdapter(adapter);
 
         engineInitialization = PublishProcessor.create();
@@ -212,13 +217,47 @@ public class EnrollmentFormActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    private void clearForm(View view){
+        EnrollmentFormService.getInstance().delete();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
 
+        //Adding an empty field to avoid the overlapping of action buttons in the activity
+        fields.put("EmptyField", new FormField(
+                "EmptyField", null, ValueType.TEXT, null,null,
+                null, false, ObjectStyle.builder().build()));
+
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
-            if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
+            if (ruleEffect.ruleAction() instanceof RuleActionAssign){
+                for (String key : fields.keySet())
+                    if (key.contains(((RuleActionAssign) ruleAction).field())) {
+                        FormField fl = fields.get(key);
+                        fields.put(fl.getUid(),new FormField(
+                                fl.getUid(), fl.getOptionSetUid(),
+                                fl.getValueType(), fl.getFormLabel(),
+                                ruleEffect.data(),
+                                fl.getOptionCode(), fl.isEditable(),
+                                fl.getObjectStyle()));
+                        try {
+                            Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                                    .value(
+                                            EnrollmentFormService.getInstance().getEnrollmentUid(),
+                                            fl.getUid()
+                                    ).blockingSet(ruleEffect.data());
+                        } catch (Exception e) {}
+                    }
+
+            }
+            else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
                 fields.remove(((RuleActionHideField) ruleAction).field());
+                for (String key : fields.keySet()) //For image options
+                    if (key.contains(((RuleActionHideField) ruleAction).field()))
+                        fields.remove(key);
             }
         }
 

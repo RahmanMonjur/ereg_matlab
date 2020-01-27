@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 
 import org.hisp.dhis.android.core.event.EventCollectionRepository;
 import org.hisp.dhis.android.core.event.EventCreateProjection;
+import org.hisp.dhis.android.core.program.ProgramStage;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -73,6 +74,14 @@ public class EventsActivity extends ListActivity {
         if (isEmpty(selectedProgram))
             findViewById(R.id.eventButton).setVisibility(View.GONE);
 
+        ProgramStage stage = Sdk.d2().programModule().programStages()
+                .uid(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
+                .blockingGet();
+
+        if (!stage.repeatable())
+            findViewById(R.id.eventButton).setVisibility(View.GONE);
+
+
         findViewById(R.id.eventButton).setOnClickListener(view ->
                 {
                     compositeDisposable.add(
@@ -85,12 +94,7 @@ public class EventsActivity extends ListActivity {
                                                 .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
                                                 .one().blockingGet().uid();
                                         */
-                                        /*
-                                        // Commenting it because the code snippet is taking the first program stage only
-                                        String stage = Sdk.d2().programModule().programStages()
-                                                .byProgramUid().eq(program.uid())
-                                                .one().blockingGet().uid();
-                                        */
+
                                         String attrOptionCombo = program.categoryCombo() != null ?
                                                 Sdk.d2().categoryModule().categoryOptionCombos()
                                                         .byCategoryComboUid().eq(program.categoryComboUid())
@@ -98,13 +102,13 @@ public class EventsActivity extends ListActivity {
 
                                         return Sdk.d2().eventModule().events()
                                                 .byProgramUid().eq(selectedProgram)
-                                                .byProgramStageUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
+                                                .byProgramStageUid().eq(stage.uid())
                                                 .blockingAdd(
                                                         EventCreateProjection.builder()
                                                                 .enrollment(selectedEnrollment)
                                                                 .organisationUnit(globalVars.getOrgUid().uid())
                                                                 .program(program.uid())
-                                                                .programStage(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name()))
+                                                                .programStage(stage.uid())
                                                                 .attributeOptionCombo(attrOptionCombo)
                                                                 .build());
 

@@ -2,8 +2,13 @@ package com.example.android.androidskeletonapp.data.service.forms;
 
 import android.text.TextUtils;
 
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
+import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
+import org.hisp.dhis.android.core.common.ObjectStyle;
+import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.enrollment.EnrollmentCreateProjection;
 import org.hisp.dhis.android.core.enrollment.EnrollmentObjectRepository;
 import org.hisp.dhis.android.core.maintenance.D2Error;
@@ -14,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -26,7 +32,7 @@ public class EnrollmentFormService {
     private final Map<String, FormField> fieldMap;
 
     private EnrollmentFormService() {
-        fieldMap = new HashMap<>();
+        fieldMap = new LinkedHashMap<>();
     }
 
     public static EnrollmentFormService getInstance() {
@@ -63,9 +69,20 @@ public class EnrollmentFormService {
                     new NullPointerException("D2 is null. EnrollmentForm has not been initialized, use init() function.")
             );
         else
+
+            fieldMap.clear();
+            fieldMap.put("EnrollmentDate", new FormField(
+                "EnrollmentDate", null, ValueType.DATE, "Enrollment Date",
+                enrollmentRepository.blockingExists() ?
+                        DateFormatHelper.formatSimpleDate(enrollmentRepository.blockingGet().enrollmentDate()) : null,
+                null, true,
+                ObjectStyle.builder().build()));
+
+
             return Flowable.fromCallable(() ->
                     d2.programModule().programTrackedEntityAttributes()
-                            .byProgram().eq(enrollmentRepository.blockingGet().program()).blockingGet()
+                            .byProgram().eq(enrollmentRepository.blockingGet().program())
+                            .orderBySortOrder(RepositoryScope.OrderByDirection.ASC).blockingGet()
             )
                     .flatMapIterable(programTrackedEntityAttributes -> programTrackedEntityAttributes)
                     .map(programAttribute -> {
@@ -97,11 +114,12 @@ public class EnrollmentFormService {
                                 !attribute.generated(),
                                 attribute.style()
                         );
-
-
                         fieldMap.put(programAttribute.trackedEntityAttribute().uid(), field);
+
                         return programAttribute;
-                    }).toList().toFlowable()
+                    })
+                    .toList()
+                    .toFlowable()
                     .map(list -> fieldMap);
     }
 

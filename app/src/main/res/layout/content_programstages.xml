@@ -15,7 +15,7 @@
         android:textSize="16sp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="@string/no_programs_found" />
+        android:text="@string/no_program_stages_found" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/programStageRecyclerView"

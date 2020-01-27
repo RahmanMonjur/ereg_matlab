@@ -31,6 +31,8 @@ import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.Fo
 import org.apache.commons.lang3.tuple.Pair;
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
 import org.hisp.dhis.android.core.arch.helpers.FileResourceDirectoryHelper;
+import org.hisp.dhis.android.core.common.ObjectStyle;
+import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 import org.hisp.dhis.rules.RuleEngine;
@@ -111,6 +113,7 @@ public class EventFormActivity extends AppCompatActivity {
 
         adapter = new FormAdapter(getValueListener(), getImageListener());
         binding.buttonEnd.setOnClickListener(this::finishEnrollment);
+        binding.buttonCancel.setOnClickListener(this::clearForm);
         binding.formRecycler.setAdapter(adapter);
         DividerItemDecoration itemDecor = new DividerItemDecoration(binding.formRecycler.getContext(), OrientationHelper.VERTICAL);
         binding.formRecycler.addItemDecoration(itemDecor);
@@ -238,6 +241,11 @@ public class EventFormActivity extends AppCompatActivity {
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
 
+        //Adding an empty field to avoid the overlapping of action buttons in the activity
+        fields.put("EmptyField", new FormField(
+                "EmptyField", null, ValueType.TEXT, "","",
+                null, false, ObjectStyle.builder().build()));
+
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionAssign){
@@ -260,7 +268,7 @@ public class EventFormActivity extends AppCompatActivity {
                     }
 
             }
-            if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
+            else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
                 fields.remove(((RuleActionHideField) ruleAction).field());
                 /*
                 for (String key : fields.keySet()) //For image options
@@ -298,6 +306,13 @@ public class EventFormActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (formType == FormType.CREATE)
+            EventFormService.getInstance().delete();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    private void clearForm(View view){
         if (formType == FormType.CREATE)
             EventFormService.getInstance().delete();
         setResult(RESULT_CANCELED);

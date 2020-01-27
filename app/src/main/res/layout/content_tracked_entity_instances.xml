@@ -26,6 +26,8 @@
                 android:layout_marginLeft="14dp"
                 android:layout_marginRight="34dp"
                 android:gravity="left"
+                android:inputType="text"
+                android:maxLines="1"
                 android:hint="Input any value to be more specific"/>
 
             <ImageButton
