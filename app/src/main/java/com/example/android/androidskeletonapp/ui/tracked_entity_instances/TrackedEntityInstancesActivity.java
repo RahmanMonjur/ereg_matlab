@@ -22,6 +22,7 @@ import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
+import org.hisp.dhis.android.core.trackedentity.search.TrackedEntityInstanceQueryCollectionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,15 +123,12 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         });
     }
 
-    private TrackedEntityInstanceCollectionRepository getTeiRepository() {
-        TrackedEntityInstanceCollectionRepository teiRepository =
-                Sdk.d2().trackedEntityModule()
-                        .trackedEntityInstances()
-                        .withTrackedEntityAttributeValues();
+    private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
+        TrackedEntityInstanceQueryCollectionRepository teiRepository =
+                Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
+                        .offlineOnly();
         if (!isEmpty(selectedProgram)) {
-            List<String> programUids = new ArrayList<>();
-            programUids.add(selectedProgram);
-            return teiRepository.byProgramUids(programUids);
+            return teiRepository.byProgram().eq(selectedProgram);
         } else {
             return teiRepository;
         }
