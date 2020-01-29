@@ -1,6 +1,7 @@
 package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.Button;
 
@@ -33,16 +34,19 @@ class DateFieldHolder extends FieldHolder {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        dateButton.setOnClickListener(view -> {
-            Calendar calendar = Calendar.getInstance();
-            new DatePickerDialog(itemView.getContext(), (datePicker, year, month, day) ->
-                    valueSavedListener.onValueSaved(fieldItem.getUid(), getDate(year, month, day)),
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)).show();
-        });
-
+        if (fieldItem.isEditable() == true) {
+            dateButton.setOnClickListener(view -> {
+                Calendar calendar = Calendar.getInstance();
+                new DatePickerDialog(itemView.getContext(), (datePicker, year, month, day) ->
+                        valueSavedListener.onValueSaved(fieldItem.getUid(), getDate(year, month, day)),
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)).show();
+            });
+        }
+        else {
+            dateButton.setTextColor(Color.DKGRAY);
+        }
     }
 
     private String getDate(int year, int month, int day) {

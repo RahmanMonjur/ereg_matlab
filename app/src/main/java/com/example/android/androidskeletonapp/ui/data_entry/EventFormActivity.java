@@ -258,7 +258,7 @@ public class EventFormActivity extends AppCompatActivity {
                                 fl.getUid(), fl.getOptionSetUid(),
                                 fl.getValueType(), fl.getFormLabel(),
                                 ruleEffect.data(),
-                                fl.getOptionCode(), fl.isEditable(),
+                                fl.getOptionCode(), false,
                                 fl.getObjectStyle()));
                         try {
                             Sdk.d2().trackedEntityModule().trackedEntityDataValues()
