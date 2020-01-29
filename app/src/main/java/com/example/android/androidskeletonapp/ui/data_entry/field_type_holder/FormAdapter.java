@@ -53,6 +53,9 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                 case DATE:
                     return new DateFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_date_field, parent, false), valueSavedListener);
+                case AGE:
+                    return new AgeFieldHolder(LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_age_field, parent, false), valueSavedListener);
                 case BOOLEAN:
                 case TRUE_ONLY:
                     return new BooleanFieldHolder(LayoutInflater.from(parent.getContext())

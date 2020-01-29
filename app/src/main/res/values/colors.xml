@@ -9,4 +9,6 @@
     <color name="colorAccentDark">#393d4d</color>
     <color name="colorAccentAlt">#f78f05</color>
     <color name="colorWarn">#e91e63</color>
+    <color name="text_black_333">#333333</color>
+    <color name="text_black_808">#808080</color>
 </resources>

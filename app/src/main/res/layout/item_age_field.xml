@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <data>
+            <import type="android.view.View" />
+
+            <variable
+                name="labels"
+                type="java.lang.String" />
+
+            <variable
+                name="description"
+                type="java.lang.String" />
+        </data>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="FORM LABEL" />
+
+            <ImageView
+                android:id="@+id/renderImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone"
+                tools:srcCompat="@drawable/bangladesh"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="15dp"
+                android:layout_below="@id/renderImage">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:hint='@{labels}'
+                    android:textColorHint="@color/text_black_808"
+                    android:theme="@style/loginInputText"
+                    tools:hint="Age">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/date_picker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="date"
+                        android:textColor="@color/text_black_333"
+                        tools:text="" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Year"
+                    android:textColorHint="@color/text_black_808"
+                    android:theme="@style/loginInputText">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_year"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="date"
+                        android:textColorHint="@color/text_black_808" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Month"
+                    android:textColorHint="@color/text_black_808"
+                    android:theme="@style/loginInputText">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_month"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="date"
+                        android:textColorHint="@color/text_black_333" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Day"
+                    android:textColorHint="@color/text_black_808"
+                    android:theme="@style/loginInputText">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_days"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="date"
+                        android:textColorHint="@color/text_black_333" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </layout>

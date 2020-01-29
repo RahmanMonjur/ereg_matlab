@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class OrganisationUnitFieldHolder extends FieldHolder {
+public class UsernameFieldHolder extends FieldHolder {
 
     private final Spinner spinner;
     private List<OrganisationUnit> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
 
-    OrganisationUnitFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    UsernameFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
         this.spinner = itemView.findViewById(R.id.spinner);
     }
