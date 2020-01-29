@@ -21,16 +21,21 @@ import androidx.databinding.DataBindingUtil;
 import com.example.android.androidskeletonapp.BuildConfig;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.forms.EnrollmentFormService;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
 import com.example.android.androidskeletonapp.data.service.forms.RuleEngineService;
 import com.example.android.androidskeletonapp.databinding.ActivityEnrollmentFormBinding;
 import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.FormAdapter;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
 import org.hisp.dhis.android.core.arch.helpers.FileResourceDirectoryHelper;
 import org.hisp.dhis.android.core.common.ObjectStyle;
+import org.hisp.dhis.android.core.common.State;
 import org.hisp.dhis.android.core.common.ValueType;
+import org.hisp.dhis.android.core.enrollment.Enrollment;
+import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValueObjectRepository;
 import org.hisp.dhis.rules.RuleEngine;
@@ -40,7 +45,10 @@ import org.hisp.dhis.rules.models.RuleActionHideField;
 import org.hisp.dhis.rules.models.RuleEffect;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,17 +75,16 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
     private String teiUid;
     private String fieldWaitingImage;
+    GlobalClass globalVars;
 
     private enum IntentExtra {
         TEI_UID, PROGRAM_UID, OU_UID
     }
 
-    public static Intent getFormActivityIntent(Context context, String teiUid, String programUid,
-                                               String orgUnitUid) {
+    public static Intent getFormActivityIntent(Context context, String teiUid, String programUid) {
         Intent intent = new Intent(context, EnrollmentFormActivity.class);
         intent.putExtra(IntentExtra.TEI_UID.name(), teiUid);
         intent.putExtra(IntentExtra.PROGRAM_UID.name(), programUid);
-        intent.putExtra(IntentExtra.OU_UID.name(), orgUnitUid);
         return intent;
     }
 
@@ -90,6 +97,8 @@ public class EnrollmentFormActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        globalVars = (GlobalClass) getApplicationContext();
 
         teiUid = getIntent().getStringExtra(IntentExtra.TEI_UID.name());
 
@@ -104,7 +113,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                 Sdk.d2(),
                 getIntent().getStringExtra(IntentExtra.TEI_UID.name()),
                 getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()),
-                getIntent().getStringExtra(IntentExtra.OU_UID.name())))
+                globalVars.getOrgUid().uid()))
             this.engineService = new RuleEngineService();
 
     }
@@ -156,6 +165,16 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                 d2Error.printStackTrace();
             } finally {
                 if (value != null && !value.equals(currentValue)) {
+                    if (fieldUid.equalsIgnoreCase("EnrollmentDate") && !value.equals("")) {
+                        try{
+                            Date dateFromValue = DateFormatHelper.parseDateAutoFormat(value);
+                            Enrollment enrollment = Sdk.d2().enrollmentModule().enrollments()
+                                    .uid(EnrollmentFormService.getInstance().getEnrollmentUid()).blockingGet();
+                            if (enrollment.state() == State.TO_POST)
+                                EnrollmentFormService.getInstance().saveEnrollmentDate(dateFromValue);
+                        }
+                        catch(ParseException ex){}
+                    }
                     engineInitialization.onNext(true);
                 }
             }

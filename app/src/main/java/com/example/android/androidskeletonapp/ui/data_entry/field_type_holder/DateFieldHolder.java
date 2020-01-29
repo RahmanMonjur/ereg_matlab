@@ -28,7 +28,7 @@ class DateFieldHolder extends FieldHolder {
 
         try {
             dateButton.setText(fieldItem.getValue() != null ?
-                    DateFormatHelper.formatSimpleDate(DateFormatHelper.parseSimpleDate(fieldItem.getValue())) :
+                    DateFormatHelper.getDateAsSystemFormat(DateFormatHelper.parseSimpleDate(fieldItem.getValue())) :
                     itemView.getContext().getString(R.string.date_button_text));
         } catch (ParseException e) {
             e.printStackTrace();

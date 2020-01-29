@@ -87,8 +87,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                         .map(teiUid -> EnrollmentFormActivity.getFormActivityIntent(
                                 TrackedEntityInstancesActivity.this,
                                 teiUid,
-                                selectedProgram,
-                                globalVars.getOrgUid().uid()
+                                selectedProgram
                                 ))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -156,5 +155,12 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                 adapter.invalidateSource();
         }
         super.onActivityResult(requestCode,resultCode,data);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        observeTrackedEntityInstances();
+
     }
 }

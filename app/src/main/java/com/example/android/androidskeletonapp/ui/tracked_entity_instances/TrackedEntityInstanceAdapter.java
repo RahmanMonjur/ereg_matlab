@@ -51,14 +51,12 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     private DataSource<?, TrackedEntityInstance> source;
     private OnTrackedEntityInstanceSelectionListener listener;
     private String programUid;
-    GlobalClass globalVars;
 
     public TrackedEntityInstanceAdapter(AppCompatActivity activity, OnTrackedEntityInstanceSelectionListener listener, String programUid) {
         super(new DiffByIdItemCallback<>());
         this.activity = activity;
         this.listener = listener;
         this.programUid = programUid;
-        globalVars = (GlobalClass) this.activity.getApplicationContext();
     }
 
     @NonNull
@@ -162,7 +160,10 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
 
         holder.cardImageView.setOnClickListener(v -> {
             ActivityStarter.startActivity( this.activity,
-                    EnrollmentFormActivity.getFormActivityIntent(this.activity.getApplicationContext(),trackedEntityInstance.uid(),programUid, globalVars.getOrgUid().uid()), false);
+                    EnrollmentFormActivity.getFormActivityIntent(
+                            this.activity.getApplicationContext(),
+                            trackedEntityInstance.uid(),
+                            programUid), false);
         });
 
         setBackgroundColor(R.color.colorAccentDark, holder.icon);

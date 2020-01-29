@@ -120,7 +120,6 @@ public class EventsActivity extends ListActivity {
                                                     selectedProgram,
                                                     selectedProgramStage,
                                                     selectedEnrollment,
-                                                    globalVars.getOrgUid().uid(),
                                                     EventFormActivity.FormType.CREATE))
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())

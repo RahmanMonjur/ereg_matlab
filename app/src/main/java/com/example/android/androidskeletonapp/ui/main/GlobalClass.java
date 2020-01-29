@@ -15,4 +15,12 @@ public class GlobalClass extends Application {
         userScopeOrgUid = pOrgUid;
     }
 
+    private String userDateFormat;
+    public String getUserDateFormat() {
+        return userDateFormat;
+    }
+    public void setUserDateFormat(String dateFormat) {
+        userDateFormat = dateFormat;
+    }
+
 }

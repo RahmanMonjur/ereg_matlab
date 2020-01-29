@@ -9,6 +9,7 @@ import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
 import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
 import org.hisp.dhis.android.core.common.ObjectStyle;
 import org.hisp.dhis.android.core.common.ValueType;
+import org.hisp.dhis.android.core.enrollment.Enrollment;
 import org.hisp.dhis.android.core.enrollment.EnrollmentCreateProjection;
 import org.hisp.dhis.android.core.enrollment.EnrollmentObjectRepository;
 import org.hisp.dhis.android.core.maintenance.D2Error;
@@ -45,16 +46,25 @@ public class EnrollmentFormService {
     public boolean init(D2 d2, String teiUid, String programUid, String ouUid) {
         this.d2 = d2;
         try {
-            String enrollmentUid = d2.enrollmentModule().enrollments().blockingAdd(
-                    EnrollmentCreateProjection.builder()
-                            .organisationUnit(ouUid)
-                            .program(programUid)
-                            .trackedEntityInstance(teiUid)
-                            .build()
-            );
-            enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollmentUid);
-            enrollmentRepository.setEnrollmentDate(getNowWithoutTime());
-            enrollmentRepository.setIncidentDate(getNowWithoutTime());
+            Enrollment enrollment = d2.enrollmentModule().enrollments()
+                    .byProgram().eq(programUid)
+                    .byTrackedEntityInstance().eq(teiUid)
+                    .one().blockingGet();
+            if (enrollment == null) {
+                String enrollmentUid = d2.enrollmentModule().enrollments().blockingAdd(
+                        EnrollmentCreateProjection.builder()
+                                .organisationUnit(ouUid)
+                                .program(programUid)
+                                .trackedEntityInstance(teiUid)
+                                .build()
+                );
+                enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollmentUid);
+                enrollmentRepository.setEnrollmentDate(getNowWithoutTime());
+                enrollmentRepository.setIncidentDate(getNowWithoutTime());
+            }
+            else {
+                enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollment.uid());
+            }
             return true;
         } catch (D2Error d2Error) {
             d2Error.printStackTrace();

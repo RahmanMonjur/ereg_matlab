@@ -1,5 +1,7 @@
 package com.example.android.androidskeletonapp.data.service;
 
+import com.example.android.androidskeletonapp.data.Sdk;
+
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,5 +54,12 @@ public class DateFormatHelper {
             return "dd-MM-yyyy";
         }
         return "yyyy-MM-dd";
+    }
+
+    public static String getDateAsSystemFormat(Date date){
+        String dateFormat = Sdk.d2().systemInfoModule().systemInfo().blockingGet().dateFormat();
+        if(dateFormat.equalsIgnoreCase("dd-MM-yyyy"))
+            return formatEnglishDate(date);
+        return formatSimpleDate(date);
     }
 }

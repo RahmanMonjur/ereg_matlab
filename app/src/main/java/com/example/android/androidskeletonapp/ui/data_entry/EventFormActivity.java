@@ -22,11 +22,13 @@ import androidx.recyclerview.widget.OrientationHelper;
 import com.example.android.androidskeletonapp.BuildConfig;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.forms.EventFormService;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
 import com.example.android.androidskeletonapp.data.service.forms.RuleEngineService;
 import com.example.android.androidskeletonapp.databinding.ActivityEnrollmentFormBinding;
 import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.FormAdapter;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
@@ -73,9 +75,10 @@ public class EventFormActivity extends AppCompatActivity {
     private FormType formType;
     private String fieldWaitingImage;
     private String eventUid;
+    GlobalClass globalVars;
 
     private enum IntentExtra {
-        EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, ENROLLMENT_UID, OU_UID, TYPE
+        EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, ENROLLMENT_UID, TYPE
     }
 
     public enum FormType {
@@ -83,13 +86,12 @@ public class EventFormActivity extends AppCompatActivity {
     }
 
     public static Intent getFormActivityIntent(Context context, String eventUid, String programUid, String programStageUid, String enrollmentUid,
-                                               String orgUnitUid, FormType type) {
+                                               FormType type) {
         Intent intent = new Intent(context, EventFormActivity.class);
         intent.putExtra(IntentExtra.EVENT_UID.name(), eventUid);
         intent.putExtra(IntentExtra.PROGRAM_UID.name(), programUid);
         intent.putExtra(IntentExtra.PROGRAM_STAGE_UID.name(), programStageUid);
         intent.putExtra(IntentExtra.ENROLLMENT_UID.name(), enrollmentUid);
-        intent.putExtra(IntentExtra.OU_UID.name(), orgUnitUid);
         intent.putExtra(IntentExtra.TYPE.name(), type.name());
         return intent;
     }
@@ -107,6 +109,7 @@ public class EventFormActivity extends AppCompatActivity {
                 .byUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()))
                 .one().blockingGet().displayName());
 
+        globalVars = (GlobalClass) getApplicationContext();
         eventUid = getIntent().getStringExtra(IntentExtra.EVENT_UID.name());
 
         formType = FormType.valueOf(getIntent().getStringExtra(IntentExtra.TYPE.name()));
@@ -126,7 +129,7 @@ public class EventFormActivity extends AppCompatActivity {
                 eventUid,
                 getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()),
                 getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()),
-                getIntent().getStringExtra(IntentExtra.OU_UID.name()),
+                globalVars.getOrgUid().uid(),
                 getIntent().getStringExtra(IntentExtra.ENROLLMENT_UID.name()) ))
             this.engineService = new RuleEngineService();
 
@@ -159,8 +162,7 @@ public class EventFormActivity extends AppCompatActivity {
                 if (value != null && !value.equals(currentValue)) {
                     if (fieldUid.equalsIgnoreCase("EventDate") && !value.equals("")) {
                         try{
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            Date dateFromValue = sdf.parse(value);
+                            Date dateFromValue = DateFormatHelper.parseDateAutoFormat(value);
                             EventFormService.getInstance().saveEventDate(dateFromValue);
                         }
                         catch(ParseException ex){}

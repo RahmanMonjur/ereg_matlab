@@ -88,7 +88,6 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
             ActivityStarter.startActivity(this,
                     EventFormActivity
                             .getFormActivityIntent(this, null, programUid, programStageUid, selectedEnrollment,
-                                    globalVars.getOrgUid().uid(),
                                     EventFormActivity.FormType.CREATE),
                     false);
         }

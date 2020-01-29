@@ -80,6 +80,7 @@
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
                         android:inputType="date"
+                        android:maxLength="4"
                         android:textColorHint="@color/text_black_808" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,6 +99,7 @@
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
                         android:inputType="date"
+                        android:maxLength="2"
                         android:textColorHint="@color/text_black_333" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -107,6 +109,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:hint="Day"
+                    android:maxLength="2"
                     android:textColorHint="@color/text_black_808"
                     android:theme="@style/loginInputText">
 
