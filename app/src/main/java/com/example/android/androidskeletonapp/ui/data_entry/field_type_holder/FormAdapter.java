@@ -57,9 +57,11 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                     return new AgeFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_age_field, parent, false), valueSavedListener);
                 case BOOLEAN:
-                case TRUE_ONLY:
                     return new BooleanFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_boolean_field, parent, false), valueSavedListener);
+                case TRUE_ONLY:
+                    return new CheckboxFieldHolder(LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_checkbox_field, parent, false), valueSavedListener);
                 case IMAGE:
                     return new ImageFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_image_field, parent, false), valueSavedListener,

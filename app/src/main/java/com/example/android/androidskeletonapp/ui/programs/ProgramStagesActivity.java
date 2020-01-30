@@ -25,6 +25,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     GlobalClass globalVars;
     private Disposable disposable;
     private String selectedEnrollment;
+    private String selectedProgram;
     private enum IntentExtra {
         PROGRAM,
         TEI
@@ -42,7 +43,9 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_program_stages, R.id.programStageToolbar, R.id.programStageRecyclerView);
-        getSupportActionBar().setTitle(Sdk.d2().programModule().programs().byUid().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name())).one().blockingGet().displayName() + " - Program Stages");
+        selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
+        String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
+        getSupportActionBar().setTitle(title + " - Program Stages");
         globalVars = (GlobalClass) getApplicationContext();
         selectedEnrollment = Sdk.d2().enrollmentModule().enrollments().byProgram().eq(getIntent().getStringExtra(IntentExtra.PROGRAM.name()))
                 .byTrackedEntityInstance().eq(getIntent().getStringExtra(IntentExtra.TEI.name())).one().blockingGet().uid();

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="FORM LABEL" />
+        tools:text="FORM LABEL"
+        android:textStyle="bold"/>
 
     <Spinner
         android:id="@+id/spinner"

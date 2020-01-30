@@ -67,7 +67,8 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                 R.id.trackedEntityInstancesRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
-        getSupportActionBar().setTitle(Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName() + " - Enrolled Participants");
+        String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
+        getSupportActionBar().setTitle( title + " - Enrolled Participants");
 
         compositeDisposable = new CompositeDisposable();
         observeTrackedEntityInstances();
