@@ -125,6 +125,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         });
     }
 
+    // I don't find the TEI after opening it in the form.
     /*
     private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
         TrackedEntityInstanceQueryCollectionRepository teiRepository =
