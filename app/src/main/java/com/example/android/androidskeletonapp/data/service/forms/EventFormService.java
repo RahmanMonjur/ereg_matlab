@@ -80,7 +80,7 @@ public class EventFormService {
         else {
             fieldMap.clear();
             fieldMap.put("EventDate", new FormField(
-                    "EventDate", null, ValueType.DATE, "Visit Date",
+                    "EventDate", null, ValueType.DATE, "Visit Date", "",
                     eventRepository.blockingExists() ?
                             DateFormatHelper.formatSimpleDate(eventRepository.blockingGet().eventDate()) : null,
                     null, true,
@@ -108,7 +108,7 @@ public class EventFormService {
                                     .byOptionSetUid().eq(dataElement.optionSetUid()).blockingGet()) {
                                 FormField formField = new FormField(
                                         dataElement.uid(), dataElement.optionSetUid(),
-                                        dataElement.valueType(), option.displayName(),
+                                        dataElement.valueType(), option.displayName(), "",
                                         valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                         option.code(), true,
                                         option.style()
@@ -118,7 +118,7 @@ public class EventFormService {
                         } else
                             fieldMap.put(dataElement.uid(), new FormField(
                                     dataElement.uid(), dataElement.optionSetUid(),
-                                    dataElement.valueType(), dataElement.formName(),
+                                    dataElement.valueType(), dataElement.formName(), "",
                                     valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                     null, true,
                                     dataElement.style())

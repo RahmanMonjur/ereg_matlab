@@ -11,14 +11,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="FORM LABEL"
-        android:textStyle="bold"/>
+        tools:text="FORM LABEL"/>
+
+    <TextView
+        android:id="@+id/label1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        android:visibility="gone"
+        tools:text="FORM LABEL 1"
+        android:textColor="#ff0000"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/label">
+        app:layout_constraintTop_toBottomOf="@id/label1">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputEditText"
@@ -29,6 +37,7 @@
             android:imeOptions="actionNext"
             android:maxLines="1"
             android:layout_marginLeft="15dp"
+            android:layout_marginBottom="10dp"
             tools:text="This is data" />
     </com.google.android.material.textfield.TextInputLayout>
 

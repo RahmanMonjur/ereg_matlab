@@ -123,12 +123,26 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         });
     }
 
+    /*
     private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
         TrackedEntityInstanceQueryCollectionRepository teiRepository =
                 Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
                         .offlineOnly();
         if (!isEmpty(selectedProgram)) {
             return teiRepository.byProgram().eq(selectedProgram);
+        } else {
+            return teiRepository;
+        }
+    }
+    */
+
+    private TrackedEntityInstanceCollectionRepository getTeiRepository() {
+        TrackedEntityInstanceCollectionRepository teiRepository =
+                Sdk.d2().trackedEntityModule().trackedEntityInstances().withTrackedEntityAttributeValues();
+        if (!isEmpty(selectedProgram)) {
+            List<String> programUids = new ArrayList<>();
+            programUids.add(selectedProgram);
+            return teiRepository.byProgramUids(programUids);
         } else {
             return teiRepository;
         }

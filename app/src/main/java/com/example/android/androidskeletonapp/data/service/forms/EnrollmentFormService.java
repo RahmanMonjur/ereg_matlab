@@ -82,7 +82,7 @@ public class EnrollmentFormService {
 
             fieldMap.clear();
             fieldMap.put("EnrollmentDate", new FormField(
-                "EnrollmentDate", null, ValueType.DATE, "Enrollment Date",
+                "EnrollmentDate", null, ValueType.DATE, "Enrollment Date","",
                 enrollmentRepository.blockingExists() ?
                         DateFormatHelper.formatSimpleDate(enrollmentRepository.blockingGet().enrollmentDate()) : null,
                 null, true,
@@ -118,7 +118,7 @@ public class EnrollmentFormService {
                                 attribute.uid(),
                                 attribute.optionSet() != null ? attribute.optionSet().uid() : null,
                                 attribute.valueType(),
-                                String.format("%s%s", attribute.formName(), programAttribute.mandatory() ? "*" : ""),
+                                String.format("%s%s", attribute.formName(), programAttribute.mandatory() ? "*" : ""),"",
                                 valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                 null,
                                 !attribute.generated(),

@@ -20,6 +20,15 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="FORM LABEL" />
 
+    <TextView
+        android:id="@+id/label1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        android:visibility="gone"
+        tools:text="FORM LABEL 1"
+        android:textColor="#ff0000"/>
+
     <ImageView
         android:id="@+id/image"
         android:layout_width="100dp"
@@ -29,7 +38,7 @@
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"
+        app:layout_constraintTop_toBottomOf="@id/label1"
         tools:src="@drawable/ic_photo" />
 
     <ImageView

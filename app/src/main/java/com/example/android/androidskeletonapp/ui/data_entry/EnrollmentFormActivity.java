@@ -42,6 +42,7 @@ import org.hisp.dhis.rules.RuleEngine;
 import org.hisp.dhis.rules.models.RuleAction;
 import org.hisp.dhis.rules.models.RuleActionAssign;
 import org.hisp.dhis.rules.models.RuleActionHideField;
+import org.hisp.dhis.rules.models.RuleActionShowWarning;
 import org.hisp.dhis.rules.models.RuleEffect;
 
 import java.io.File;
@@ -247,7 +248,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
         //Adding an empty field to avoid the overlapping of action buttons in the activity
         fields.put("EmptyField", new FormField(
-                "EmptyField", null, ValueType.TEXT, null,null,
+                "EmptyField", null, ValueType.TEXT, null, null,null,
                 null, false, ObjectStyle.builder().build()));
 
         for (RuleEffect ruleEffect : ruleEffects) {
@@ -258,7 +259,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
                                 ruleEffect.data(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));
@@ -277,6 +278,18 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                 for (String key : fields.keySet()) //For image options
                     if (key.contains(((RuleActionHideField) ruleAction).field()))
                         fields.remove(key);
+            }
+            else if (ruleEffect.ruleAction() instanceof RuleActionShowWarning) {
+                for (String key : fields.keySet())
+                    if (key.contains(((RuleActionShowWarning) ruleAction).field())) {
+                        FormField fl = fields.get(key);
+                        fields.put(fl.getUid(),new FormField(
+                                fl.getUid(), fl.getOptionSetUid(),
+                                fl.getValueType(), fl.getFormLabel() , ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getValue(),
+                                fl.getOptionCode(), fl.isEditable(),
+                                fl.getObjectStyle()));
+                    }
             }
         }
 

@@ -3,6 +3,8 @@ package com.example.android.androidskeletonapp.data.service.forms;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.jexl2.JexlEngine;
@@ -219,17 +221,29 @@ public class RuleEngineService {
             List<ProgramTrackedEntityAttribute> programTrackedEntityAttributes) {
         List<String> attrUids = new ArrayList<>();
         for (ProgramTrackedEntityAttribute programTrackedEntityAttribute : programTrackedEntityAttributes)
-            attrUids.add(programTrackedEntityAttribute.uid());
+            attrUids.add(programTrackedEntityAttribute.trackedEntityAttribute().uid());
         return attrUids;
     }
 
     private List<RuleAttributeValue> transformToRuleAttributeValues(List<TrackedEntityAttributeValue> attributeValues) {
         List<RuleAttributeValue> ruleAttributeValues = new ArrayList<>();
 
-        for (TrackedEntityAttributeValue attributeValue : attributeValues)
-            ruleAttributeValues.add(
-                    RuleAttributeValue.create(attributeValue.trackedEntityAttribute(), attributeValue.value())
-            );
+        for (TrackedEntityAttributeValue attributeValue : attributeValues) {
+            TrackedEntityAttribute attribute = Sdk.d2().trackedEntityModule().trackedEntityAttributes().uid(attributeValue.trackedEntityAttribute()).blockingGet();
+            if(attribute.valueType() == ValueType.DATE | attribute.valueType() == ValueType.AGE) {
+                try {
+                    String dateFormatted = DateFormatHelper.formatSimpleDate(DateFormatHelper.parseDateAutoFormat(attributeValue.value()));
+                    ruleAttributeValues.add(
+                            RuleAttributeValue.create(attributeValue.trackedEntityAttribute(), dateFormatted)
+                    );
+                } catch (Exception e) {}
+            }
+            else {
+                ruleAttributeValues.add(
+                        RuleAttributeValue.create(attributeValue.trackedEntityAttribute(), attributeValue.value())
+                );
+            }
+        }
 
         return ruleAttributeValues;
     }

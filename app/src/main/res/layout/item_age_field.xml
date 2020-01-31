@@ -19,15 +19,23 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="FORM LABEL"
-                android:textStyle="bold"/>
+                tools:text="FORM LABEL"/>
+
+            <TextView
+                android:id="@+id/label1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/label"
+                android:visibility="gone"
+                tools:text="FORM LABEL 1"
+                android:textColor="#ff0000"/>
 
             <ImageView
                 android:id="@+id/renderImage"
@@ -42,9 +50,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="15dp"
+                android:layout_marginBottom="10dp"
                 android:layout_below="@id/renderImage">
 
                 <com.google.android.material.textfield.TextInputLayout

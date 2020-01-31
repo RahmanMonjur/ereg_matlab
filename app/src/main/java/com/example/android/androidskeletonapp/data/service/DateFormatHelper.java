@@ -42,17 +42,17 @@ public class DateFormatHelper {
 
     public static Date parseDateAutoFormat(String date) throws ParseException {
         String[] dateparts = date.split("\\-");
-        if (dateparts[2].length() == 4) {
-            return dateFormat2.parse(date);
-        }
+        if (dateparts.length == 3)
+            if (dateparts[2].length() == 4)
+                return dateFormat2.parse(date);
         return dateFormat.parse(date);
     }
 
     public static String getFormat(String date){
         String[] dateparts = date.split("\\-");
-        if (dateparts[2].length() == 4) {
-            return "dd-MM-yyyy";
-        }
+        if (dateparts.length == 3)
+            if (dateparts[2].length() == 4)
+                return "dd-MM-yyyy";
         return "yyyy-MM-dd";
     }
 

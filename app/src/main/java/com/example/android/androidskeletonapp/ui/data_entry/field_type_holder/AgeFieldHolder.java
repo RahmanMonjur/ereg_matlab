@@ -69,6 +69,14 @@ public class AgeFieldHolder extends FieldHolder {
 
         input_date.setOnClickListener(view -> {
             Calendar calendar = Calendar.getInstance();
+            if (fieldItem.getValue() != null && !fieldItem.getValue().equalsIgnoreCase("")) {
+                String[] dateparts = fieldItem.getValue().split("\\-");
+                if (dateparts.length == 3)
+                    if (dateparts[2].length() == 4)
+                        calendar.set(Integer.parseInt(dateparts[2]), Integer.parseInt(dateparts[1])-1,Integer.parseInt(dateparts[0]));
+                    else
+                        calendar.set(Integer.parseInt(dateparts[0]), Integer.parseInt(dateparts[1])-1,Integer.parseInt(dateparts[2]));
+            }
             new DatePickerDialog(itemView.getContext(), (datePicker, year, month, day) ->
                     valueSavedListener.onValueSaved(fieldItem.getUid(), getDate(year, month, day)),
                     calendar.get(Calendar.YEAR),
