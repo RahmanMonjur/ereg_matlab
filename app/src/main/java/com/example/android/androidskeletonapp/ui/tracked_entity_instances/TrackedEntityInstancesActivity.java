@@ -14,6 +14,7 @@ import androidx.paging.PagedList;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.data_entry.EnrollmentFormActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
@@ -25,6 +26,7 @@ import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProje
 import org.hisp.dhis.android.core.trackedentity.search.TrackedEntityInstanceQueryCollectionRepository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -137,8 +139,15 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     */
 
     private TrackedEntityInstanceCollectionRepository getTeiRepository() {
+        Date date = new Date();
+        try{
+            date = DateFormatHelper.parseDateAutoFormat("2018-10-13");
+        } catch (Exception e){};
+
         TrackedEntityInstanceCollectionRepository teiRepository =
-                Sdk.d2().trackedEntityModule().trackedEntityInstances().withTrackedEntityAttributeValues();
+                Sdk.d2().trackedEntityModule().trackedEntityInstances()
+                        .byCreated().after(date)
+                        .withTrackedEntityAttributeValues();
         if (!isEmpty(selectedProgram)) {
             List<String> programUids = new ArrayList<>();
             programUids.add(selectedProgram);
@@ -175,6 +184,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     @Override
     protected void onRestart() {
         super.onRestart();
+        etFirstName.setText("");
         observeTrackedEntityInstances();
 
     }

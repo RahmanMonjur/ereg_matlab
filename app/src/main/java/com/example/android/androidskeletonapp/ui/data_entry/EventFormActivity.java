@@ -255,7 +255,7 @@ public class EventFormActivity extends AppCompatActivity {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionAssign){
                 for (String key : fields.keySet())
-                    if (key.contains(((RuleActionAssign) ruleAction).field())) {
+                    if (key.equals(((RuleActionAssign) ruleAction).field())) {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
@@ -278,11 +278,11 @@ public class EventFormActivity extends AppCompatActivity {
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionShowWarning) {
                 for (String key : fields.keySet())
-                    if (key.contains(((RuleActionShowWarning) ruleAction).field())) {
+                    if (key.equals(((RuleActionShowWarning) ruleAction).field())) {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel() , ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getValueType(), fl.getFormLabel(), ((RuleActionShowWarning) ruleAction).content(),
                                 fl.getValue(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));

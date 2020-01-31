@@ -271,7 +271,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private Observable<D2Progress> downloadTrackedEntityInstances() {
-        return Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader()
+        return Sdk.d2().trackedEntityModule()
+                .trackedEntityInstanceDownloader()
                 .limit(1000)
                 .limitByOrgunit(false).limitByProgram(false).download();
     }

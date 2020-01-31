@@ -32,9 +32,9 @@
                 android:id="@+id/label1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/label"
-                android:visibility="gone"
+                android:layout_below="@id/label"
                 tools:text="FORM LABEL 1"
+                android:visibility="gone"
                 android:textColor="#ff0000"/>
 
             <ImageView
@@ -45,6 +45,7 @@
                 android:layout_marginBottom="5dp"
                 android:visibility="gone"
                 tools:srcCompat="@drawable/bangladesh"
+                android:layout_below="@id/label1"
                 tools:visibility="visible" />
 
             <LinearLayout
@@ -71,6 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="date"
+                        android:padding="8dp"
                         android:textColor="@color/text_black_333"
                         tools:text="" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -92,6 +94,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="date"
                         android:maxLength="4"
+                        android:padding="8dp"
                         android:textColorHint="@color/text_black_808" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,6 +115,7 @@
                         android:background="#FFFFFF"
                         android:inputType="date"
                         android:maxLength="2"
+                        android:padding="8dp"
                         android:textColorHint="@color/text_black_333" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -132,6 +136,7 @@
                         android:background="#FFFFFF"
                         android:imeOptions="actionDone"
                         android:inputType="date"
+                        android:padding="8dp"
                         android:textColorHint="@color/text_black_333" />
                 </com.google.android.material.textfield.TextInputLayout>
 

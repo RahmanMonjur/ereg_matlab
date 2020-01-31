@@ -30,11 +30,15 @@ class FieldHolder extends RecyclerView.ViewHolder {
         label.setTextColor(Color.BLACK);
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
 
-        if(fieldItem.getFormHint() != ""){
+        if(!fieldItem.getFormHint().isEmpty() && fieldItem.getFormHint() != ""){
             label1.setVisibility(View.VISIBLE);
             label1.setText(fieldItem.getFormHint());
             label1.setTextSize(15);
             label1.setTextColor(Color.RED);
+        }
+        else {
+            label1.setVisibility(View.GONE);
+            label1.setText("");
         }
     }
 }

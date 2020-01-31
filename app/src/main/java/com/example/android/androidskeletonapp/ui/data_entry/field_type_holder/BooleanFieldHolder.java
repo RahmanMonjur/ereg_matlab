@@ -22,12 +22,6 @@ class BooleanFieldHolder extends FieldHolder {
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
 
-        if (fieldItem.getValueType() == ValueType.TRUE_ONLY) {
-            itemView.findViewById(R.id.optionNo).setVisibility(View.GONE);
-        } else {
-            itemView.findViewById(R.id.optionNo).setVisibility(View.VISIBLE);
-        }
-
         if (fieldItem.getValue() != null && fieldItem.getValue().equals("true")) {
             radioGroup.check(R.id.optionYes);
         } else if (fieldItem.getValue() != null && fieldItem.getValue().equals("false")) {
