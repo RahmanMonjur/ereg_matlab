@@ -126,7 +126,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     }
 
     // I don't find the TEI after opening it in the form.
-    /*
+
     private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
         TrackedEntityInstanceQueryCollectionRepository teiRepository =
                 Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
@@ -137,12 +137,12 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
             return teiRepository;
         }
     }
-    */
 
+    /*
     private TrackedEntityInstanceCollectionRepository getTeiRepository() {
         Date date = new Date();
         try{
-            date = DateFormatHelper.parseDateAutoFormat("2018-10-13");
+            date = DateFormatHelper.parseDateAutoFormat("2017-10-13");
         } catch (Exception e){};
 
         TrackedEntityInstanceCollectionRepository teiRepository =
@@ -157,7 +157,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
             return teiRepository;
         }
     }
-
+    */
     private LiveData<PagedList<TrackedEntityInstance>> getTrackedEntityInstanceQuery() {
         adapter = new TrackedEntityInstanceAdapter( this,this, selectedProgram);
         recyclerView.setAdapter(adapter);
