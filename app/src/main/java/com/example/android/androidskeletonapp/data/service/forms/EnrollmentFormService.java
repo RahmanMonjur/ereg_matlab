@@ -12,6 +12,7 @@ import org.hisp.dhis.android.core.common.ValueType;
 import org.hisp.dhis.android.core.enrollment.Enrollment;
 import org.hisp.dhis.android.core.enrollment.EnrollmentCreateProjection;
 import org.hisp.dhis.android.core.enrollment.EnrollmentObjectRepository;
+import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttribute;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValueObjectRepository;
@@ -31,6 +32,7 @@ public class EnrollmentFormService {
     private EnrollmentObjectRepository enrollmentRepository;
     private static EnrollmentFormService instance;
     private final Map<String, FormField> fieldMap;
+    private Boolean newEnrollment;
 
     private EnrollmentFormService() {
         fieldMap = new LinkedHashMap<>();
@@ -49,6 +51,7 @@ public class EnrollmentFormService {
             Enrollment enrollment = d2.enrollmentModule().enrollments()
                     .byProgram().eq(programUid)
                     .byTrackedEntityInstance().eq(teiUid)
+                    .byStatus().eq(EnrollmentStatus.ACTIVE)
                     .one().blockingGet();
             if (enrollment == null) {
                 String enrollmentUid = d2.enrollmentModule().enrollments().blockingAdd(
@@ -61,9 +64,11 @@ public class EnrollmentFormService {
                 enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollmentUid);
                 enrollmentRepository.setEnrollmentDate(getNowWithoutTime());
                 enrollmentRepository.setIncidentDate(getNowWithoutTime());
+                newEnrollment = true;
             }
             else {
                 enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollment.uid());
+                newEnrollment = false;
             }
             return true;
         } catch (D2Error d2Error) {
@@ -159,6 +164,10 @@ public class EnrollmentFormService {
 
     public String getEnrollmentUid() {
         return enrollmentRepository.blockingGet().uid();
+    }
+
+    public Boolean getNewEnrollment(){
+        return newEnrollment;
     }
 
     public void delete() {

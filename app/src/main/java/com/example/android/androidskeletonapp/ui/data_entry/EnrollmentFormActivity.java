@@ -224,25 +224,6 @@ public class EnrollmentFormActivity extends AppCompatActivity {
         );
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        disposable.clear();
-    }
-
-    @Override
-    protected void onDestroy() {
-        EnrollmentFormService.clear();
-        super.onDestroy();
-    }
-
-    private void clearForm(View view){
-        EnrollmentFormService.getInstance().delete();
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
 
@@ -271,7 +252,6 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                                     ).blockingSet(ruleEffect.data());
                         } catch (Exception e) {}
                     }
-
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
                 fields.remove(((RuleActionHideField) ruleAction).field());
@@ -297,6 +277,25 @@ public class EnrollmentFormActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        disposable.clear();
+    }
+
+    @Override
+    protected void onDestroy() {
+        EnrollmentFormService.clear();
+        super.onDestroy();
+    }
+
+    private void clearForm(View view){
+        if (EnrollmentFormService.getInstance().getNewEnrollment() == true)
+            EnrollmentFormService.getInstance().delete();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
@@ -309,7 +308,8 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        EnrollmentFormService.getInstance().delete();
+        if (EnrollmentFormService.getInstance().getNewEnrollment() == true)
+            EnrollmentFormService.getInstance().delete();
         setResult(RESULT_CANCELED);
         finish();
     }

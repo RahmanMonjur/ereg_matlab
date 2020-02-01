@@ -20,6 +20,7 @@ import com.example.android.androidskeletonapp.ui.data_entry.EnrollmentFormActivi
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
+import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
@@ -39,6 +40,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
     private CompositeDisposable compositeDisposable;
     private String selectedProgram;
+    private String newTeiUid;
     private final int ENROLLMENT_RQ = 1210;
     private TrackedEntityInstanceAdapter adapter;
     private static EditText etFirstName;
@@ -87,6 +89,10 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                                                 .trackedEntityType(program.trackedEntityType().uid())
                                                 .build()
                                 ))
+                        .map(teiUid -> {
+                            newTeiUid = teiUid;
+                            return  teiUid;
+                        })
                         .map(teiUid -> EnrollmentFormActivity.getFormActivityIntent(
                                 TrackedEntityInstancesActivity.this,
                                 teiUid,
@@ -177,7 +183,16 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == ENROLLMENT_RQ && resultCode == RESULT_OK){
-                adapter.invalidateSource();
+            adapter.invalidateSource();
+        }
+        else if (requestCode == ENROLLMENT_RQ && resultCode == RESULT_CANCELED) {
+            if(newTeiUid != null){
+                try {
+                    Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(newTeiUid).blockingDelete();
+                } catch (D2Error d2Error) {
+                    d2Error.printStackTrace();
+                }
+            }
         }
         super.onActivityResult(requestCode,resultCode,data);
     }
