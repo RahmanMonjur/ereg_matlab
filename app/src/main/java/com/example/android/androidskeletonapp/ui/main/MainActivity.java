@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -19,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
+import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
@@ -33,9 +35,15 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.hisp.dhis.android.core.arch.call.D2Progress;
+import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
+import org.hisp.dhis.android.core.period.PeriodType;
+import org.hisp.dhis.android.core.period.internal.PeriodHelper;
 import org.hisp.dhis.android.core.user.User;
+import org.joda.time.Period;
 
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar progressBar;
 
     private boolean isSyncing = false;
+    GlobalClass globalVars;
 
     public static Intent getMainActivityIntent(Context context) {
         return new Intent(context, MainActivity.class);
@@ -65,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        globalVars = (GlobalClass) getApplicationContext();
 
         compositeDisposable = new CompositeDisposable();
 
@@ -207,16 +217,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         enablePossibleButtons(programCount + dataSetCount > 0);
 
-        TextView downloadedProgramsText = findViewById(R.id.programsDownloadedText);
-        TextView downloadedDataSetsText = findViewById(R.id.dataSetsDownloadedText);
-        TextView downloadedTeisText = findViewById(R.id.trackedEntityInstancesDownloadedText);
-        TextView singleEventsDownloadedText = findViewById(R.id.singleEventsDownloadedText);
-        TextView downloadedDataValuesText = findViewById(R.id.dataValuesDownloadedText);
-        downloadedProgramsText.setText(MessageFormat.format("{0}", programCount));
-        downloadedDataSetsText.setText(MessageFormat.format("{0}", dataSetCount));
-        downloadedTeisText.setText(MessageFormat.format("{0}", trackedEntityInstanceCount));
-        singleEventsDownloadedText.setText(MessageFormat.format("{0}", singleEventCount));
-        downloadedDataValuesText.setText(MessageFormat.format("{0}", dataValueCount));
+        Date trialDate = new Date();
+        try{
+            trialDate = DateFormatHelper.parseDateAutoFormat("2017-10-13");
+        } catch (Exception e){};
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+
+        int totalEnroll = Sdk.d2().enrollmentModule().enrollments()
+                .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
+                .byProgram().eq("WSGAb5XwJ3Y")
+                .byStatus().eq(EnrollmentStatus.ACTIVE)
+                .byCreated().after(trialDate)
+                .blockingCount();
+
+        int lastMonthEnroll = Sdk.d2().enrollmentModule().enrollments()
+                .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
+                .byCreated().after(trialDate)
+                .byProgram().eq("WSGAb5XwJ3Y")
+                .byStatus().eq(EnrollmentStatus.ACTIVE)
+                .byEnrollmentDate().after(calendar.getTime())
+                .blockingCount();
+
+        int lastMonthVisit = Sdk.d2().eventModule().events()
+                .byProgramStageUid().eq("V3hCCKHGAaz")
+                .byOrganisationUnitUid().eq(globalVars.getOrgUid().uid())
+                .byCreated().after(trialDate)
+                .byCreated().after(calendar.getTime())
+                .blockingCount();
+
+        TextView indicator1 = findViewById(R.id.indicator1);
+        TextView indicator2 = findViewById(R.id.indicator2);
+        TextView indicator3 = findViewById(R.id.indicator3);
+        indicator1.setText(MessageFormat.format("{0}", totalEnroll));
+        indicator2.setText(MessageFormat.format("{0}", lastMonthEnroll));
+        indicator3.setText(MessageFormat.format("{0}", lastMonthVisit));
     }
 
     private void createNavigationView(User user) {
@@ -246,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     setSyncingFinished();
                     //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
                 })
+                .doOnError(throwable -> Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_LONG).show())
                 .subscribe());
     }
 
@@ -315,15 +352,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.navPrograms) {
-            ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
-        } else if (id == R.id.navTrackedEntities) {
-            ActivityStarter.startActivity(this, TrackedEntityInstancesActivity.getTrackedEntityInstancesActivityIntent(this, null), false);
-        } else if (id == R.id.navTrackedEntitiesSearch) {
-            ActivityStarter.startActivity(this, TrackedEntityInstanceSearchActivity.getIntent(this), false);
-        } else if (id == R.id.navDataSets) {
-            ActivityStarter.startActivity(this, DataSetsActivity.getIntent(this), false);
-        } else if (id == R.id.navDataSetInstances) {
-            ActivityStarter.startActivity(this, DataSetInstancesActivity.getIntent(this), false);
+            //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
+            ActivityStarter.startActivity(this,
+                    TrackedEntityInstancesActivity
+                            .getTrackedEntityInstancesActivityIntent(this, "ZBIqxwVixn8"),
+                    false);
         } else if (id == R.id.navD2Errors) {
             ActivityStarter.startActivity(this, D2ErrorActivity.getIntent(this), false);
         } else if (id == R.id.navFKViolations) {

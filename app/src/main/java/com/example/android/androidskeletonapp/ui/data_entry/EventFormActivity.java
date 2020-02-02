@@ -119,7 +119,6 @@ public class EventFormActivity extends AppCompatActivity {
 
         adapter = new FormAdapter(getValueListener(), getImageListener());
         binding.buttonEnd.setOnClickListener(this::finishEnrollment);
-        binding.buttonCancel.setOnClickListener(this::clearForm);
         binding.formRecycler.setAdapter(adapter);
         DividerItemDecoration itemDecor = new DividerItemDecoration(binding.formRecycler.getContext(), OrientationHelper.VERTICAL);
         binding.formRecycler.addItemDecoration(itemDecor);
@@ -246,11 +245,6 @@ public class EventFormActivity extends AppCompatActivity {
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
 
-        //Adding an empty field to avoid the overlapping of action buttons in the activity
-        fields.put("EmptyField", new FormField(
-                "EmptyField", null, ValueType.TEXT, "", "","",
-                null, false, ObjectStyle.builder().build()));
-
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionAssign){
@@ -274,7 +268,53 @@ public class EventFormActivity extends AppCompatActivity {
 
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
+                List<String> myList = new ArrayList<>();
+                for (String key : fields.keySet())
+                    if (key.equals(((RuleActionHideField) ruleAction).field())) {
+                        FormField fl = fields.get(key);
+                        fields.put(fl.getUid(), new FormField(
+                                fl.getUid(), fl.getOptionSetUid(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                null,
+                                fl.getOptionCode(), false,
+                                fl.getObjectStyle()));
+                        myList.add(fl.getUid());
+                        try {
+                            Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                                    .value(
+                                            EventFormService.getInstance().getEventUid(),
+                                            fl.getUid()
+                                    ).blockingDelete();
+                        } catch (Exception e) {
+                        }
+                    }
+                for (String key : myList) {
+                    fields.remove(key);
+                }
+
+                /*
                 fields.remove(((RuleActionHideField) ruleAction).field());
+                for (String key : fields.keySet()) //For image options
+                    if (key.equals(((RuleActionHideField) ruleAction).field()))
+                        fields.remove(key);
+                */
+                /*
+                List<String> myList = new ArrayList<>();
+                for (String key : fields.keySet())
+                    if (key.equals(((RuleActionHideField) ruleAction).field())) {
+                        FormField fl = fields.get(key);
+                        fields.put(fl.getUid(), new FormField(
+                                fl.getUid(), fl.getOptionSetUid(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                null,
+                                fl.getOptionCode(), false,
+                                fl.getObjectStyle()));
+                        myList.add(fl.getUid());
+                    }
+                for (String key : myList) {
+                    fields.remove(key);
+                }
+                */
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionShowWarning) {
                 for (String key : fields.keySet())

@@ -43,7 +43,7 @@
     <string name="data_values">Data values</string>
     <string name="zero">0</string>
     <!-- Strings related to programs -->
-    <string name="title_activity_programs">Your programs</string>
+    <string name="title_activity_programs">Programs</string>
     <string name="title_activity_program_stage">Program Stages</string>
     <string name="program_name">Program Name</string>
     <string name="program_icon">Program Icon</string>

@@ -18,8 +18,6 @@ import org.hisp.dhis.android.core.program.ProgramStage;
 
 public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListItemWithCardHolder> {
 
-
-
     private final OnProgramStageSelectionListener programStageSelectionListener;
     private final String programUid;
     private final String trackedEntityInstanceUid;
@@ -29,8 +27,6 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
         this.programStageSelectionListener = programStageSelectionListener;
         this.programUid = programUid;
         this.trackedEntityInstanceUid = teiUid;
-
-
     }
 
     @NonNull

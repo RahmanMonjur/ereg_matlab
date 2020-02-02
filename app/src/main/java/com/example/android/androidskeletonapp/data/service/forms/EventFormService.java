@@ -89,7 +89,7 @@ public class EventFormService {
             return Flowable.fromCallable(() ->
                     d2.programModule().programStageDataElements()
                             .byProgramStage().eq(eventRepository.blockingGet().programStage())
-                            .orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
+                            //.orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
                             .blockingGet()
             )
                     .flatMapIterable(programStageDataElements -> programStageDataElements)

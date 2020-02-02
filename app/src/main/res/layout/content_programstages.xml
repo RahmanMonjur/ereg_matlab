@@ -14,8 +14,19 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="1dp"
         android:text="@string/no_program_stages_found" />
+
+    <Spinner
+        android:id="@+id/listProgram"
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/programStageRecyclerView"
@@ -23,6 +34,7 @@
         android:layout_height="match_parent"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
+        android:layout_marginTop="70dp"
         android:clipToPadding="false"
         tools:listitem="@layout/list_item_simple"/>
 

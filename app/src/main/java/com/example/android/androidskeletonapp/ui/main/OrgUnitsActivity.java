@@ -74,11 +74,14 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
         globalVars.setOrgUid(orgUid);
         String orgname = orgUid.displayName();
         Toast.makeText(getApplicationContext(), "You have selected "+orgname, Toast.LENGTH_LONG).show();
+        /*
         if (Sdk.d2().programModule().programs().blockingCount() > 0) {
             ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), true);
         } else {
             ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
         }
+        */
+        ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
     }
 
 

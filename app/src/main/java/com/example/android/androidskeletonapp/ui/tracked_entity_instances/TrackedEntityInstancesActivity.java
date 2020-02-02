@@ -18,9 +18,12 @@ import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.ListActivity;
 import com.example.android.androidskeletonapp.ui.data_entry.EnrollmentFormActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
+import com.example.android.androidskeletonapp.ui.main.MainActivity;
+import com.example.android.androidskeletonapp.ui.main.OrgUnitsActivity;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
 import org.hisp.dhis.android.core.maintenance.D2Error;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProjection;
@@ -69,7 +72,16 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_tracked_entity_instances, R.id.trackedEntityInstancesToolbar,
                 R.id.trackedEntityInstancesRecyclerView);
+
         globalVars = (GlobalClass) getApplicationContext();
+        if(globalVars.getOrgUid() == null) {
+            if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount()==1) {
+                globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
+            } else {
+                ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+            }
+        }
+
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
         getSupportActionBar().setTitle( title + " - Enrolled Participants");
