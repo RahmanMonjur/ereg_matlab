@@ -80,17 +80,16 @@ public class LoginActivity extends AppCompatActivity {
                 showLoginFailed(loginResult.getError());
             }
             if (loginResult.getSuccess() != null) {
-                if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount()>0){
+
+                ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
+                /*
+                if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() > 1){
                     Toast.makeText(getApplicationContext(), "You are assigned to more than one organisation unit.\nPlease select one from the list. ", Toast.LENGTH_LONG).show();
                     ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this),true);
-
-                }else {
-                    if (Sdk.d2().programModule().programs().blockingCount() > 0) {
-                        ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), true);
-                    } else {
-                        ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
-                    }
+                } else {
+                    ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
                 }
+                */
             }
             setResult(Activity.RESULT_OK);
         });

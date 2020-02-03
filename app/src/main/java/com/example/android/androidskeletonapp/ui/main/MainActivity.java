@@ -217,46 +217,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         enablePossibleButtons(programCount + dataSetCount > 0);
 
-        Date trialDate = new Date();
-        try{
-            trialDate = DateFormatHelper.parseDateAutoFormat("2017-10-13");
-        } catch (Exception e){};
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
+        if (globalVars.getOrgUid() != null) {
+            Date trialDate = new Date();
+            try {
+                trialDate = DateFormatHelper.parseDateAutoFormat("2017-10-13");
+            } catch (Exception e) {
+            }
 
-        /*
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
 
-        int totalEnroll = Sdk.d2().enrollmentModule().enrollments()
-                .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
-                .byProgram().eq("WSGAb5XwJ3Y")
-                .byStatus().eq(EnrollmentStatus.ACTIVE)
-                .byCreated().after(trialDate)
-                .blockingCount();
 
-        int lastMonthEnroll = Sdk.d2().enrollmentModule().enrollments()
-                .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
-                .byCreated().after(trialDate)
-                .byProgram().eq("WSGAb5XwJ3Y")
-                .byStatus().eq(EnrollmentStatus.ACTIVE)
-                .byEnrollmentDate().after(calendar.getTime())
-                .blockingCount();
+            int totalEnroll = Sdk.d2().enrollmentModule().enrollments()
+                    .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
+                    .byProgram().eq("WSGAb5XwJ3Y")
+                    .byStatus().eq(EnrollmentStatus.ACTIVE)
+                    .byCreated().after(trialDate)
+                    .blockingCount();
 
-        int lastMonthVisit = Sdk.d2().eventModule().events()
-                .byProgramStageUid().eq("V3hCCKHGAaz")
-                .byOrganisationUnitUid().eq(globalVars.getOrgUid().uid())
-                .byCreated().after(trialDate)
-                .byCreated().after(calendar.getTime())
-                .blockingCount();
+            int lastMonthEnroll = Sdk.d2().enrollmentModule().enrollments()
+                    .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
+                    .byCreated().after(trialDate)
+                    .byProgram().eq("WSGAb5XwJ3Y")
+                    .byStatus().eq(EnrollmentStatus.ACTIVE)
+                    .byEnrollmentDate().after(calendar.getTime())
+                    .blockingCount();
 
-        TextView indicator1 = findViewById(R.id.indicator1);
-        TextView indicator2 = findViewById(R.id.indicator2);
-        TextView indicator3 = findViewById(R.id.indicator3);
-        indicator1.setText(MessageFormat.format("{0}", totalEnroll));
-        indicator2.setText(MessageFormat.format("{0}", lastMonthEnroll));
-        indicator3.setText(MessageFormat.format("{0}", lastMonthVisit));
+            int lastMonthVisit = Sdk.d2().eventModule().events()
+                    .byProgramStageUid().eq("V3hCCKHGAaz")
+                    .byOrganisationUnitUid().eq(globalVars.getOrgUid().uid())
+                    .byCreated().after(trialDate)
+                    .byCreated().after(calendar.getTime())
+                    .blockingCount();
 
-         */
+            TextView indicator1 = findViewById(R.id.indicator1);
+            TextView indicator2 = findViewById(R.id.indicator2);
+            TextView indicator3 = findViewById(R.id.indicator3);
+            indicator1.setText(MessageFormat.format("{0}", totalEnroll));
+            indicator2.setText(MessageFormat.format("{0}", lastMonthEnroll));
+            indicator3.setText(MessageFormat.format("{0}", lastMonthVisit));
+        }
+
     }
 
     private void createNavigationView(User user) {
@@ -306,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .doOnComplete(() -> {
                             setSyncingFinished();
                             //ActivityStarter.startActivity(this, TrackedEntityInstancesActivity.getTrackedEntityInstancesActivityIntent(this, null), false);
+
                         })
                         .doOnError(Throwable::printStackTrace)
                         .subscribe());
