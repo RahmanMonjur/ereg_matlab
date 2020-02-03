@@ -26,7 +26,10 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -80,7 +83,6 @@ public class LoginActivity extends AppCompatActivity {
                 showLoginFailed(loginResult.getError());
             }
             if (loginResult.getSuccess() != null) {
-
                 ActivityStarter.startActivity(this, MainActivity.getMainActivityIntent(this), true);
                 /*
                 if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() > 1){

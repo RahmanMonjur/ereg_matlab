@@ -133,9 +133,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         syncStatusText = findViewById(R.id.notificator);
         progressBar = findViewById(R.id.syncProgressBar);
 
-        if(SyncStatusHelper.programCount() + SyncStatusHelper.dataSetCount() == 0){
+        if(SyncStatusHelper.programCount() + SyncStatusHelper.trackedEntityInstanceCount() == 0){
             downloadInitialMetadata();
-            downloadData();
+            downloadInitialData();
         }
 
         syncMetadataButton.setOnClickListener(view -> {
@@ -165,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void downloadInitialMetadata(){
         setSyncing();
-        syncStatusText.setText("Downloading initial metadata...");
         syncMetadata();
     }
 
@@ -286,7 +285,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .doOnError(Throwable::printStackTrace)
                 .doOnComplete(() -> {
                     setSyncingFinished();
-                    //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
                 })
                 .doOnError(throwable -> Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_LONG).show())
                 .subscribe());
@@ -307,8 +305,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete(() -> {
                             setSyncingFinished();
-                            //ActivityStarter.startActivity(this, TrackedEntityInstancesActivity.getTrackedEntityInstancesActivityIntent(this, null), false);
+                        })
+                        .doOnError(Throwable::printStackTrace)
+                        .subscribe());
+    }
 
+    private void downloadInitialData() {
+        syncStatusText.setText("Downloading initial metadata and data...");
+        compositeDisposable.add(
+                downloadTrackedEntityInstances()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete(() -> {
+                            setSyncingFinished();
+                            ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
                         })
                         .doOnError(Throwable::printStackTrace)
                         .subscribe());
