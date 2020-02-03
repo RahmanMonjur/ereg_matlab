@@ -225,6 +225,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, -1);
 
+        /*
+
         int totalEnroll = Sdk.d2().enrollmentModule().enrollments()
                 .byOrganisationUnit().eq(globalVars.getOrgUid().uid())
                 .byProgram().eq("WSGAb5XwJ3Y")
@@ -253,6 +255,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         indicator1.setText(MessageFormat.format("{0}", totalEnroll));
         indicator2.setText(MessageFormat.format("{0}", lastMonthEnroll));
         indicator3.setText(MessageFormat.format("{0}", lastMonthVisit));
+
+         */
     }
 
     private void createNavigationView(User user) {
