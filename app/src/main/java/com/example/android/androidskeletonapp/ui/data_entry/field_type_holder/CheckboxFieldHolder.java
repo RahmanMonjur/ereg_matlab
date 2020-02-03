@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.ui.data_entry.field_type_holder;
 
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -29,13 +30,13 @@ public class CheckboxFieldHolder extends FieldHolder {
             checkBox.setChecked(false);
         }
 
-        checkBox.setOnCheckedChangeListener((radioGroup, i) -> {
-            String value = "";
-            if (checkBox.isChecked())
-               value = "true";
-
-            valueSavedListener.onValueSaved(fieldItem.getUid(), value);
+        checkBox.setOnCheckedChangeListener((view, isChecked) -> {
+                valueSavedListener.onValueSaved(fieldItem.getUid(), isChecked ? "true" : "");
         });
+
+
+
+
     }
 }
 

@@ -268,29 +268,29 @@ public class EventFormActivity extends AppCompatActivity {
 
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
-                List<String> myList = new ArrayList<>();
                 for (String key : fields.keySet())
                     if (key.equals(((RuleActionHideField) ruleAction).field())) {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(), new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
                                 fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
-                                null,
+                                "",
                                 fl.getOptionCode(), false,
                                 fl.getObjectStyle()));
-                        myList.add(fl.getUid());
-                        try {
-                            Sdk.d2().trackedEntityModule().trackedEntityDataValues()
-                                    .value(
-                                            EventFormService.getInstance().getEventUid(),
-                                            fl.getUid()
-                                    ).blockingDelete();
-                        } catch (Exception e) {
+                        if (Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                                .byEvent().eq(EventFormService.getInstance().getEventUid())
+                                .byDataElement().eq(key).blockingGet().size() > 0) {
+                            try {
+                                Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                                        .value(
+                                                EventFormService.getInstance().getEventUid(),
+                                                fl.getUid()
+                                        ).blockingDelete();
+                            } catch (Exception e) {
+                            }
                         }
                     }
-                for (String key : myList) {
-                    fields.remove(key);
-                }
+                fields.remove(((RuleActionHideField) ruleAction).field());
 
                 /*
                 fields.remove(((RuleActionHideField) ruleAction).field());
@@ -328,7 +328,6 @@ public class EventFormActivity extends AppCompatActivity {
                                 fl.getObjectStyle()));
                     }
             }
-
         }
 
         return new ArrayList<>(fields.values());

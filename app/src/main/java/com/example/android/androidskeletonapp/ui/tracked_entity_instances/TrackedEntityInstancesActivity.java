@@ -22,6 +22,7 @@ import com.example.android.androidskeletonapp.ui.main.MainActivity;
 import com.example.android.androidskeletonapp.ui.main.OrgUnitsActivity;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
+import org.hisp.dhis.android.core.D2Manager;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
@@ -75,10 +76,15 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
         globalVars = (GlobalClass) getApplicationContext();
         if(globalVars.getOrgUid() == null) {
-            if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount()==1) {
-                globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
-            } else {
-                ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+            if (Sdk.d2() == null){
+                D2Manager.instantiateD2(Sdk.getD2Configuration(this));
+            }
+            else {
+                if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() == 1) {
+                    globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
+                } else {
+                    ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+                }
             }
         }
 

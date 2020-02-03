@@ -118,7 +118,7 @@ public class EventFormService {
                         } else
                             fieldMap.put(dataElement.uid(), new FormField(
                                     dataElement.uid(), dataElement.optionSetUid(),
-                                    dataElement.valueType(), dataElement.formName(), "",
+                                    dataElement.valueType(), dataElement.displayFormName(), "",
                                     valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                     null, true,
                                     dataElement.style())
