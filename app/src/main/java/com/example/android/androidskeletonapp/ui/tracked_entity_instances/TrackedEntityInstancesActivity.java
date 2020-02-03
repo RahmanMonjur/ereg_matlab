@@ -76,7 +76,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
         globalVars = (GlobalClass) getApplicationContext();
         if(globalVars.getOrgUid() == null) {
-            if (Sdk.d2() == null){
+            if (D2Manager.isD2Instantiated() == false){
                 D2Manager.instantiateD2(Sdk.getD2Configuration(this));
             }
             else {

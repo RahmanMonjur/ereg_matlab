@@ -19,7 +19,7 @@
 
     <Spinner
         android:id="@+id/listProgram"
-        android:background="#FFFFFF"
+        android:background="#87ceeb"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:paddingTop="4dp"
