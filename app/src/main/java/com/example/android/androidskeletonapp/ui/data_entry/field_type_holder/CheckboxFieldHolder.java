@@ -30,14 +30,13 @@ public class CheckboxFieldHolder extends FieldHolder {
             checkBox.setChecked(false);
         }
 
+        setCheckBox(fieldItem.getUid());
+    }
+
+    void setCheckBox(String field){
         checkBox.setOnCheckedChangeListener((view, isChecked) -> {
-            String fieldUid = fieldItem.getUid();
-            valueSavedListener.onValueSaved(fieldUid, isChecked ? "true" : "");
+            valueSavedListener.onValueSaved(field, isChecked ? "true" : "");
         });
-
-
-
-
     }
 }
 

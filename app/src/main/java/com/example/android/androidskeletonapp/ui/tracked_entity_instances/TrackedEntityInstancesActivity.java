@@ -76,10 +76,14 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
         globalVars = (GlobalClass) getApplicationContext();
         if(globalVars.getOrgUid() == null) {
-            if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() == 1) {
+            if(D2Manager.isD2Instantiated()) {
+                if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() == 1) {
                     globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
                 } else {
-                ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+                    ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
+                }
+            } else {
+                D2Manager.instantiateD2(Sdk.getD2Configuration(this));
             }
         }
 

@@ -268,6 +268,7 @@ public class EventFormActivity extends AppCompatActivity {
 
             }
             else if (ruleEffect.ruleAction() instanceof RuleActionHideField) {
+
                 for (String key : fields.keySet())
                     if (key.equals(((RuleActionHideField) ruleAction).field())) {
                         FormField fl = fields.get(key);
@@ -285,7 +286,7 @@ public class EventFormActivity extends AppCompatActivity {
                                         .value(
                                                 EventFormService.getInstance().getEventUid(),
                                                 fl.getUid()
-                                        ).blockingDelete();
+                                        ).blockingDeleteIfExist();
                             } catch (Exception e) {
                             }
                         }

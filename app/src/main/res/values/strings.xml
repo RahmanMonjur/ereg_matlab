@@ -11,7 +11,7 @@
     <string name="invalid_password">Password must have more than 5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <!-- Strings related to autoFill -->
-    <string name="auto_fill_url">"https://eregistriestraining.mohfw.gov.bd/dhistr"</string>
+    <string name="auto_fill_url">"https://bd-eregistry.dhis2.org/dhis"</string>
     <string name="auto_fill_username">"lipi11"</string>
     <string name="auto_fill_password">"Asdf#123"</string>
     <!-- Strings related to list item -->
