@@ -61,6 +61,11 @@ public class AgeFieldHolder extends FieldHolder {
                 input_day.setText(String.valueOf(dateDifference[2]));
                 input_month.setText(String.valueOf(dateDifference[1]));
                 input_year.setText(String.valueOf(dateDifference[0]));
+
+                input_date.setTextSize(20);
+                input_day.setTextSize(20);
+                input_month.setTextSize(20);
+                input_year.setTextSize(20);
             }
 
         } catch (ParseException e) {

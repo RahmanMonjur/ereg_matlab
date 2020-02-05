@@ -24,6 +24,8 @@ public class CheckboxFieldHolder extends FieldHolder {
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
 
+        checkBox.setOnCheckedChangeListener(null);
+
         if (fieldItem.getValue() != null && fieldItem.getValue().equals("true")) {
             checkBox.setChecked(true);
         }  else {

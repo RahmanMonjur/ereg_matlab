@@ -57,7 +57,7 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
         holder.title.setText(orgUnit(event.organisationUnit()).displayName());
         //holder.subtitle1.setText(valueAt(values, event.programStage()));
         //holder.subtitle2.setText(optionCombo(event.attributeOptionCombo()).displayName());
-        holder.rightText.setText(DateFormatHelper.formatSimpleDate(event.eventDate()));
+        holder.rightText.setText(DateFormatHelper.getDateAsSystemFormat(event.eventDate()));
         holder.icon.setImageResource(R.drawable.ic_programs_black_24dp);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {

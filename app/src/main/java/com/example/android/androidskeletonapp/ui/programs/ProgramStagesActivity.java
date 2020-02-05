@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -81,6 +82,9 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!((SpinnerItems)listProgram.getSelectedItem()).getId().equals("")) {
+                    TextView textView = (TextView) view;
+                    ((TextView) adapterView.getChildAt(0)).setTextSize(20);
+
                     if (selectedProgram != ((SpinnerItems) listProgram.getSelectedItem()).getId()) {
                         selectedProgram = ((SpinnerItems)listProgram.getSelectedItem()).getId();
                         Enrollment enrollment = Sdk.d2().enrollmentModule().enrollments()

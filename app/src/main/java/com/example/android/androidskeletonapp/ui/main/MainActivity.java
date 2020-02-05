@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         User user = getUser();
         TextView greeting = findViewById(R.id.greeting);
-        greeting.setText(String.format("Hi %s!", user.displayName()));
+        greeting.setText(String.format("Welcome %s!", user.displayName()));
 
         inflateMainView();
         createNavigationView(user);

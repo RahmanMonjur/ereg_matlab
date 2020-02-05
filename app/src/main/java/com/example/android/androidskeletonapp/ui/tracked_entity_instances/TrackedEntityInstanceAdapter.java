@@ -76,7 +76,7 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         //holder.title.setText(valueAt(values, teiTitle(trackedEntityInstance)));
         //holder.subtitle1.setText(valueAt(values, teiSubtitle1(trackedEntityInstance)));
         //holder.subtitle2.setText(setSubtitle2(values, trackedEntityInstance));
-        holder.rightText.setText(DateFormatHelper.formatSimpleDate(trackedEntityInstance.created()));
+        holder.rightText.setText(DateFormatHelper.getDateAsSystemFormat(trackedEntityInstance.created()));
         setImage(trackedEntityInstance, holder);
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {

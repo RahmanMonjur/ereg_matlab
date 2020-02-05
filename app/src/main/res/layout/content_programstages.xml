@@ -21,11 +21,12 @@
         android:id="@+id/listProgram"
         android:background="#87ceeb"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="60dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
+        android:layout_marginRight="5dp"
         />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,7 @@
         android:layout_height="match_parent"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="80dp"
         android:clipToPadding="false"
         tools:listitem="@layout/list_item_simple"/>
 

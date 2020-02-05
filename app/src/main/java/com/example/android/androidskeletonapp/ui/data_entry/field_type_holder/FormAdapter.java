@@ -22,6 +22,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
     private final OnValueSaved valueSavedListener;
     private final OnImageSelectionClick imageSelectionListener;
     private boolean isListingRendering = true;
+    private int textSize;
 
     private List<FormField> fields;
 
@@ -116,7 +117,6 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
 
         fields.clear();
         fields.addAll(updates);
-
         diffResult.dispatchUpdatesTo(this);
     }
 
@@ -130,6 +130,11 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                 return OPTIONSETIMAGE;
         else
             return fields.get(position).getValueType().ordinal();
+    }
+
+    public void setTextSizes(int textSize) {
+        this.textSize = textSize;
+        //notifyDataSetChanged();
     }
 
     public void setListingRendering(boolean isListingRendering) {

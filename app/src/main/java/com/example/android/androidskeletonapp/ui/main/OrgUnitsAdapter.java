@@ -35,6 +35,7 @@ public class OrgUnitsAdapter extends PagedListAdapter<OrganisationUnit, ListItem
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
         OrganisationUnit orgunit = getItem(position);
         holder.title.setText(orgunit.displayName());
+        holder.title.setTextSize(20);
         holder.subtitle1.setText("");
         StyleBinderHelper.bindStyle(holder, null);
 

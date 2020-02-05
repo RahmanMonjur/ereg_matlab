@@ -488,21 +488,22 @@ public class RuleEngineService {
 
     private Flowable<Map<String, List<String>>> getSupplementaryData(String orgUnitUid){
         Map<String, List<String>> supData = new HashMap<String, List<String>>();
-        if (orgUnitUid!= "") {
+        if (orgUnitUid.isEmpty()) {
             OrganisationUnit orgUnit = d2.organisationUnitModule().organisationUnits()
                     .withOrganisationUnitGroups().uid(orgUnitUid)
                     .blockingGet();
-
-            Iterator orgit = orgUnit.organisationUnitGroups().iterator();
-            while (orgit.hasNext()) {
-                OrganisationUnitGroup orgrp = (OrganisationUnitGroup) orgit.next();
-                if (orgrp.code() != null) {
-                    supData.put(orgrp.code(), Arrays.asList(orgUnit.uid()));
+            if (orgUnit != null) {
+                Iterator orgit = orgUnit.organisationUnitGroups().iterator();
+                while (orgit.hasNext()) {
+                    OrganisationUnitGroup orgrp = (OrganisationUnitGroup) orgit.next();
+                    if (orgrp.code() != null) {
+                        supData.put(orgrp.code(), Arrays.asList(orgUnit.uid()));
+                    }
+                    supData.put(orgrp.uid(), Arrays.asList(orgUnit.uid()));
                 }
-                supData.put(orgrp.uid(), Arrays.asList(orgUnit.uid()));
+                List<String> userRoleUids = UidsHelper.getUidsList(d2.userModule().userRoles().blockingGet());
+                supData.put("USER", userRoleUids);
             }
-            List<String> userRoleUids = UidsHelper.getUidsList(d2.userModule().userRoles().blockingGet());
-            supData.put("USER", userRoleUids);
         }
         return Flowable.fromCallable(() -> supData);
 

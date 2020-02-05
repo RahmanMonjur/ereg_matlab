@@ -34,6 +34,7 @@ class DateFieldHolder extends FieldHolder {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        dateButton.setTextSize(20);
         if (fieldItem.isEditable() == true) {
             dateButton.setOnClickListener(view -> {
                 Calendar calendar = Calendar.getInstance();

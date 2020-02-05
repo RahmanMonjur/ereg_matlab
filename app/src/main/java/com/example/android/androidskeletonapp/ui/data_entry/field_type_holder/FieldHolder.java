@@ -26,14 +26,14 @@ class FieldHolder extends RecyclerView.ViewHolder {
 
     void bind(FormField fieldItem) {
         label.setText(fieldItem.getFormLabel());
-        label.setTextSize(16);
+        label.setTextSize(20);
         label.setTextColor(Color.BLACK);
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
 
         if(fieldItem.getFormHint() != null && fieldItem.getFormHint() != ""){
             label1.setVisibility(View.VISIBLE);
             label1.setText(fieldItem.getFormHint());
-            label1.setTextSize(15);
+            label1.setTextSize(18);
             label1.setTextColor(Color.RED);
         }
         else {

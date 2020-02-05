@@ -30,6 +30,8 @@ class BooleanFieldHolder extends FieldHolder {
             radioGroup.clearCheck();
         }
 
+        radioGroup.setOnCheckedChangeListener(null);
+
         radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
             String value;
             switch (i) {

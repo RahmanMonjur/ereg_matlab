@@ -26,6 +26,7 @@ class TextFieldHolder extends FieldHolder {
 
         editText.setFilters(new InputFilter[]{});
         editText.setMaxLines(1);
+        editText.setTextSize(20);
 
         switch (fieldItem.getValueType()) {
             case NUMBER:

@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +50,8 @@ class OptionSetFieldHolder extends FieldHolder {
         for (Option option : optionList) optionListNames.add(option.displayName());
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));
+
+        spinner.setOnItemSelectedListener(null);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -57,6 +60,9 @@ class OptionSetFieldHolder extends FieldHolder {
                         valueSavedListener.onValueSaved(fieldUid, optionList.get(i - 1).code());
                 } else if (fieldCurrentValue != null)
                     valueSavedListener.onValueSaved(fieldUid, null);
+
+                TextView textView = (TextView) view;
+                ((TextView) adapterView.getChildAt(0)).setTextSize(20);
             }
 
             @Override

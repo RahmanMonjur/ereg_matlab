@@ -33,7 +33,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
     @Override
     public ListItemWithCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_simple, parent, false);
+                .inflate(R.layout.list_item_simple_without_icon, parent, false);
         return new ListItemWithCardHolder(itemView);
     }
 
@@ -41,6 +41,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
         ProgramStage programStage = getItem(position);
         holder.title.setText(programStage.displayName());
+        holder.title.setTextSize(20);
         Integer programStageInstancesCount = Sdk.d2().eventModule().events()
                 .byProgramStageUid().eq(programStage.uid())
                 .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
@@ -50,7 +51,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
         else
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");
-
+        holder.subtitle1.setTextSize(16);
         //holder.subtitle1.setText(program.programType() == ProgramType.WITH_REGISTRATION ?
         //        "Program with registration" : "Program without registration");
         StyleBinderHelper.bindStyle(holder, programStage.style());
