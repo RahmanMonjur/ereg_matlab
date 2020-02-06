@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         globalVars = (GlobalClass) getApplicationContext();
-
         compositeDisposable = new CompositeDisposable();
+        this.setTitle(globalVars.getTranslatedWord("Home"));
 
         User user = getUser();
         TextView greeting = findViewById(R.id.greeting);
@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             downloadInitialMetadata();
             downloadInitialData();
         }
+
+        globalVars.setUserLocale(Sdk.d2().userModule().user().blockingGet().languages());
 
         syncMetadataButton.setOnClickListener(view -> {
             setSyncing();

@@ -1,5 +1,6 @@
 package com.example.android.androidskeletonapp.data.service.forms;
 
+import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 
 import org.hisp.dhis.android.core.D2;
@@ -14,6 +15,8 @@ import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.option.Option;
 import org.hisp.dhis.android.core.program.ProgramStageSection;
 import org.hisp.dhis.android.core.program.ProgramStageSectionRenderingType;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValue;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueCollectionRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 
 import java.text.DateFormat;
@@ -30,6 +33,7 @@ public class EventFormService {
     private static EventFormService instance;
     private final Map<String, FormField> fieldMap;
     private EventObjectRepository eventRepository;
+    private static List<TrackedEntityDataValue> eventDataBackup;
     private boolean isListingRendering;
 
     private EventFormService() {
@@ -61,6 +65,7 @@ public class EventFormService {
                                 .build()
                 );
             eventRepository = d2.eventModule().events().uid(eventUid);
+            eventDataBackup = d2.trackedEntityModule().trackedEntityDataValues().byEvent().eq(eventUid).blockingGet();
             if (eventRepository.blockingGet().eventDate() == null)
                 eventRepository.setEventDate(new Date());
             return true;
@@ -155,6 +160,22 @@ public class EventFormService {
             eventRepository.blockingDelete();
         } catch (D2Error d2Error) {
             d2Error.printStackTrace();
+        }
+    }
+
+    public void rollBack() {
+        for (TrackedEntityDataValue tedv : eventDataBackup) {
+            TrackedEntityDataValueObjectRepository valueRepository =
+                    Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                            .value(
+                                    EventFormService.getInstance().getEventUid(),
+                                    tedv.dataElement()
+                            );
+            try {
+                valueRepository.blockingSet(tedv.value());
+            } catch (D2Error d2Error) {
+                d2Error.printStackTrace();
+            }
         }
     }
 

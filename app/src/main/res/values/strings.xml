@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">eRegistry Initiative, Matlab</string>
+    <string name="app_name">eRegistry Matlab</string>
     <!-- Strings related to login -->
     <string name="title_activity_login">Log in</string>
     <string name="prompt_server_url">Server url</string>
@@ -45,6 +45,7 @@
     <!-- Strings related to programs -->
     <string name="title_activity_programs">Programs</string>
     <string name="title_activity_program_stage">Program Stages</string>
+    <string name="no_orgs_found">No organisation found</string>
     <string name="program_name">Program Name</string>
     <string name="program_icon">Program Icon</string>
     <string name="program_stages">2 Program stages</string>

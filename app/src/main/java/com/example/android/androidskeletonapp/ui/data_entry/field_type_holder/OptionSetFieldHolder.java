@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.option.Option;
 
@@ -24,6 +25,7 @@ class OptionSetFieldHolder extends FieldHolder {
     private List<Option> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
+    GlobalClass globalVars;
 
     OptionSetFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
@@ -43,9 +45,9 @@ class OptionSetFieldHolder extends FieldHolder {
 
     private void setUpSpinner(String optionSetUid) {
         optionList = Sdk.d2().optionModule().options().byOptionSetUid().eq(optionSetUid).blockingGet();
-
+        globalVars = (GlobalClass) this.itemView.getContext().getApplicationContext();
         List<String> optionListNames = new ArrayList<>();
-        optionListNames.add("Please select from list");
+        optionListNames.add(globalVars.getTranslatedWord("Please select from list"));
         //optionListNames.add(label.getText().toString());
         for (Option option : optionList) optionListNames.add(option.displayName());
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),

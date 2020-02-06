@@ -361,13 +361,8 @@ public class EventFormActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (formType == FormType.CREATE)
             EventFormService.getInstance().delete();
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
-    private void clearForm(View view){
-        if (formType == FormType.CREATE)
-            EventFormService.getInstance().delete();
+        else
+            EventFormService.getInstance().rollBack();
         setResult(RESULT_CANCELED);
         finish();
     }

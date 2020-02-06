@@ -31,6 +31,8 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
         recyclerSetup(R.layout.activity_orgunits, R.id.programsToolbar, R.id.programsRecyclerView);
 
         globalVars = (GlobalClass) getApplicationContext();
+        getSupportActionBar().setTitle(globalVars.getTranslatedWord("Please choose an organisation unit"));
+
         globalVars.setUserDateFormat(Sdk.d2().systemInfoModule().systemInfo().blockingGet().dateFormat());
         observeOrgUnits();
     }

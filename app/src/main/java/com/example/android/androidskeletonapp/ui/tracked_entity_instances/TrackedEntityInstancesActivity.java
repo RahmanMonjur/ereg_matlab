@@ -89,7 +89,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
 
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
-        getSupportActionBar().setTitle( title + " - Enrolled Participants");
+        getSupportActionBar().setTitle( title + " - " + globalVars.getTranslatedWord("Enrolled Participants"));
 
         compositeDisposable = new CompositeDisposable();
         observeTrackedEntityInstances();
@@ -126,6 +126,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         ));
 
         etFirstName = findViewById(R.id.txtParamFirstName);
+        etFirstName.setHint(globalVars.getTranslatedWord("Input any value to be more specific"));
         ImageButton searchButton = findViewById(R.id.btnSearchTei);
         searchButton.setOnClickListener(view -> {
             getTrackedEntityInstanceQuery().observe(this, trackedEntityInstancePagedList -> {

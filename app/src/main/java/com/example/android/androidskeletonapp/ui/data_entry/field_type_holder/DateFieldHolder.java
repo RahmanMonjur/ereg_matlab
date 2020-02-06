@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -18,6 +19,7 @@ import java.util.Date;
 class DateFieldHolder extends FieldHolder {
 
     private final Button dateButton;
+    GlobalClass globalVars;
 
     DateFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
@@ -26,11 +28,12 @@ class DateFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        globalVars = (GlobalClass) this.itemView.getContext().getApplicationContext();
 
         try {
             dateButton.setText(fieldItem.getValue() != null ?
                     DateFormatHelper.getDateAsSystemFormat(DateFormatHelper.parseSimpleDate(fieldItem.getValue())) :
-                    itemView.getContext().getString(R.string.date_button_text));
+                    globalVars.getTranslatedWord(itemView.getContext().getString(R.string.date_button_text)));
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -29,15 +29,20 @@ import org.hisp.dhis.android.core.enrollment.Enrollment;
 import org.hisp.dhis.android.core.enrollment.EnrollmentCreateProjection;
 import org.hisp.dhis.android.core.enrollment.EnrollmentObjectRepository;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
+import org.hisp.dhis.android.core.event.Event;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.program.Program;
+import org.hisp.dhis.android.core.program.ProgramStage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Singleton;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -67,10 +72,10 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_program_stages, R.id.programStageToolbar, R.id.programStageRecyclerView);
+        globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         //String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
-        getSupportActionBar().setTitle("Program Stages");
-        globalVars = (GlobalClass) getApplicationContext();
+        getSupportActionBar().setTitle(globalVars.getTranslatedWord("Program Stages"));
 
         observeProgramStages(selectedProgram, getIntent().getStringExtra(IntentExtra.TEI.name()));
 
@@ -97,10 +102,11 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                             observeProgramStages(((SpinnerItems)listProgram.getSelectedItem()).getId(), getIntent().getStringExtra(IntentExtra.TEI.name()));
                         } else {
                             new AlertDialog.Builder(ProgramStagesActivity.this)
-                                    .setTitle("Enrollment Confirmation")
-                                    .setMessage("This TEI has no enrollment in this program.\nDo you want to enroll this TEI now?")
+                                    .setTitle(globalVars.getTranslatedWord("Enrollment Confirmation"))
+                                    .setMessage(globalVars.getTranslatedWord("This TEI has no enrollment in this program")+".\n"+
+                                            globalVars.getTranslatedWord("Do you want to enroll this TEI now?"))
                                     .setIcon(android.R.drawable.ic_dialog_info)
-                                    .setPositiveButton("Yes, I want to enroll", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to enroll"), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
                                             if (EnrollmentFormService.getInstance().init(
                                                     Sdk.d2(),
@@ -113,7 +119,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                                             }
 
                                         }})
-                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    .setNegativeButton(globalVars.getTranslatedWord("No"), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
                                             listProgram.setSelection(1);
                                             selectedProgram = "ZBIqxwVixn8";
@@ -155,20 +161,28 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     @Override
     public void onProgramStageSelected(String programUid, String programStageUid, String teiUid) {
 
-        Integer eventsNumber = Sdk.d2().eventModule().events()
+        List<Event> events = Sdk.d2().eventModule().events()
                 .byProgramUid().eq(programUid)
                 .byProgramStageUid().eq(programStageUid)
                 .byTrackedEntityInstanceUids(Lists.newArrayList(teiUid))
-                .blockingCount();
+                .blockingGet();
 
-        if (eventsNumber>0) {
+        ProgramStage programStage = Sdk.d2().programModule().programStages().uid(programStageUid).blockingGet();
+
+        if (events.size() > 0 && programStage.repeatable()) {
             ActivityStarter.startActivity(this,
                     EventsActivity
                             .getIntent(this, programUid, programStageUid, teiUid),
                     false);
-        }
-        else {
-
+        } else if (events.size() > 0 && !programStage.repeatable()) {
+            ActivityStarter.startActivity(this,
+                    EventFormActivity
+                            .getFormActivityIntent(this,
+                                    events.get(0).uid(),
+                                    programUid, programStageUid, selectedEnrollment,
+                                    EventFormActivity.FormType.CHECK),
+                    false);
+        } else {
             ActivityStarter.startActivity(this,
                     EventFormActivity
                             .getFormActivityIntent(this, null, programUid, programStageUid, selectedEnrollment,
