@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.data.service.forms;
 
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
@@ -35,6 +36,7 @@ public class EventFormService {
     private EventObjectRepository eventRepository;
     private static List<TrackedEntityDataValue> eventDataBackup;
     private boolean isListingRendering;
+    GlobalClass globalVars;
 
     private EventFormService() {
         fieldMap = new LinkedHashMap<>();
@@ -47,8 +49,9 @@ public class EventFormService {
         return instance;
     }
 
-    public boolean init(D2 d2, String eventUid, String programUid, String programStageUid, String ouUid, String enrollmentUid) {
+    public boolean init(GlobalClass globalVars, D2 d2, String eventUid, String programUid, String programStageUid, String enrollmentUid) {
         this.d2 = d2;
+        this.globalVars = globalVars;
         //ProgramStage programStage = d2.programModule().programStages()
         //        .byProgramUid().eq(programUid).one().blockingGet();
         String defaultOptionCombo = d2.categoryModule().categoryOptionCombos()
@@ -61,7 +64,7 @@ public class EventFormService {
                                 .attributeOptionCombo(defaultOptionCombo)
                                 .programStage(programStageUid)
                                 .program(programUid)
-                                .organisationUnit(ouUid)
+                                .organisationUnit(globalVars.getOrgUid().uid())
                                 .build()
                 );
             eventRepository = d2.eventModule().events().uid(eventUid);
@@ -85,7 +88,7 @@ public class EventFormService {
         else {
             fieldMap.clear();
             fieldMap.put("EventDate", new FormField(
-                    "EventDate", null, ValueType.DATE, "Visit Date", "",
+                    "EventDate", null, ValueType.DATE, globalVars.getTranslatedWord("Visit Date"), "", "", "","",
                     eventRepository.blockingExists() ?
                             DateFormatHelper.formatSimpleDate(eventRepository.blockingGet().eventDate()) : null,
                     null, true,
@@ -113,7 +116,7 @@ public class EventFormService {
                                     .byOptionSetUid().eq(dataElement.optionSetUid()).blockingGet()) {
                                 FormField formField = new FormField(
                                         dataElement.uid(), dataElement.optionSetUid(),
-                                        dataElement.valueType(), option.displayName(), "",
+                                        dataElement.valueType(), option.displayName(), dataElement.displayDescription(),"","","",
                                         valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                         option.code(), true,
                                         option.style()
@@ -123,7 +126,10 @@ public class EventFormService {
                         } else
                             fieldMap.put(dataElement.uid(), new FormField(
                                     dataElement.uid(), dataElement.optionSetUid(),
-                                    dataElement.valueType(), dataElement.displayFormName(), "",
+                                    dataElement.valueType(),
+                                    String.format("%s%s",  programStageDataElement.compulsory() ? "* " : "", dataElement.displayFormName()),
+                                    dataElement.displayDescription(),"","",
+                                    (programStageDataElement == null) ? "" : (programStageDataElement.compulsory() ? "1" : ""),
                                     valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                     null, true,
                                     dataElement.style())

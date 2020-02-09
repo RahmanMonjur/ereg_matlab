@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -77,9 +79,10 @@ public class EnrollmentFormActivity extends AppCompatActivity {
     private String teiUid;
     private String fieldWaitingImage;
     GlobalClass globalVars;
+    private Map<String, FormField> fieldsFinal;
 
     private enum IntentExtra {
-        TEI_UID, PROGRAM_UID, OU_UID
+        TEI_UID, PROGRAM_UID
     }
 
     public static Intent getFormActivityIntent(Context context, String teiUid, String programUid) {
@@ -109,11 +112,10 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
         engineInitialization = PublishProcessor.create();
 
-        if (EnrollmentFormService.getInstance().init(
+        if (EnrollmentFormService.getInstance().init(globalVars,
                 Sdk.d2(),
                 getIntent().getStringExtra(IntentExtra.TEI_UID.name()),
-                getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()),
-                globalVars.getOrgUid().uid()))
+                getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name())))
             this.engineService = new RuleEngineService();
 
     }
@@ -225,7 +227,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
-
+        //mandatoryCheck = "";
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionAssign){
@@ -234,7 +236,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(), fl.getFormError(), fl.getMandatory(),
                                 ruleEffect.data(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));
@@ -254,7 +256,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(), new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(), fl.getFormError(), fl.getMandatory(),
                                 null,
                                 fl.getOptionCode(), false,
                                 fl.getObjectStyle()));
@@ -278,14 +280,30 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel() , ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getFormError(), fl.getMandatory(),
                                 fl.getValue(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));
                     }
             }
         }
-
+        /*
+        for (String key : fields.keySet()){
+            FormField fl = fields.get(key);
+            if (fl.getMandatory() == "1" && (fl.getValue() == null || fl.getValue().isEmpty())) {
+                mandatoryCheck = "1";
+                fields.put(fl.getUid(),new FormField(
+                        fl.getUid(), fl.getOptionSetUid(),
+                        fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(),
+                        globalVars.getTranslatedWord("This is a mandatory field. Please input a value."), fl.getMandatory(),
+                        fl.getValue(),
+                        fl.getOptionCode(), fl.isEditable(),
+                        fl.getObjectStyle()));
+            }
+        }
+        */
+        fieldsFinal = fields;
         return new ArrayList<>(fields.values());
     }
 
@@ -315,16 +333,58 @@ public class EnrollmentFormActivity extends AppCompatActivity {
     }
 
     private void finishEnrollment(View view) {
-        setResult(RESULT_OK);
-        finish();
+        if (checkMandatory(fieldsFinal) == true) {
+            new AlertDialog.Builder(this)
+                    .setMessage(globalVars.getTranslatedWord("You did not fill up some mandatory fields"))
+                    .setCancelable(false)
+                    .setPositiveButton(globalVars.getTranslatedWord("Yes"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                        }}).show();
+        } else {
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
+
+    private boolean checkMandatory(Map<String, FormField> fields){
+        Boolean mandatoryCheck = false;
+        for (String key : fields.keySet()){
+            FormField fl = fields.get(key);
+            if (fl.getMandatory() == "1" && (fl.getValue() == null || fl.getValue().isEmpty())) {
+                mandatoryCheck = true;
+                fields.put(fl.getUid(),new FormField(
+                        fl.getUid(), fl.getOptionSetUid(),
+                        fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(),
+                        globalVars.getTranslatedWord("This is a mandatory field. Please input a value."), fl.getMandatory(),
+                        fl.getValue(),
+                        fl.getOptionCode(), fl.isEditable(),
+                        fl.getObjectStyle()));
+            }
+        }
+        if (mandatoryCheck == true) {
+            adapter.updateData(new ArrayList<>(fields.values()));
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void onBackPressed() {
-        if (EnrollmentFormService.getInstance().getNewEnrollment() == true)
-            EnrollmentFormService.getInstance().delete();
-        setResult(RESULT_CANCELED);
-        finish();
+        new AlertDialog.Builder(this)
+                .setTitle(globalVars.getTranslatedWord("Exit Confirmation"))
+                .setMessage(globalVars.getTranslatedWord("Do you really want to exit?"))
+                .setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+                .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to exit"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (EnrollmentFormService.getInstance().getNewEnrollment() == true)
+                            EnrollmentFormService.getInstance().delete();
+                        else
+                            EnrollmentFormService.getInstance().rollBack();
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }})
+                .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
     }
 
     @Override

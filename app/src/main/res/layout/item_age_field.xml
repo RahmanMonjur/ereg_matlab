@@ -21,21 +21,67 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
 
-            <TextView
-                android:id="@+id/label"
+            <LinearLayout
+                android:id="@+id/lnrLabel"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="FORM LABEL"/>
+                android:weightSum="9"
+                app:layout_constraintTop_toTopOf="parent" >
 
-            <TextView
-                android:id="@+id/label1"
+                <TextView
+                    android:id="@+id/label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    tools:text="FORM LABEL"/>
+
+                <ImageButton
+                    android:id="@+id/helpButton"
+                    android:layout_width="16dp"
+                    android:layout_height="15dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/circle_shape"
+                    app:srcCompat="@drawable/ic_alert_positive"
+                    android:backgroundTint="#000080"
+                    app:tint="@color/colorWhite" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lnrLabel1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/label"
-                tools:text="FORM LABEL 1"
-                android:visibility="gone"
-                android:textColor="#ff0000"/>
+                android:orientation="vertical"
+                android:layout_below="@id/lnrLabel">
+
+                <TextView
+                    android:id="@+id/label1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000080"
+                    android:visibility="gone"
+                    tools:text="FORM LABEL 1" />
+
+                <TextView
+                    android:id="@+id/label2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff0000"
+                    android:visibility="gone"
+                    tools:text="FORM LABEL 2" />
+
+                <TextView
+                    android:id="@+id/label3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff0000"
+                    android:visibility="gone"
+                    tools:text="FORM LABEL 3" />
+
+            </LinearLayout>
+
 
             <ImageView
                 android:id="@+id/renderImage"
@@ -44,27 +90,26 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="5dp"
                 android:visibility="gone"
+                android:layout_below="@id/lnrLabel1"
                 tools:srcCompat="@drawable/bangladesh"
-                android:layout_below="@id/label1"
-                tools:visibility="visible" />
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
                 android:layout_marginBottom="10dp"
-                android:layout_below="@id/renderImage">
+                android:layout_below="@id/renderImage"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/inputLayout"
+                    android:id="@+id/lblDate"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:hint='@{labels}'
                     android:textColorHint="@color/text_black_808"
-                    android:theme="@style/loginInputText"
-                    tools:hint="Age">
+                    android:theme="@style/loginInputText">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/date_picker"
@@ -79,6 +124,7 @@
 
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/lblYear"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -95,11 +141,12 @@
                         android:inputType="date"
                         android:maxLength="4"
                         android:padding="8dp"
-                        android:textColorHint="@color/text_black_808" />
+                        android:textColorHint="@color/text_black_333" />
                 </com.google.android.material.textfield.TextInputLayout>
 
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/lblMonth"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -121,6 +168,7 @@
 
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/lblDay"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

@@ -18,6 +18,7 @@ import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.ui.base.DiffByIdItemCallback;
 import com.example.android.androidskeletonapp.ui.base.SimpleListWithSyncHolder;
 import com.example.android.androidskeletonapp.ui.data_entry.EventFormActivity;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
 import org.hisp.dhis.android.core.category.CategoryOptionCombo;
@@ -37,6 +38,7 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
 
     private final AppCompatActivity activity;
     private DataSource<?, Event> source;
+    GlobalClass globalVars;
 
     public EventAdapter(AppCompatActivity activity) {
         super(new DiffByIdItemCallback<>());
@@ -53,6 +55,7 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
     @Override
     public void onBindViewHolder(@NonNull SimpleListWithSyncHolder holder, int position) {
         Event event = getItem(position);
+        globalVars = (GlobalClass) this.activity.getApplicationContext();
         List<TrackedEntityDataValue> values = new ArrayList<>(event.trackedEntityDataValues());
         holder.title.setText(orgUnit(event.organisationUnit()).displayName());
         //holder.subtitle1.setText(valueAt(values, event.programStage()));
@@ -62,10 +65,10 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
             new AlertDialog.Builder(this.activity)
-                    .setTitle("Delete Confirmation")
-                    .setMessage("Do you really want to delete?")
+                    .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
+                    .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
                     .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton("Yes, I want to delete", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             try {
                                 Sdk.d2().eventModule().events().uid(event.uid()).blockingDelete();
@@ -75,7 +78,7 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
                                 d2Error.printStackTrace();
                             }
                         }})
-                    .setNegativeButton(android.R.string.no, null).show();
+                    .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
 
         });
         setBackgroundColor(R.color.colorAccentDark, holder.icon);

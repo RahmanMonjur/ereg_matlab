@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -79,6 +81,7 @@ public class EventFormActivity extends AppCompatActivity {
     private String fieldWaitingImage;
     private String eventUid;
     GlobalClass globalVars;
+    private Map<String, FormField> fieldsFinal;
 
     private enum IntentExtra {
         EVENT_UID, PROGRAM_UID, PROGRAM_STAGE_UID, ENROLLMENT_UID, TYPE
@@ -127,11 +130,11 @@ public class EventFormActivity extends AppCompatActivity {
         engineInitialization = PublishProcessor.create();
 
         if (EventFormService.getInstance().init(
+                globalVars,
                 Sdk.d2(),
                 eventUid,
                 getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()),
                 getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()),
-                globalVars.getOrgUid().uid(),
                 getIntent().getStringExtra(IntentExtra.ENROLLMENT_UID.name()) ))
             this.engineService = new RuleEngineService();
 
@@ -244,7 +247,6 @@ public class EventFormActivity extends AppCompatActivity {
 
     private List<FormField> applyEffects(Map<String, FormField> fields,
                                          List<RuleEffect> ruleEffects) {
-
         for (RuleEffect ruleEffect : ruleEffects) {
             RuleAction ruleAction = ruleEffect.ruleAction();
             if (ruleEffect.ruleAction() instanceof RuleActionAssign){
@@ -253,7 +255,7 @@ public class EventFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(), fl.getFormError(),fl.getMandatory(),
                                 ruleEffect.data(),
                                 fl.getOptionCode(), false,
                                 fl.getObjectStyle()));
@@ -274,7 +276,7 @@ public class EventFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(), new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(), fl.getFormHint(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(), fl.getFormError(),fl.getMandatory(),
                                 "",
                                 fl.getOptionCode(), false,
                                 fl.getObjectStyle()));
@@ -323,15 +325,54 @@ public class EventFormActivity extends AppCompatActivity {
                         FormField fl = fields.get(key);
                         fields.put(fl.getUid(),new FormField(
                                 fl.getUid(), fl.getOptionSetUid(),
-                                fl.getValueType(), fl.getFormLabel(), ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(),
+                                ((RuleActionShowWarning) ruleAction).content(),
+                                fl.getFormError(),fl.getMandatory(),
                                 fl.getValue(),
                                 fl.getOptionCode(), fl.isEditable(),
                                 fl.getObjectStyle()));
                     }
             }
         }
-
+        /*
+        for (String key : fields.keySet()){
+            FormField fl = fields.get(key);
+            if (fl.getMandatory() == "1" && (fl.getValue() == null || fl.getValue().isEmpty())) {
+                mandatoryCheck = "1";
+                fields.put(fl.getUid(),new FormField(
+                        fl.getUid(), fl.getOptionSetUid(),
+                        fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(),
+                        globalVars.getTranslatedWord("This is a mandatory field. Please input a value."), fl.getMandatory(),
+                        fl.getValue(),
+                        fl.getOptionCode(), fl.isEditable(),
+                        fl.getObjectStyle()));
+            }
+        }
+        */
+        fieldsFinal = fields;
         return new ArrayList<>(fields.values());
+    }
+
+    private boolean checkMandatory(Map<String, FormField> fields){
+        Boolean mandatoryCheck = false;
+        for (String key : fields.keySet()){
+            FormField fl = fields.get(key);
+            if (fl.getMandatory() == "1" && (fl.getValue() == null || fl.getValue().isEmpty())) {
+                mandatoryCheck = true;
+                fields.put(fl.getUid(),new FormField(
+                        fl.getUid(), fl.getOptionSetUid(),
+                        fl.getValueType(), fl.getFormLabel(), fl.getFormDescription(), fl.getFormWarning(),
+                        globalVars.getTranslatedWord("This is a mandatory field. Please input a value."), fl.getMandatory(),
+                        fl.getValue(),
+                        fl.getOptionCode(), fl.isEditable(),
+                        fl.getObjectStyle()));
+            }
+        }
+        if (mandatoryCheck == true) {
+            adapter.updateData(new ArrayList<>(fields.values()));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -353,18 +394,36 @@ public class EventFormActivity extends AppCompatActivity {
     }
 
     private void finishEnrollment(View view) {
-        setResult(RESULT_OK);
-        finish();
+        if (checkMandatory(fieldsFinal) == true) {
+            new AlertDialog.Builder(this)
+                    .setMessage(globalVars.getTranslatedWord("You did not fill up some mandatory fields"))
+                    .setCancelable(false)
+                    .setPositiveButton(globalVars.getTranslatedWord("Yes"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                        }}).show();
+        } else {
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        if (formType == FormType.CREATE)
-            EventFormService.getInstance().delete();
-        else
-            EventFormService.getInstance().rollBack();
-        setResult(RESULT_CANCELED);
-        finish();
+        new AlertDialog.Builder(this)
+                .setTitle(globalVars.getTranslatedWord("Exit Confirmation"))
+                .setMessage(globalVars.getTranslatedWord("Do you really want to exit?"))
+                .setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+                .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to exit"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if (formType == FormType.CREATE)
+                            EventFormService.getInstance().delete();
+                        else
+                            EventFormService.getInstance().rollBack();
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }})
+                .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {

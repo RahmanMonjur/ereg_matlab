@@ -36,6 +36,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
+import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.period.PeriodType;
 import org.hisp.dhis.android.core.period.internal.PeriodHelper;
 import org.hisp.dhis.android.core.user.User;
@@ -44,6 +45,8 @@ import org.joda.time.Period;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -76,11 +79,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_navigation);
         globalVars = (GlobalClass) getApplicationContext();
         compositeDisposable = new CompositeDisposable();
+
+        OrganisationUnit orgunit = Sdk.d2().organisationUnitModule().organisationUnits()
+                .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                .one().blockingGet();
+        if (orgunit != null) {
+            String locale = "en";
+            String regex = "^[a-zA-Z0-9]+$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(orgunit.displayName());
+            if (!matcher.matches())
+                locale = "bn";
+            globalVars.setUserLocale(locale);
+        }
         this.setTitle(globalVars.getTranslatedWord("Home"));
 
         User user = getUser();
         TextView greeting = findViewById(R.id.greeting);
-        greeting.setText(String.format("Welcome %s!", user.displayName()));
+        greeting.setText(globalVars.getTranslatedWord("Welcome") + String.format(" %s!", user.displayName()));
 
         inflateMainView();
         createNavigationView(user);
@@ -129,38 +145,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         syncMetadataButton = findViewById(R.id.syncMetadataButton);
         syncDataButton = findViewById(R.id.syncDataButton);
         uploadDataButton = findViewById(R.id.uploadDataButton);
+        ((TextView)findViewById(R.id.syncMetadataText)).setText(globalVars.getTranslatedWord("Update metadata and data"));
+        ((TextView)findViewById(R.id.syncDataText)).setText(globalVars.getTranslatedWord("Download data"));
+        ((TextView)findViewById(R.id.uploadDataText)).setText(globalVars.getTranslatedWord("Upload data"));
 
         syncStatusText = findViewById(R.id.notificator);
         progressBar = findViewById(R.id.syncProgressBar);
 
         if(SyncStatusHelper.programCount() + SyncStatusHelper.trackedEntityInstanceCount() == 0){
-            downloadInitialMetadata();
-            downloadInitialData();
+            downloadMetadataAndData();
         }
-
-        globalVars.setUserLocale(Sdk.d2().userModule().user().blockingGet().languages());
 
         syncMetadataButton.setOnClickListener(view -> {
             setSyncing();
-            Snackbar.make(view, "Updating metadata", Snackbar.LENGTH_LONG)
+            /*
+            Snackbar.make(view, globalVars.getTranslatedWord("Updating metadata…"), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            syncStatusText.setText(R.string.syncing_metadata);
+            syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.syncing_metadata)));
             syncMetadata();
+            */
+            Snackbar.make(view, globalVars.getTranslatedWord("Downloading metadata and data..."), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
+            downloadMetadataAndData();
         });
 
         syncDataButton.setOnClickListener(view -> {
             setSyncing();
-            Snackbar.make(view, "Downloading data", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, globalVars.getTranslatedWord("Downloading data…"), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            syncStatusText.setText(R.string.syncing_data);
+            syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.syncing_data)));
             downloadData();
         });
 
         uploadDataButton.setOnClickListener(view -> {
             setSyncing();
-            Snackbar.make(view, "Uploading data", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, globalVars.getTranslatedWord("Uploading data…"), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            syncStatusText.setText(R.string.uploading_data);
+            syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.uploading_data)));
             uploadData();
         });
     }
@@ -248,16 +270,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int lastMonthVisit = Sdk.d2().eventModule().events()
                     .byProgramStageUid().eq("V3hCCKHGAaz")
                     .byOrganisationUnitUid().eq(globalVars.getOrgUid().uid())
-                    .byCreated().after(trialDate)
                     .byCreated().after(calendar.getTime())
                     .blockingCount();
 
-            TextView indicator1 = findViewById(R.id.indicator1);
-            TextView indicator2 = findViewById(R.id.indicator2);
-            TextView indicator3 = findViewById(R.id.indicator3);
-            indicator1.setText(MessageFormat.format("{0}", totalEnroll));
-            indicator2.setText(MessageFormat.format("{0}", lastMonthEnroll));
-            indicator3.setText(MessageFormat.format("{0}", lastMonthVisit));
+            ((TextView)findViewById(R.id.lblInd1)).setText(globalVars.getTranslatedWord("Total number of women enrolled in the Org Unit"));
+            ((TextView)findViewById(R.id.lblInd2)).setText(globalVars.getTranslatedWord("Number of women enrolled in last month"));
+            ((TextView)findViewById(R.id.lblInd3)).setText(globalVars.getTranslatedWord("Number of HH visited in last month"));
+            ((TextView)findViewById(R.id.indicator1)).setText(MessageFormat.format("{0}", totalEnroll));
+            ((TextView)findViewById(R.id.indicator2)).setText(MessageFormat.format("{0}", lastMonthEnroll));
+            ((TextView)findViewById(R.id.indicator3)).setText(MessageFormat.format("{0}", lastMonthVisit));
         }
 
     }
@@ -296,6 +317,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return Sdk.d2().metadataModule().download();
     }
 
+    private void downloadMetadataAndData(){
+        syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
+        compositeDisposable.add(
+                downloadMetadata()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete(() -> {
+                            downloadDataMain();
+                        })
+                        .doOnError(Throwable::printStackTrace)
+                        .subscribe());
+    }
+
+    private void downloadDataMain() {
+        compositeDisposable.add(
+                downloadTrackedEntityInstances()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete(() -> {
+                            setSyncingFinished();
+                            if (globalVars.getUserLocale() == null) {
+                                String locale = "en";
+                                String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
+                                        .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                                        .one().blockingGet().displayName();
+                                String regex = "^[a-zA-Z0-9]+$";
+                                Pattern pattern = Pattern.compile(regex);
+                                Matcher matcher = pattern.matcher(orgunitname);
+                                if (!matcher.matches())
+                                    locale = "bn";
+                                globalVars.setUserLocale(locale);
+                            }
+                            if (globalVars.getOrgUid() == null) {
+                                ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
+                            }
+                        })
+                        .doOnError(Throwable::printStackTrace)
+                        .subscribe());
+    }
+
     private void downloadData() {
         compositeDisposable.add(
                 Observable.merge(
@@ -319,6 +380,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete(() -> {
+
+                            String locale = "en";
+                            String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
+                                    .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                                    .one().blockingGet().displayName();
+                            String regex = "^[a-zA-Z0-9]+$";
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(orgunitname);
+                            if (!matcher.matches())
+                                locale = "bn";
+                            globalVars.setUserLocale(locale);
+
                             setSyncingFinished();
                             ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
                         })

@@ -14,6 +14,9 @@ import com.example.android.androidskeletonapp.ui.programs.ProgramsActivity;
 
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -29,8 +32,22 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_orgunits, R.id.programsToolbar, R.id.programsRecyclerView);
-
         globalVars = (GlobalClass) getApplicationContext();
+
+        OrganisationUnit orgunit = Sdk.d2().organisationUnitModule().organisationUnits()
+                .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                .one().blockingGet();
+        if (orgunit != null) {
+            String locale = "en";
+            String regex = "^[a-zA-Z0-9]+$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(orgunit.displayName());
+            if (!matcher.matches())
+                locale = "bn";
+            globalVars.setUserLocale(locale);
+        }
+        this.setTitle(globalVars.getTranslatedWord("Home"));
+
         getSupportActionBar().setTitle(globalVars.getTranslatedWord("Please choose an organisation unit"));
 
         globalVars.setUserDateFormat(Sdk.d2().systemInfoModule().systemInfo().blockingGet().dateFormat());
@@ -75,7 +92,7 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
     public void onOrgUnitSelected (OrganisationUnit orgUid) {
         globalVars.setOrgUid(orgUid);
         String orgname = orgUid.displayName();
-        Toast.makeText(getApplicationContext(), "You have selected "+orgname, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), globalVars.getTranslatedWord("You have selected") + ", "+ orgname, Toast.LENGTH_LONG).show();
         /*
         if (Sdk.d2().programModule().programs().blockingCount() > 0) {
             ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), true);

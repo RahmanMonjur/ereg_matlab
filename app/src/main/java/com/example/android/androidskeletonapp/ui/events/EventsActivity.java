@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -60,6 +61,8 @@ public class EventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_events, R.id.eventsToolbar, R.id.eventsRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
+        ((TextView) findViewById(R.id.eventsNotificator)).setText(globalVars.getTranslatedWord("No events found"));
+
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         selectedProgramStage = getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE.name());
         selectedTei = getIntent().getStringExtra(IntentExtra.TEI.name());

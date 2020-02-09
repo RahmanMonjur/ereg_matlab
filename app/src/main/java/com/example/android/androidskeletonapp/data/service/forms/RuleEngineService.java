@@ -488,7 +488,7 @@ public class RuleEngineService {
 
     private Flowable<Map<String, List<String>>> getSupplementaryData(String orgUnitUid){
         Map<String, List<String>> supData = new HashMap<String, List<String>>();
-        if (orgUnitUid.isEmpty()) {
+        if (!orgUnitUid.isEmpty()) {
             OrganisationUnit orgUnit = d2.organisationUnitModule().organisationUnits()
                     .withOrganisationUnitGroups().uid(orgUnitUid)
                     .blockingGet();

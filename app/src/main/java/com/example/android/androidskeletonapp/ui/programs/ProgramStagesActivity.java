@@ -21,6 +21,7 @@ import com.example.android.androidskeletonapp.ui.data_entry.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.SpinnerItems;
 import com.example.android.androidskeletonapp.ui.events.EventsActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
+import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstanceAdapter;
 import com.google.common.collect.Lists;
 
 import org.hisp.dhis.android.core.arch.helpers.AccessHelper;
@@ -33,6 +34,8 @@ import org.hisp.dhis.android.core.event.Event;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.program.Program;
 import org.hisp.dhis.android.core.program.ProgramStage;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttribute;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValue;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -75,7 +78,10 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
         globalVars = (GlobalClass) getApplicationContext();
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         //String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
-        getSupportActionBar().setTitle(globalVars.getTranslatedWord("Program Stages"));
+        List<TrackedEntityAttributeValue> teiAttrVal = Sdk.d2().trackedEntityModule().trackedEntityInstances().withTrackedEntityAttributeValues().uid(getIntent().getStringExtra(IntentExtra.TEI.name())).blockingGet().trackedEntityAttributeValues();
+        getSupportActionBar().setTitle(valueAt(teiAttrVal, "QWTcaK2mXeD") + " - "+ globalVars.getTranslatedWord("Program Stages"));
+
+        ((TextView) findViewById(R.id.programStageNotificator)).setText(globalVars.getTranslatedWord("No program stages found"));
 
         observeProgramStages(selectedProgram, getIntent().getStringExtra(IntentExtra.TEI.name()));
 
@@ -109,10 +115,10 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                                     .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to enroll"), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
                                             if (EnrollmentFormService.getInstance().init(
+                                                    globalVars,
                                                     Sdk.d2(),
                                                     getIntent().getStringExtra(IntentExtra.TEI.name()),
-                                                    selectedProgram,
-                                                    globalVars.getOrgUid().uid())) {
+                                                    selectedProgram)) {
 
                                                 selectedEnrollment = EnrollmentFormService.getInstance().getEnrollmentUid();
                                                 observeProgramStages(selectedProgram, getIntent().getStringExtra(IntentExtra.TEI.name()));
@@ -136,6 +142,15 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
             }
         });
 
+        TextView instruction = (TextView)findViewById(R.id.enrollmentInstruction);
+        Enrollment enrollment = Sdk.d2().enrollmentModule().enrollments()
+                .byTrackedEntityInstance().eq(getIntent().getStringExtra(IntentExtra.TEI.name()))
+                .byProgram().eq("WSGAb5XwJ3Y")
+                .one().blockingGet();
+        instruction.setText((selectedProgram=="ZBIqxwVixn8" && enrollment == null) ?
+                globalVars.getTranslatedWord("Do not forget to enroll in the MCH program") :
+                globalVars.getTranslatedWord("You can change the program by clicking the dropdown below"));
+
 
     }
 
@@ -153,9 +168,19 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                     adapter.submitList(programStagePagedList);
                     findViewById(R.id.programStageNotificator).setVisibility(
                             programStagePagedList.isEmpty() ? View.VISIBLE : View.GONE);
+
                 }));
 
         recyclerView.setAdapter(adapter);
+    }
+
+    private String valueAt(List<TrackedEntityAttributeValue> values, String attributeUid) {
+        for (TrackedEntityAttributeValue attributeValue : values) {
+            if (attributeValue.trackedEntityAttribute().equals(attributeUid)) {
+                return attributeValue.value();
+            }
+        }
+        return "";
     }
 
     @Override

@@ -25,9 +25,17 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="25dp"
         android:layout_marginRight="5dp"
         />
+
+    <TextView
+        android:id="@+id/enrollmentInstruction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="1dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/programStageRecyclerView"
@@ -35,7 +43,7 @@
         android:layout_height="match_parent"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="85dp"
         android:clipToPadding="false"
         tools:listitem="@layout/list_item_simple"/>
 

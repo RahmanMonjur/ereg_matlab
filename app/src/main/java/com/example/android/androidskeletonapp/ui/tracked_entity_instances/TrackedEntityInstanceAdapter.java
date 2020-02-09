@@ -51,6 +51,7 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     private DataSource<?, TrackedEntityInstance> source;
     private OnTrackedEntityInstanceSelectionListener listener;
     private String programUid;
+    GlobalClass globalVars;
 
     public TrackedEntityInstanceAdapter(AppCompatActivity activity, OnTrackedEntityInstanceSelectionListener listener, String programUid) {
         super(new DiffByIdItemCallback<>());
@@ -69,6 +70,8 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     @Override
     public void onBindViewHolder(@NonNull ListItemWithCardAndSyncHolder holder, int position) {
         TrackedEntityInstance trackedEntityInstance = getItem(position);
+        globalVars = (GlobalClass) this.activity.getApplicationContext();
+
         List<TrackedEntityAttributeValue> values = trackedEntityInstance.trackedEntityAttributeValues();
         holder.title.setText(valueAt(values, "QWTcaK2mXeD") + " - " + valueAt(values, "etJ8MaVKH2g"));
         holder.subtitle1.setText(valueAt(values, "N8skKU3roph") + " - " + valueAt(values, "KSSF2lnMKca"));
@@ -81,10 +84,10 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(view -> {
             new AlertDialog.Builder(this.activity)
-                    .setTitle("Delete Confirmation")
-                    .setMessage("Do you really want to delete?")
+                    .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
+                    .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
                     .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton("Yes, I want to delete", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             try {
                                 Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(trackedEntityInstance.uid()).blockingDelete();
@@ -94,7 +97,7 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
                                 d2Error.printStackTrace();
                             }
                         }})
-                    .setNegativeButton(android.R.string.no, null).show();
+                    .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
 
         });
         /*
@@ -187,7 +190,6 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
                 return attributeValue.value();
             }
         }
-
         return null;
     }
 
@@ -234,6 +236,10 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     }
 
     public void invalidateSource() {
-        source.invalidate();
+        try {
+            source.invalidate();
+        } catch (Exception ex){
+
+        }
     }
 }

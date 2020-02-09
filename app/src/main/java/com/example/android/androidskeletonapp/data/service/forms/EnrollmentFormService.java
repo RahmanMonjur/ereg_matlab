@@ -1,8 +1,11 @@
 package com.example.android.androidskeletonapp.data.service.forms;
 
 import android.text.TextUtils;
+import android.widget.EditText;
 
+import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.D2;
 import org.hisp.dhis.android.core.arch.helpers.GeometryHelper;
@@ -15,6 +18,7 @@ import org.hisp.dhis.android.core.enrollment.EnrollmentObjectRepository;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttribute;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValue;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValueObjectRepository;
 
 import java.util.Calendar;
@@ -22,6 +26,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -30,9 +35,11 @@ public class EnrollmentFormService {
 
     private D2 d2;
     private EnrollmentObjectRepository enrollmentRepository;
+    private static List<TrackedEntityAttributeValue> enrollmentDataBackup;
     private static EnrollmentFormService instance;
     private final Map<String, FormField> fieldMap;
     private Boolean newEnrollment;
+    GlobalClass globalVars;
 
     private EnrollmentFormService() {
         fieldMap = new LinkedHashMap<>();
@@ -45,8 +52,9 @@ public class EnrollmentFormService {
         return instance;
     }
 
-    public boolean init(D2 d2, String teiUid, String programUid, String ouUid) {
+    public boolean init(GlobalClass globalVars, D2 d2, String teiUid, String programUid) {
         this.d2 = d2;
+        this.globalVars = globalVars;
         try {
             Enrollment enrollment = d2.enrollmentModule().enrollments()
                     .byProgram().eq(programUid)
@@ -56,7 +64,7 @@ public class EnrollmentFormService {
             if (enrollment == null) {
                 String enrollmentUid = d2.enrollmentModule().enrollments().blockingAdd(
                         EnrollmentCreateProjection.builder()
-                                .organisationUnit(ouUid)
+                                .organisationUnit(globalVars.getOrgUid().uid())
                                 .program(programUid)
                                 .trackedEntityInstance(teiUid)
                                 .build()
@@ -68,6 +76,8 @@ public class EnrollmentFormService {
             }
             else {
                 enrollmentRepository = d2.enrollmentModule().enrollments().uid(enrollment.uid());
+                enrollmentDataBackup = d2.trackedEntityModule().trackedEntityAttributeValues()
+                        .byTrackedEntityInstance().eq(teiUid).blockingGet();
                 newEnrollment = false;
             }
             return true;
@@ -84,11 +94,10 @@ public class EnrollmentFormService {
                     new NullPointerException("D2 is null. EnrollmentForm has not been initialized, use init() function.")
             );
         else
-
             fieldMap.clear();
             fieldMap.put("EnrollmentDate", new FormField(
-                "EnrollmentDate", null, ValueType.DATE, "Enrollment Date","",
-                enrollmentRepository.blockingExists() ?
+                "EnrollmentDate", null, ValueType.DATE, globalVars.getTranslatedWord("Enrollment Date"), "",
+                    "","","", enrollmentRepository.blockingExists() ?
                         DateFormatHelper.formatSimpleDate(enrollmentRepository.blockingGet().enrollmentDate()) : null,
                 null, true,
                 ObjectStyle.builder().build()));
@@ -118,12 +127,12 @@ public class EnrollmentFormService {
                                             enrollmentRepository.blockingGet().organisationUnit());
                             valueRepository.blockingSet(value);
                         }
-
                         FormField field = new FormField(
                                 attribute.uid(),
                                 attribute.optionSet() != null ? attribute.optionSet().uid() : null,
                                 attribute.valueType(),
-                                String.format("%s%s", attribute.displayName(), programAttribute.mandatory() ? "*" : ""),"",
+                                String.format("%s%s", programAttribute.mandatory() ? "* " : "", attribute.displayName()),
+                                attribute.displayDescription(), "","",programAttribute.mandatory() ? "1" : "",
                                 valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
                                 null,
                                 !attribute.generated(),
@@ -159,6 +168,22 @@ public class EnrollmentFormService {
             enrollmentRepository.setIncidentDate(incidentDate);
         } catch (D2Error d2Error) {
             d2Error.printStackTrace();
+        }
+    }
+
+    public void rollBack() {
+        for (TrackedEntityAttributeValue tedv : enrollmentDataBackup) {
+            TrackedEntityAttributeValueObjectRepository valueRepository =
+                    Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
+                            .value(
+                                    tedv.trackedEntityAttribute(),
+                                    tedv.trackedEntityInstance()
+                            );
+            try {
+                valueRepository.blockingSet(tedv.value());
+            } catch (D2Error d2Error) {
+                d2Error.printStackTrace();
+            }
         }
     }
 

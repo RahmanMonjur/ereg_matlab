@@ -1,13 +1,20 @@
 package com.example.android.androidskeletonapp.ui.tracked_entity_instances;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.LiveData;
 import androidx.paging.PagedList;
 
@@ -75,27 +82,31 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                 R.id.trackedEntityInstancesRecyclerView);
 
         globalVars = (GlobalClass) getApplicationContext();
-        if(globalVars.getOrgUid() == null) {
-            if(D2Manager.isD2Instantiated()) {
+
+        if (D2Manager.isD2Instantiated()) {
+            if (globalVars.getOrgUid() == null) {
                 if (Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).blockingCount() == 1) {
                     globalVars.setOrgUid(Sdk.d2().organisationUnitModule().organisationUnits().byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE).one().blockingGet());
                 } else {
                     ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), true);
                 }
-            } else {
-                D2Manager.instantiateD2(Sdk.getD2Configuration(this));
             }
+        } else {
+            D2Manager.instantiateD2(Sdk.getD2Configuration(this));
         }
+
 
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
-        getSupportActionBar().setTitle( title + " - " + globalVars.getTranslatedWord("Enrolled Participants"));
+        getSupportActionBar().setTitle(title + " - " + globalVars.getTranslatedWord("Enrolled Participants"));
 
         compositeDisposable = new CompositeDisposable();
         observeTrackedEntityInstances();
 
         if (isEmpty(selectedProgram))
             findViewById(R.id.enrollmentButton).setVisibility(View.GONE);
+
+        ((TextView) findViewById(R.id.trackedEntityInstancesNotificator)).setText(globalVars.getTranslatedWord("No tracked entity instances found"));
 
         findViewById(R.id.enrollmentButton).setOnClickListener(view -> compositeDisposable.add(
                 Sdk.d2().programModule().programs().uid(selectedProgram).get()
@@ -108,25 +119,26 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                                 ))
                         .map(teiUid -> {
                             newTeiUid = teiUid;
-                            return  teiUid;
+                            return teiUid;
                         })
                         .map(teiUid -> EnrollmentFormActivity.getFormActivityIntent(
                                 TrackedEntityInstancesActivity.this,
                                 teiUid,
                                 selectedProgram
-                                ))
+                        ))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 activityIntent ->
                                         ActivityStarter.startActivityForResult(
-                                                TrackedEntityInstancesActivity.this, activityIntent,ENROLLMENT_RQ),
+                                                TrackedEntityInstancesActivity.this, activityIntent, ENROLLMENT_RQ),
                                 Throwable::printStackTrace
                         )
         ));
 
         etFirstName = findViewById(R.id.txtParamFirstName);
         etFirstName.setHint(globalVars.getTranslatedWord("Input any value to be more specific"));
+
         ImageButton searchButton = findViewById(R.id.btnSearchTei);
         searchButton.setOnClickListener(view -> {
             getTrackedEntityInstanceQuery().observe(this, trackedEntityInstancePagedList -> {
@@ -135,6 +147,39 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                         trackedEntityInstancePagedList.isEmpty() ? View.VISIBLE : View.GONE);
             });
         });
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if(clipboard != null) {
+            if(clipboard.hasPrimaryClip()){
+                if(clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11){
+                    etFirstName.setText(clipboard.getPrimaryClip().getItemAt(0).getText());
+                }
+            }
+        }
+
+        ImageButton elementButton = findViewById(R.id.btnElement);
+        elementButton.setOnClickListener(view -> {
+            if(clipboard != null){
+                etFirstName.setText("");
+                ClipData clip = ClipData.newPlainText("","");
+                clipboard.setPrimaryClip(clip);
+            }
+            try {
+                Intent intent = new Intent();
+                intent.setClassName("com.element.dhis2", "com.element.epalm.HomeActivity");
+                startActivity(intent);
+            } catch (Exception ex){
+                new AlertDialog.Builder(this)
+                        .setMessage(globalVars.getTranslatedWord("Something went wrong with the Element application. Please check."))
+                        .setCancelable(false)
+                        .setPositiveButton(globalVars.getTranslatedWord("Yes"), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                            }}).show();
+            }
+
+        });
+
     }
 
     private void observeTrackedEntityInstances() {
@@ -148,8 +193,6 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
                     trackedEntityInstancePagedList.isEmpty() ? View.VISIBLE : View.GONE);
         });
     }
-
-    // I don't find the TEI after opening it in the form.
 
     private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
         TrackedEntityInstanceQueryCollectionRepository teiRepository =
@@ -221,5 +264,13 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         etFirstName.setText("");
         observeTrackedEntityInstances();
 
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if(clipboard != null) {
+            if(clipboard.hasPrimaryClip()){
+                if(clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11){
+                    etFirstName.setText(clipboard.getPrimaryClip().getItemAt(0).getText());
+                }
+            }
+        }
     }
 }

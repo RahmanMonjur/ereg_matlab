@@ -18,12 +18,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorWhite">
+            <ImageButton
+                android:id="@+id/btnElement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="left"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/circle_shape"
+                app:srcCompat="@drawable/ic_person_black_24dp"
+                android:backgroundTint="@color/colorWarn"
+                app:tint="@color/colorWhite" />
+
             <EditText
                 android:id="@+id/txtParamFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="17dp"
-                android:layout_marginLeft="14dp"
+                android:layout_marginLeft="40dp"
                 android:layout_marginRight="34dp"
                 android:gravity="left"
                 android:inputType="text"

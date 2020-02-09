@@ -6,20 +6,59 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/label"
+    <LinearLayout
+        android:id="@+id/lnrLabel"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="FORM LABEL"/>
+        android:weightSum="9"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            tools:text="FORM LABEL"/>
+
+        <ImageButton
+            android:id="@+id/helpButton"
+            android:layout_width="21dp"
+            android:layout_height="20dp"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/circle_shape"
+            app:srcCompat="@drawable/ic_alert_positive"
+            android:backgroundTint="#000080"
+            app:tint="@color/colorWhite" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/label1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/label"
+        app:layout_constraintTop_toBottomOf="@id/lnrLabel"
         android:visibility="gone"
         tools:text="FORM LABEL 1"
+        android:textColor="#000080"/>
+
+    <TextView
+        android:id="@+id/label2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/label1"
+        android:visibility="gone"
+        tools:text="FORM LABEL 2"
+        android:textColor="#ff0000"/>
+
+    <TextView
+        android:id="@+id/label3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/label2"
+        android:visibility="gone"
+        tools:text="FORM LABEL 3"
         android:textColor="#ff0000"/>
 
     <CheckBox
@@ -32,7 +71,7 @@
         android:layout_marginBottom="10dp"
         android:text=""
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label1" />
+        app:layout_constraintTop_toBottomOf="@+id/label3" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,21 +10,27 @@ public class FormField {
     private String optionSetUid;
     private ValueType valueType;
     private String formLabel;
-    private String formHint;
+    private String formDescription;
+    private String formWarning;
+    private String formError;
+    private String mandatory;
     private String value;
     private String optionCode;
     private boolean editable;
     private ObjectStyle objectStyle;
 
     public FormField(String uid, String optionSetUid,
-                     ValueType valueType, String formLabel, String formHint,
-                     String value, String optionCode,
+                     ValueType valueType, String formLabel, String formDescription, String formWarning, String formError,
+                     String mandatory, String value, String optionCode,
                      boolean isEditable, ObjectStyle objectStyle) {
         this.uid = uid;
         this.optionSetUid = optionSetUid;
         this.valueType = valueType;
         this.formLabel = formLabel;
-        this.formHint = formHint;
+        this.formDescription = formDescription;
+        this.formWarning = formWarning;
+        this.formError = formError;
+        this.mandatory = mandatory;
         this.value = value;
         this.optionCode = optionCode;
         this.isEditable = isEditable;
@@ -51,8 +57,20 @@ public class FormField {
         return formLabel;
     }
 
-    public String getFormHint() {
-        return formHint;
+    public String getFormDescription() {
+        return formDescription;
+    }
+
+    public String getFormWarning() {
+        return formWarning;
+    }
+
+    public String getFormError() {
+        return formError;
+    }
+
+    public String getMandatory() {
+        return mandatory;
     }
 
     public String getOptionCode() {

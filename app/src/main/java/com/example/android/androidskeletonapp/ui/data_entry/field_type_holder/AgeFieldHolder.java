@@ -26,7 +26,12 @@ public class AgeFieldHolder extends FieldHolder {
     private TextInputEditText input_day;
     private TextInputEditText input_month;
     private TextInputEditText input_year;
+    private TextInputLayout lbl_day;
+    private TextInputLayout lbl_month;
+    private TextInputLayout lbl_year;
+
     private String dateFormat;
+    GlobalClass globalVars;
 
     private ViewDataBinding binding;
 
@@ -38,12 +43,20 @@ public class AgeFieldHolder extends FieldHolder {
 
     AgeFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
+        globalVars = (GlobalClass) itemView.getContext().getApplicationContext();
         this.input_date = itemView.findViewById(R.id.date_picker);
         input_date.setFocusable(false);
         this.input_day = itemView.findViewById(R.id.input_days);
         this.input_month = itemView.findViewById(R.id.input_month);
         this.input_year = itemView.findViewById(R.id.input_year);
-        dateFormat = Sdk.d2().systemInfoModule().systemInfo().blockingGet().dateFormat();
+
+        this.lbl_day = itemView.findViewById(R.id.lblDay);
+        this.lbl_month = itemView.findViewById(R.id.lblMonth);
+        this.lbl_year = itemView.findViewById(R.id.lblYear);
+
+        lbl_day.setHint(globalVars.getTranslatedWord("Day"));
+        lbl_month.setHint(globalVars.getTranslatedWord("Month"));
+        lbl_year.setHint(globalVars.getTranslatedWord("Year"));
     }
 
     void bind(FormField fieldItem) {
@@ -52,7 +65,7 @@ public class AgeFieldHolder extends FieldHolder {
         try {
             input_date.setText(fieldItem.getValue() != null ?
                     fieldItem.getValue() :
-                    itemView.getContext().getString(R.string.date_button_text));
+                    globalVars.getTranslatedWord(itemView.getContext().getString(R.string.date_button_text)));
             if (fieldItem.getValue() != null) {
                 dateFormat = DateFormatHelper.getFormat(fieldItem.getValue());
                 Date dob = DateFormatHelper.parseDateAutoFormat(fieldItem.getValue());
@@ -66,6 +79,7 @@ public class AgeFieldHolder extends FieldHolder {
                 input_day.setTextSize(20);
                 input_month.setTextSize(20);
                 input_year.setTextSize(20);
+
             }
 
         } catch (ParseException e) {
@@ -90,17 +104,17 @@ public class AgeFieldHolder extends FieldHolder {
         });
 
         input_year.setOnFocusChangeListener((view, b) -> {
-                if (b == false)
-                    dateFocusChange(fieldItem.getUid());
+            if (!b)
+                dateFocusChange(fieldItem.getUid());
         });
 
         input_month.setOnFocusChangeListener((view, b) -> {
-            if (b == false)
+            if (!b)
                 dateFocusChange(fieldItem.getUid());
         });
 
         input_day.setOnFocusChangeListener((view, b) -> {
-            if (b == false)
+            if (!b)
                 dateFocusChange(fieldItem.getUid());
         });
     }

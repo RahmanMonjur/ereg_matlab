@@ -29,6 +29,7 @@
         app:layout_constraintTop_toTopOf="parent" >
 
         <TextView
+            android:id="@+id/lblInd1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -57,6 +58,7 @@
         app:layout_constraintTop_toTopOf="parent" >
 
         <TextView
+            android:id="@+id/lblInd2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -85,6 +87,7 @@
         app:layout_constraintTop_toTopOf="parent" >
 
         <TextView
+            android:id="@+id/lblInd3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -158,6 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/sync_data"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -190,6 +194,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
             android:tint="@color/colorWhite"
+            android:visibility="gone"
             android:layout_marginBottom="@dimen/fab_margin_with_text"
             app:srcCompat="@drawable/ic_person_black_24dp" />
 
