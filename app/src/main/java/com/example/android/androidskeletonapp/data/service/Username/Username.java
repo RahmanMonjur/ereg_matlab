@@ -1,7 +1,9 @@
 package com.example.android.androidskeletonapp.data.service.Username;
 
+
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,31 +20,32 @@ public abstract class Username extends BaseIdentifiableObject implements CoreObj
 
     @Nullable
     @JsonProperty()
-    public abstract String userid();
+    public abstract String surname();
 
     @Nullable
     @JsonProperty()
-    public abstract String username();
+    public abstract String firstName();
 
+    @NonNull
     public static Username create(Cursor cursor) {
-        return $AutoValue_Username.createFromCursor(cursor);
+        return AutoValue_Username.createFromCursor(cursor);
     }
 
     public static Builder builder() {
-        return new $$AutoValue_Username.Builder();
+        return new $AutoValue_Username.Builder();
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
-    public abstract static class Builder extends BaseIdentifiableObject.Builder<Builder> {
+    public static abstract class Builder extends BaseIdentifiableObject.Builder<Builder> {
 
         public abstract Builder id(Long id);
 
-        public abstract Builder userid(String userid);
+        public abstract Builder surname(String surname);
 
-        public abstract Builder username(String username);
+        public abstract Builder firstName(String firstName);
 
         public abstract Username build();
     }
