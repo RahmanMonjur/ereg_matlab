@@ -20,7 +20,7 @@ public abstract class Username extends BaseIdentifiableObject implements CoreObj
 
     @Nullable
     @JsonProperty()
-    public abstract String surname();
+    public abstract String surName();
 
     @Nullable
     @JsonProperty()
@@ -28,11 +28,11 @@ public abstract class Username extends BaseIdentifiableObject implements CoreObj
 
     @NonNull
     public static Username create(Cursor cursor) {
-        return AutoValue_Username.createFromCursor(cursor);
+        return $AutoValue_Username.createFromCursor(cursor);
     }
 
     public static Builder builder() {
-        return new $AutoValue_Username.Builder();
+        return new $$AutoValue_Username.Builder();
     }
 
     public abstract Builder toBuilder();
@@ -43,7 +43,7 @@ public abstract class Username extends BaseIdentifiableObject implements CoreObj
 
         public abstract Builder id(Long id);
 
-        public abstract Builder surname(String surname);
+        public abstract Builder surName(String surname);
 
         public abstract Builder firstName(String firstName);
 
