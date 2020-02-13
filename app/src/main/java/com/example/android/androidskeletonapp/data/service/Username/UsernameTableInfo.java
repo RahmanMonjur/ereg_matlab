@@ -14,7 +14,7 @@ public final class UsernameTableInfo {
 
         @Override
         public String name() {
-            return "Username";
+            return "User";
         }
 
         @Override

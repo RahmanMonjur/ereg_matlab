@@ -22,8 +22,11 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
+import com.example.android.androidskeletonapp.data.service.Username.UsernameFields;
+import com.example.android.androidskeletonapp.data.service.UsernameService;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
+import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.UsernameFieldHolder;
 import com.example.android.androidskeletonapp.ui.data_sets.DataSetsActivity;
 import com.example.android.androidskeletonapp.ui.data_sets.instances.DataSetInstancesActivity;
 import com.example.android.androidskeletonapp.ui.foreign_key_violations.ForeignKeyViolationsActivity;
@@ -34,6 +37,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.hisp.dhis.android.core.arch.api.fields.internal.Fields;
+import org.hisp.dhis.android.core.arch.api.payload.internal.Payload;
 import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
@@ -52,6 +57,9 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.example.android.androidskeletonapp.data.service.LogOutService.logOut;
 
@@ -100,6 +108,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         inflateMainView();
         createNavigationView(user);
+
+
+        UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
+        Call<Payload<User>> call = usernameService.getUsernames(Fields.<User>builder().build(), false);
+        call.enqueue(new Callback<Payload<User>>() {
+            @Override
+            public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
+                processUsername(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Payload<User>> call, Throwable t) {
+
+                Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void processUsername(Payload<User> users){
+        // Codes for creation of user records in database
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.android.androidskeletonapp.data.service.Username;
 
 import org.hisp.dhis.android.core.arch.modules.internal.MetadataModuleDownloader;
 import org.hisp.dhis.android.core.constant.Constant;
+import org.hisp.dhis.android.core.user.User;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -11,7 +12,7 @@ import javax.inject.Inject;
 import dagger.Reusable;
 
 @Reusable
-public class UsernameModuleDownloader implements MetadataModuleDownloader<List<Username>> {
+public class UsernameModuleDownloader implements MetadataModuleDownloader<List<User>> {
 
     private final UsernameCallFactory usernameCallFactory;
 
@@ -21,7 +22,7 @@ public class UsernameModuleDownloader implements MetadataModuleDownloader<List<U
     }
 
     @Override
-    public Callable<List<Username>> downloadMetadata() {
+    public Callable<List<User>> downloadMetadata() {
         return usernameCallFactory.create();
     }
 }

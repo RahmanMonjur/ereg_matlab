@@ -6,9 +6,9 @@ import org.hisp.dhis.android.core.user.User;
 
 final class UsernameFields {
 
-    private static final FieldsHelper<Username> fh = new FieldsHelper<>();
+    private static final FieldsHelper<User> fh = new FieldsHelper<>();
 
-    static final Fields<Username> allFields = Fields.<Username>builder()
+    static final Fields<User> allFields = Fields.<User>builder()
             .fields(fh.getIdentifiableFields())
             .fields(fh.<Double>field(UsernameTableInfo.Columns.VALUE))
             .build();

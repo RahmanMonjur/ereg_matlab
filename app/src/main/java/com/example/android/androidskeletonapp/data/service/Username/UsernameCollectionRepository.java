@@ -6,6 +6,7 @@ import org.hisp.dhis.android.core.arch.repositories.collection.internal.ReadOnly
 import org.hisp.dhis.android.core.arch.repositories.filters.internal.DoubleFilterConnector;
 import org.hisp.dhis.android.core.arch.repositories.filters.internal.FilterConnectorFactory;
 import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
+import org.hisp.dhis.android.core.user.User;
 
 import java.util.Map;
 
@@ -15,12 +16,12 @@ import dagger.Reusable;
 
 @Reusable
 public final class UsernameCollectionRepository extends ReadOnlyIdentifiableCollectionRepositoryImpl<
-        Username, UsernameCollectionRepository> {
+        User, UsernameCollectionRepository> {
 
     @Inject
     UsernameCollectionRepository(
-            final IdentifiableObjectStore<Username> store,
-            final Map<String, ChildrenAppender<Username>> childrenAppenders,
+            final IdentifiableObjectStore<User> store,
+            final Map<String, ChildrenAppender<User>> childrenAppenders,
             final RepositoryScope scope) {
         super(store, childrenAppenders, scope, new FilterConnectorFactory<>(scope,
                 s -> new UsernameCollectionRepository(store, childrenAppenders, s)));
