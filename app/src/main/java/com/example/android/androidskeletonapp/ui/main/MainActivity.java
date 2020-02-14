@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -22,17 +21,11 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
-import com.example.android.androidskeletonapp.data.service.Username.UsernameFields;
 import com.example.android.androidskeletonapp.data.service.UsernameService;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
-import com.example.android.androidskeletonapp.ui.data_entry.field_type_holder.UsernameFieldHolder;
-import com.example.android.androidskeletonapp.ui.data_sets.DataSetsActivity;
-import com.example.android.androidskeletonapp.ui.data_sets.instances.DataSetInstancesActivity;
 import com.example.android.androidskeletonapp.ui.foreign_key_violations.ForeignKeyViolationsActivity;
-import com.example.android.androidskeletonapp.ui.programs.ProgramsActivity;
 import com.example.android.androidskeletonapp.ui.tracked_entity_instances.TrackedEntityInstancesActivity;
-import com.example.android.androidskeletonapp.ui.tracked_entity_instances.search.TrackedEntityInstanceSearchActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -42,14 +35,12 @@ import org.hisp.dhis.android.core.arch.api.payload.internal.Payload;
 import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
-import org.hisp.dhis.android.core.period.PeriodType;
-import org.hisp.dhis.android.core.period.internal.PeriodHelper;
 import org.hisp.dhis.android.core.user.User;
-import org.joda.time.Period;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         call.enqueue(new Callback<Payload<User>>() {
             @Override
             public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
-                processUsername(response.body());
+                String a = processUsername(response.body());
             }
 
             @Override
@@ -127,8 +118,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void processUsername(Payload<User> users){
-        // Codes for creation of user records in database
+    private String processUsername(Payload<User> users){
+        List<User> user = users.items();
+        String a= "";
+        if(user != null){
+            a = user.get(0).firstName();
+        }
+        return a;
     }
 
     @Override

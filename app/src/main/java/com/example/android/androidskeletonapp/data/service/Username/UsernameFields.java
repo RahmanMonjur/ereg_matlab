@@ -4,7 +4,7 @@ import org.hisp.dhis.android.core.arch.api.fields.internal.Fields;
 import org.hisp.dhis.android.core.arch.fields.internal.FieldsHelper;
 import org.hisp.dhis.android.core.user.User;
 
-final class UsernameFields {
+public final class UsernameFields {
 
     private static final FieldsHelper<User> fh = new FieldsHelper<>();
 
