@@ -21,6 +21,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
+import com.example.android.androidskeletonapp.data.service.Username.UsernameFields;
 import com.example.android.androidskeletonapp.data.service.UsernameService;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
@@ -37,6 +38,10 @@ import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.user.User;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isSyncing = false;
     GlobalClass globalVars;
 
+    File myInternalFile;
+    private String filename = "fwalist.txt";
+
     public static Intent getMainActivityIntent(Context context) {
         return new Intent(context, MainActivity.class);
     }
@@ -78,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_navigation);
         globalVars = (GlobalClass) getApplicationContext();
         compositeDisposable = new CompositeDisposable();
+        myInternalFile = this.getFileStreamPath(filename);
 
         OrganisationUnit orgunit = Sdk.d2().organisationUnitModule().organisationUnits()
                 .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
@@ -101,30 +110,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         createNavigationView(user);
 
 
-        UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
-        Call<Payload<User>> call = usernameService.getUsernames(Fields.<User>builder().build(), false);
-        call.enqueue(new Callback<Payload<User>>() {
-            @Override
-            public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
-                String a = processUsername(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<Payload<User>> call, Throwable t) {
-
-                Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
 
-    private String processUsername(Payload<User> users){
-        List<User> user = users.items();
-        String a= "";
-        if(user != null){
-            a = user.get(0).firstName();
+    private void processUsername(Payload<User> plUsers){
+        myInternalFile = this.getFileStreamPath(filename);
+        if (!myInternalFile.exists())
+        {
+            myInternalFile = new File(this.getFilesDir(), filename);
+            try {
+                BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
+                List<User> users= plUsers.items();
+                for (User user: users) {
+                    buf.append(user.uid() + '~' + user.surname()+' '+user.firstName());
+                    buf.newLine();
+                }
+                buf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            boolean deleted = myInternalFile.delete();
         }
-        return a;
+
     }
 
     @Override
@@ -374,6 +382,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     locale = "bn";
                                 globalVars.setUserLocale(locale);
                             }
+
+                            if (myInternalFile.exists()) {
+                                boolean deleted = myInternalFile.delete();
+                                if (deleted) {
+                                    myInternalFile = new File(this.getFilesDir(), filename);
+
+                                    UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
+                                    Call<Payload<User>> call = usernameService.getUsernames(UsernameFields.allFields, false);
+                                    call.enqueue(new Callback<Payload<User>>() {
+                                        @Override
+                                        public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
+                                            try {
+                                                BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
+                                                List<User> users = response.body().items();
+                                                for (User user : users) {
+                                                    buf.append(user.uid() + '~' + user.surname() + ' ' + user.firstName());
+                                                    buf.newLine();
+                                                }
+                                                buf.close();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Payload<User>> call, Throwable t) {
+                                            Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
                             }

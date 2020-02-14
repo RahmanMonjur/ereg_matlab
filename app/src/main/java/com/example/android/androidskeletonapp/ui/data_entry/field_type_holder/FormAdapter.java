@@ -70,6 +70,9 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                 case ORGANISATION_UNIT:
                     return new OrganisationUnitFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_field_optionset, parent, false), valueSavedListener);
+                case USERNAME:
+                    return new UsernameFieldHolder(LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.item_field_optionset, parent, false), valueSavedListener);
                 default:
                     return new TextFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_field, parent, false), valueSavedListener);
