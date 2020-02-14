@@ -28,6 +28,7 @@ public final class UsernameFields {
     private static final NestedField<User, OrganisationUnit> organisationUnits
             = NestedField.create(ORGANISATION_UNITS);
 
+
     public static final Fields<User> allFields = Fields.<User>builder().fields(
             uid, surname, firstName, userCredentials.with(UserCredentialsFields.allFields),
             organisationUnits.with(OrganisationUnitFields.fieldsInUserCall)

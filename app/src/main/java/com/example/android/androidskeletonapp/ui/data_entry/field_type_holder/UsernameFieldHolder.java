@@ -27,7 +27,7 @@ import java.util.Objects;
 public class UsernameFieldHolder extends FieldHolder {
 
     private final Spinner spinner;
-    private HashMap<String,String> optionList;
+    private Map<String,String> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
 
@@ -92,8 +92,8 @@ public class UsernameFieldHolder extends FieldHolder {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i > 0) {
-                    if (fieldCurrentValue == null || !Objects.equals(fieldCurrentValue, getKey(optionList, optionList.get(i - 1))))
-                        valueSavedListener.onValueSaved(fieldUid, getKey(optionList, optionList.get(i - 1)));
+                    if (fieldCurrentValue == null || !Objects.equals(fieldCurrentValue, getKey(optionList, spinner.getSelectedItem().toString())))
+                        valueSavedListener.onValueSaved(fieldUid, getKey(optionList, spinner.getSelectedItem().toString()));
                 } else if (fieldCurrentValue != null)
                     valueSavedListener.onValueSaved(fieldUid, null);
             }
@@ -106,9 +106,10 @@ public class UsernameFieldHolder extends FieldHolder {
     }
 
     private void setInitialValue(String selectedCode) {
-        for (int i = 0; i < optionList.size(); i++)
-            if (Objects.equals(getKey(optionList, optionList.get(i - 1)), selectedCode))
-                spinner.setSelection(i + 1);
+        String value = optionList.get(selectedCode);
+        ArrayAdapter<String> spinnerAdap = (ArrayAdapter<String>) spinner.getAdapter();
+        int spinnerPosition = spinnerAdap.getPosition(value);
+        spinner.setSelection(spinnerPosition);
     }
 
     private <K, V> K getKey(Map<K, V> map, V value) {
