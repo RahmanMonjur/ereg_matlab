@@ -9,8 +9,8 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-interface UsernameService {
+public interface UsernameService {
     @GET("users")
     Call<Payload<User>> getUsernames (@Query("fields") @Which Fields<User> fields,
-                                  @Query("paging") boolean paging);
+                                      @Query("paging") boolean paging);
 }

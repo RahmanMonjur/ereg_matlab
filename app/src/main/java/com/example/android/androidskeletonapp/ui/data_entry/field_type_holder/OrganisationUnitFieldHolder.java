@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 
@@ -23,6 +24,7 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
     private List<OrganisationUnit> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
+    GlobalClass globalVars;
 
     OrganisationUnitFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
@@ -31,6 +33,7 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        globalVars = (GlobalClass) itemView.getContext().getApplicationContext();
         fieldUid = fieldItem.getUid();
         fieldCurrentValue = fieldItem.getValue();
 
@@ -45,9 +48,12 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
 
 
         List<String> optionListNames = new ArrayList<>();
-        optionListNames.add("Please select from list");
+        optionListNames.add(globalVars.getTranslatedWord("Please select from list"));
         //optionListNames.add(label.getText().toString());
-        for (OrganisationUnit option : optionList) optionListNames.add(option.displayName());
+        for (OrganisationUnit option : optionList) {
+            if (!option.uid().equals("JoBQEuzxohv") || !option.uid().equals("NzTpSVrwBcE"))
+                optionListNames.add(option.displayName());
+        }
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

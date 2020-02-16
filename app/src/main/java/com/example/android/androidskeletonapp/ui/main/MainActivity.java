@@ -21,8 +21,12 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
+import com.example.android.androidskeletonapp.data.service.Username.UserList;
+import com.example.android.androidskeletonapp.data.service.Username.UserListFields;
+import com.example.android.androidskeletonapp.data.service.Username.UserListService;
+import com.example.android.androidskeletonapp.data.service.Username.Username;
 import com.example.android.androidskeletonapp.data.service.Username.UsernameFields;
-import com.example.android.androidskeletonapp.data.service.UsernameService;
+import com.example.android.androidskeletonapp.data.service.Username.UsernameService;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
 import com.example.android.androidskeletonapp.ui.foreign_key_violations.ForeignKeyViolationsActivity;
@@ -31,12 +35,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.hisp.dhis.android.core.arch.api.fields.internal.Fields;
 import org.hisp.dhis.android.core.arch.api.payload.internal.Payload;
 import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.user.User;
+import org.hisp.dhis.android.core.user.UserCredentials;
+import org.hisp.dhis.android.core.user.UserRole;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -385,34 +390,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                             if (myInternalFile.exists()) {
                                 boolean deleted = myInternalFile.delete();
-                                if (deleted) {
-                                    myInternalFile = new File(this.getFilesDir(), filename);
+                            }
+                            myInternalFile = new File(this.getFilesDir(), filename);
+                            /*
+                            UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
+                            Call<Payload<User>> call = usernameService.getUsernames(UsernameFields.allFields, false);
+                            call.enqueue(new Callback<Payload<User>>() {
+                                @Override
+                                public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
+                                    try {
+                                        BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
+                                        List<User> users = response.body().items();
+                                        for (User user : users) {
 
-                                    UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
-                                    Call<Payload<User>> call = usernameService.getUsernames(UsernameFields.allFields, false);
-                                    call.enqueue(new Callback<Payload<User>>() {
-                                        @Override
-                                        public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
-                                            try {
-                                                BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
-                                                List<User> users = response.body().items();
-                                                for (User user : users) {
-                                                    buf.append(user.uid() + '~' + user.surname() + ' ' + user.firstName());
+                                            //UserCredentials uc = user.getUserCredentials();
+                                            //buf.append(user.userCredentials().username() + '~' + user.name());
+                                            buf.newLine();
+                                        }
+                                        buf.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Payload<User>> call, Throwable t) {
+                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            */
+
+
+                            UserListService usernameService = Sdk.d2().retrofit().create(UserListService.class);
+                            Call<Payload<UserList>> call = usernameService.getUsernames(UserListFields.allFields, false);
+                            call.enqueue(new Callback<Payload<UserList>>() {
+                                @Override
+                                public void onResponse(Call<Payload<UserList>> call, Response<Payload<UserList>> response) {
+                                    try {
+                                        BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
+                                        List<UserList> users = response.body().items();
+                                        for (UserList user : users) {
+                                            UserCredentials uc = user.getUserCredentials();
+                                            List<OrganisationUnit> ous = user.getOrganisationUnits();
+                                            List<UserRole> urs = uc.userRoles();
+                                            for(UserRole ur: urs){
+                                                if (ur.uid().equals("lItc9BR90WI")) {
+                                                    buf.append(uc.username() + '~' + uc.displayName() + '~' + ((ous.size() > 0) ? ous.get(0).path() : ""));
                                                     buf.newLine();
                                                 }
-                                                buf.close();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
                                             }
                                         }
-
-                                        @Override
-                                        public void onFailure(Call<Payload<User>> call, Throwable t) {
-                                            Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                        buf.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
+
+                                @Override
+                                public void onFailure(Call<Payload<UserList>> call, Throwable t) {
+                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
 
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);

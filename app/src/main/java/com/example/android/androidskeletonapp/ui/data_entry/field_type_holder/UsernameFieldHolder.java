@@ -9,9 +9,12 @@ import androidx.annotation.NonNull;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
+import com.example.android.androidskeletonapp.data.service.forms.EnrollmentFormService;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
+import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValueObjectRepository;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -30,6 +33,7 @@ public class UsernameFieldHolder extends FieldHolder {
     private Map<String,String> optionList;
     private String fieldUid;
     private String fieldCurrentValue;
+    GlobalClass globalVars;
 
     UsernameFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
         super(itemView, valueSavedListener);
@@ -38,6 +42,7 @@ public class UsernameFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        globalVars = (GlobalClass) itemView.getContext().getApplicationContext();
         fieldUid = fieldItem.getUid();
         fieldCurrentValue = fieldItem.getValue();
 
@@ -50,7 +55,7 @@ public class UsernameFieldHolder extends FieldHolder {
     private void setUpSpinner(String optionSetUid) {
         optionList = new HashMap<>();
         List<String> optionListNames = new ArrayList<>();
-        optionListNames.add("Please select from list");
+        optionListNames.add(globalVars.getTranslatedWord("Please select from list"));
 
         FileInputStream fis;
         try {
@@ -60,8 +65,24 @@ public class UsernameFieldHolder extends FieldHolder {
             String receiveString = "";
             while ( (receiveString = bufferedReader.readLine()) != null ) {
                 if (receiveString != ""){
-                    String[] separated = receiveString.split("~");
-                    optionList.put(separated[0],separated[1]);
+                    String[] userData = receiveString.split("~");
+                    if(userData.length>2) {
+                        String[] orgs = userData[2].split("/");
+                        if (orgs.length > 5) {
+                            if (EnrollmentFormService.getInstance() != null) {
+                                TrackedEntityAttributeValueObjectRepository valueRepository =
+                                        Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
+                                                .value("OhmSPuuHj53",
+                                                        Sdk.d2().enrollmentModule().enrollments().uid(
+                                                                EnrollmentFormService.getInstance().getEnrollmentUid()).blockingGet().trackedEntityInstance());
+                                if ((valueRepository.blockingExists() ? valueRepository.blockingGet().value() : "null").equals(orgs[5])) {
+                                    optionList.put(userData[0], userData[1]);
+                                }
+                            } else {
+                                //optionList.put(userData[0], userData[1]);
+                            }
+                        }
+                    }
                 }
             }
             if (optionList.size()<1){
