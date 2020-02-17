@@ -136,7 +136,7 @@ public class EnrollmentFormService {
                                 String.format("%s%s", programAttribute.mandatory() ? "* " : "", attribute.displayName()),
                                 attribute.displayDescription(), "","",programAttribute.mandatory() ? "1" : "",
                                 valueRepository.blockingExists() ? valueRepository.blockingGet().value() :
-                                        (attribute.uid().equals("aQEvaiBpohU") ? elementId : null),
+                                        ((elementId!=null && attribute.uid().equals("aQEvaiBpohU")) ? elementId : null),
                                 null,
                                 !attribute.generated(),
                                 attribute.style()

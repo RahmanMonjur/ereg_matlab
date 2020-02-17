@@ -76,6 +76,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_program_stages, R.id.programStageToolbar, R.id.programStageRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
+        TextView instruction = (TextView)findViewById(R.id.enrollmentInstruction);
         selectedProgram = getIntent().getStringExtra(IntentExtra.PROGRAM.name());
         //String title = (selectedProgram == null) ? "" : Sdk.d2().programModule().programs().byUid().eq(selectedProgram).one().blockingGet().displayName();
         List<TrackedEntityAttributeValue> teiAttrVal = Sdk.d2().trackedEntityModule().trackedEntityInstances().withTrackedEntityAttributeValues().uid(getIntent().getStringExtra(IntentExtra.TEI.name())).blockingGet().trackedEntityAttributeValues();
@@ -127,8 +128,11 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
                                         }})
                                     .setNegativeButton(globalVars.getTranslatedWord("No"), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            listProgram.setSelection(1);
+                                            listProgram.setSelection(0);
                                             selectedProgram = "ZBIqxwVixn8";
+                                            instruction.setText((selectedProgram.equals("ZBIqxwVixn8") && enrollment == null) ?
+                                                    globalVars.getTranslatedWord("Do not forget to enroll in the MCH program") :
+                                                    globalVars.getTranslatedWord("You can change the program by clicking below"));
                                         }})
                                     .show();
                         }
@@ -142,14 +146,14 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
             }
         });
 
-        TextView instruction = (TextView)findViewById(R.id.enrollmentInstruction);
+
         Enrollment enrollment = Sdk.d2().enrollmentModule().enrollments()
                 .byTrackedEntityInstance().eq(getIntent().getStringExtra(IntentExtra.TEI.name()))
                 .byProgram().eq("WSGAb5XwJ3Y")
                 .one().blockingGet();
-        instruction.setText((selectedProgram=="ZBIqxwVixn8" && enrollment == null) ?
+        instruction.setText((selectedProgram.equals("ZBIqxwVixn8") && enrollment == null) ?
                 globalVars.getTranslatedWord("Do not forget to enroll in the MCH program") :
-                globalVars.getTranslatedWord("You can change the program by clicking the dropdown below"));
+                globalVars.getTranslatedWord("You can change the program by clicking below"));
 
 
     }

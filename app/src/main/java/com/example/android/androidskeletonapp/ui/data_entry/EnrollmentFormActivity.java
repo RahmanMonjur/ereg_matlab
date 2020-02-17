@@ -1,6 +1,7 @@
 package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -115,7 +116,7 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
         engineInitialization = PublishProcessor.create();
 
-        String elementId = "";
+        String elementId = null;
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if(clipboard != null) {
@@ -126,6 +127,8 @@ public class EnrollmentFormActivity extends AppCompatActivity {
                     Matcher matcher = pattern.matcher(clipboard.getPrimaryClip().getItemAt(0).getText());
                     if (matcher.matches()) {
                         elementId = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
+                        ClipData clip = ClipData.newPlainText("","");
+                        clipboard.setPrimaryClip(clip);
                     }
                 }
             }

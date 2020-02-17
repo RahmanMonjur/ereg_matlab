@@ -26,7 +26,7 @@
     <!-- Strings related to main -->
     <string name="title_activity_main">Home</string>
     <string name="welcome">"Welcome!"</string>
-    <string name="lorem_ipsum">"Lorem ipsum dolor sit amet"</string>
+    <string name="lorem_ipsum">"Downloading metadata and data"</string>
     <string name="syncing_metadata">Updating metadata…</string>
     <string name="syncing_data">Downloading data…</string>
     <string name="sync_metadata">Update metadata</string>

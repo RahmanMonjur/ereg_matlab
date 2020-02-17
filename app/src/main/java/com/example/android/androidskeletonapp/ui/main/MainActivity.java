@@ -116,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         inflateMainView();
         createNavigationView(user);
 
-
-
     }
 
 
@@ -292,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .byCreated().after(calendar.getTime())
                     .blockingCount();
 
-            ((TextView)findViewById(R.id.lblInd1)).setText(globalVars.getTranslatedWord("Total number of women enrolled in the Org Unit"));
+            ((TextView)findViewById(R.id.lblInd1)).setText(globalVars.getTranslatedWord("Number of women enrolled in the Org Unit"));
             ((TextView)findViewById(R.id.lblInd2)).setText(globalVars.getTranslatedWord("Number of women enrolled in last month"));
             ((TextView)findViewById(R.id.lblInd3)).setText(globalVars.getTranslatedWord("Number of HH visited in last month"));
             ((TextView)findViewById(R.id.indicator1)).setText(MessageFormat.format("{0}", totalEnroll));
@@ -337,7 +335,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void downloadMetadataAndData(){
-
+        setSyncing();
+        //syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
         compositeDisposable.add(
                 downloadMetadata()
                         .subscribeOn(Schedulers.io())

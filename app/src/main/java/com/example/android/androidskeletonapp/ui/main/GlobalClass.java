@@ -57,7 +57,7 @@ public class GlobalClass extends Application {
         translatedWords.put("Month","মাস");
         translatedWords.put("Year","বছর");
         translatedWords.put("You have selected","আপনি নির্বাচন করেছেন");
-        translatedWords.put("Total number of women enrolled in the Org Unit","এই কর্মস্থলে মোট নিবন্ধিতের সংখ্যা");
+        translatedWords.put("Number of women enrolled in the Org Unit","এই কর্মস্থলে মোট নিবন্ধিতের সংখ্যা");
         translatedWords.put("Number of women enrolled in last month","গত মাসে নিবন্ধনের সংখ্যা");
         translatedWords.put("Number of HH visited in last month","গত মাসে বাড়ি পরিদর্শনের সংখ্যা");
         translatedWords.put("Visit Date","পরিদর্শনের তারিখ");
