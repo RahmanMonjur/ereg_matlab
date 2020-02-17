@@ -4,7 +4,7 @@ import org.hisp.dhis.android.core.arch.api.fields.internal.Field;
 import org.hisp.dhis.android.core.arch.api.fields.internal.Fields;
 
 public class UserGroupFields {
-    private static final Field<UserGroup, String> uid = Field.create("Uid");
+    private static final Field<UserGroup, String> uid = Field.create("id");
 
     public static final Fields<UserGroup> allfields = Fields.<UserGroup>builder()
             .fields(

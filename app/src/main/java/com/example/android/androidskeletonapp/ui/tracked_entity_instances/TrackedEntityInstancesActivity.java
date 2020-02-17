@@ -40,6 +40,8 @@ import org.hisp.dhis.android.core.trackedentity.search.TrackedEntityInstanceQuer
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -152,7 +154,12 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         if(clipboard != null) {
             if(clipboard.hasPrimaryClip()){
                 if(clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11){
-                    etFirstName.setText(clipboard.getPrimaryClip().getItemAt(0).getText());
+                    String regex = "^[0-9]+$";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(clipboard.getPrimaryClip().getItemAt(0).getText());
+                    if (matcher.matches()) {
+                        etFirstName.setText(clipboard.getPrimaryClip().getItemAt(0).getText());
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.example.android.androidskeletonapp.ui.data_entry;
 
 import android.Manifest;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,6 +56,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -112,10 +115,26 @@ public class EnrollmentFormActivity extends AppCompatActivity {
 
         engineInitialization = PublishProcessor.create();
 
+        String elementId = "";
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if(clipboard != null) {
+            if(clipboard.hasPrimaryClip()){
+                if(clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11){
+                    String regex = "^[0-9]+$";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(clipboard.getPrimaryClip().getItemAt(0).getText());
+                    if (matcher.matches()) {
+                        elementId = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
+                    }
+                }
+            }
+        }
+
         if (EnrollmentFormService.getInstance().init(globalVars,
                 Sdk.d2(),
                 getIntent().getStringExtra(IntentExtra.TEI_UID.name()),
-                getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name())))
+                getIntent().getStringExtra(IntentExtra.PROGRAM_UID.name()), elementId))
             this.engineService = new RuleEngineService();
 
     }

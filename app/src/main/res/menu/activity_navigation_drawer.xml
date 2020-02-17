@@ -12,14 +12,7 @@
             android:id="@+id/navD2Errors"
             android:icon="@drawable/ic_error_outline_black_24dp"
             android:title="@string/title_activity_d2_errors" />
-        <item
-            android:id="@+id/navFKViolations"
-            android:icon="@drawable/ic_foreign_key_black_24dp"
-            android:title="@string/title_activity_fk_violations" />
-        <item
-            android:id="@+id/navCodeExecutor"
-            android:icon="@drawable/ic_execute_code_black_24dp"
-            android:title="@string/code_executor" />
+        
     </group>
 
     <item android:title="@string/data_management">

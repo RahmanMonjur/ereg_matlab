@@ -40,6 +40,7 @@ public class EnrollmentFormService {
     private final Map<String, FormField> fieldMap;
     private Boolean newEnrollment;
     GlobalClass globalVars;
+    private String elementId;
 
     private EnrollmentFormService() {
         fieldMap = new LinkedHashMap<>();
@@ -52,9 +53,10 @@ public class EnrollmentFormService {
         return instance;
     }
 
-    public boolean init(GlobalClass globalVars, D2 d2, String teiUid, String programUid) {
+    public boolean init(GlobalClass globalVars, D2 d2, String teiUid, String programUid,String elementId) {
         this.d2 = d2;
         this.globalVars = globalVars;
+        this.elementId = elementId;
         try {
             Enrollment enrollment = d2.enrollmentModule().enrollments()
                     .byProgram().eq(programUid)
@@ -133,7 +135,8 @@ public class EnrollmentFormService {
                                 attribute.valueType(),
                                 String.format("%s%s", programAttribute.mandatory() ? "* " : "", attribute.displayName()),
                                 attribute.displayDescription(), "","",programAttribute.mandatory() ? "1" : "",
-                                valueRepository.blockingExists() ? valueRepository.blockingGet().value() : null,
+                                valueRepository.blockingExists() ? valueRepository.blockingGet().value() :
+                                        (attribute.uid().equals("aQEvaiBpohU") ? elementId : null),
                                 null,
                                 !attribute.generated(),
                                 attribute.style()

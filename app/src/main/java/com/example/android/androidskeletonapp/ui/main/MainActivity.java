@@ -21,6 +21,7 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
+import com.example.android.androidskeletonapp.data.service.Username.UserGroup;
 import com.example.android.androidskeletonapp.data.service.Username.UserList;
 import com.example.android.androidskeletonapp.data.service.Username.UserListFields;
 import com.example.android.androidskeletonapp.data.service.Username.UserListService;
@@ -119,27 +120,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void processUsername(Payload<User> plUsers){
-        myInternalFile = this.getFileStreamPath(filename);
-        if (!myInternalFile.exists())
-        {
-            myInternalFile = new File(this.getFilesDir(), filename);
-            try {
-                BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
-                List<User> users= plUsers.items();
-                for (User user: users) {
-                    buf.append(user.uid() + '~' + user.surname()+' '+user.firstName());
-                    buf.newLine();
-                }
-                buf.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            boolean deleted = myInternalFile.delete();
-        }
-
-    }
 
     @Override
     protected void onResume() {
@@ -283,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (globalVars.getOrgUid() != null) {
             Date trialDate = new Date();
             try {
-                trialDate = DateFormatHelper.parseDateAutoFormat("2017-10-13");
+                trialDate = DateFormatHelper.parseDateAutoFormat("2018-10-13");
             } catch (Exception e) {
             }
 
@@ -357,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void downloadMetadataAndData(){
-        syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
+
         compositeDisposable.add(
                 downloadMetadata()
                         .subscribeOn(Schedulers.io())
@@ -370,12 +350,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void downloadDataMain() {
+        syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
         compositeDisposable.add(
                 downloadTrackedEntityInstances()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete(() -> {
-                            setSyncingFinished();
+                            //setSyncingFinished();
                             if (globalVars.getUserLocale() == null) {
                                 String locale = "en";
                                 String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
@@ -393,34 +374,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 boolean deleted = myInternalFile.delete();
                             }
                             myInternalFile = new File(this.getFilesDir(), filename);
-                            /*
-                            UsernameService usernameService = Sdk.d2().retrofit().create(UsernameService.class);
-                            Call<Payload<User>> call = usernameService.getUsernames(UsernameFields.allFields, false);
-                            call.enqueue(new Callback<Payload<User>>() {
-                                @Override
-                                public void onResponse(Call<Payload<User>> call, Response<Payload<User>> response) {
-                                    try {
-                                        BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
-                                        List<User> users = response.body().items();
-                                        for (User user : users) {
-
-                                            //UserCredentials uc = user.getUserCredentials();
-                                            //buf.append(user.userCredentials().username() + '~' + user.name());
-                                            buf.newLine();
-                                        }
-                                        buf.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Payload<User>> call, Throwable t) {
-                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            */
-
 
                             UserListService usernameService = Sdk.d2().retrofit().create(UserListService.class);
                             Call<Payload<UserList>> call = usernameService.getUsernames(UserListFields.allFields, false);
@@ -433,11 +386,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         for (UserList user : users) {
                                             UserCredentials uc = user.getUserCredentials();
                                             List<OrganisationUnit> ous = user.getOrganisationUnits();
+                                            List<UserGroup> ugs = user.getUserGroups();
                                             List<UserRole> urs = uc.userRoles();
-                                            for(UserRole ur: urs){
-                                                if (ur.uid().equals("lItc9BR90WI")) {
-                                                    buf.append(uc.username() + '~' + uc.displayName() + '~' + ((ous.size() > 0) ? ous.get(0).path() : ""));
-                                                    buf.newLine();
+                                            for(UserGroup grp: ugs) {
+                                                if (grp.getUid().equals("ow22Lm7dg4l")) {
+                                                    for (UserRole ur : urs) {
+                                                        if (ur.uid().equals("lItc9BR90WI")) {
+                                                            buf.append(uc.username() + '~' + uc.displayName() + '~' + ((ous.size() > 0) ? ous.get(0).path() : ""));
+                                                            buf.newLine();
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -457,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
                             }
+                            setSyncingFinished();
                         })
                         .doOnError(Throwable::printStackTrace)
                         .subscribe());
@@ -556,11 +515,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     false);
         } else if (id == R.id.navD2Errors) {
             ActivityStarter.startActivity(this, D2ErrorActivity.getIntent(this), false);
-        } else if (id == R.id.navFKViolations) {
-            ActivityStarter.startActivity(this, ForeignKeyViolationsActivity.getIntent(this), false);
-        } else if (id == R.id.navCodeExecutor) {
-            ActivityStarter.startActivity(this, CodeExecutorActivity.getIntent(this), false);
-        } else if (id == R.id.navWipeData) {
+        }  else if (id == R.id.navWipeData) {
             syncStatusText.setText(R.string.wiping_data);
             wipeData();
         } else if (id == R.id.navExit) {

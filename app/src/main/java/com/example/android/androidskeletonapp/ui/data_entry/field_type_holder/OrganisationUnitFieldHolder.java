@@ -52,8 +52,9 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
         optionListNames.add(globalVars.getTranslatedWord("Please select from list"));
         //optionListNames.add(label.getText().toString());
         for (OrganisationUnit option : optionList) {
-            if (!option.uid().equals("JoBQEuzxohv") || !option.uid().equals("NzTpSVrwBcE"))
+            if (!option.uid().equals("JoBQEuzxohv") && !option.uid().equals("NzTpSVrwBcE") && !option.uid().equals("RAI8qgDClSr")) {
                 optionListNames.add(option.displayName());
+            }
         }
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
                 android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));
