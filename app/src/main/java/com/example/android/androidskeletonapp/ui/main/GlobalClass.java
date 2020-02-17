@@ -92,7 +92,7 @@ public class GlobalClass extends Application {
                 break;
             }
         }
-        if(!locale.isEmpty() || locale == "bn")
+        if(locale.isEmpty() || locale == "bn")
             return matchedValue.isEmpty() ? text : matchedValue;
         else
             return text;

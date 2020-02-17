@@ -39,7 +39,7 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
                 .one().blockingGet();
         if (orgunit != null) {
             String locale = "en";
-            String regex = "^[a-zA-Z0-9]+$";
+            String regex = "^[0-9a-zA-Z \\/_?:.,\\s-]+$";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(orgunit.displayName());
             if (!matcher.matches())

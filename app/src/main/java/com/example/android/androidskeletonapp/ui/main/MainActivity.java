@@ -98,11 +98,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .one().blockingGet();
         if (orgunit != null) {
             String locale = "en";
-            String regex = "^[a-zA-Z0-9]+$";
+            String regex = "^[0-9a-zA-Z \\/_?:.,\\s-]+$";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(orgunit.displayName());
-            if (!matcher.matches())
+            if (!matcher.matches()) {
                 locale = "bn";
+            }
             globalVars.setUserLocale(locale);
         }
         this.setTitle(globalVars.getTranslatedWord("Home"));
@@ -380,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
                                         .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
                                         .one().blockingGet().displayName();
-                                String regex = "^[a-zA-Z0-9]+$";
+                                String regex = "^[0-9a-zA-Z \\/_?:.,\\s-]+$";
                                 Pattern pattern = Pattern.compile(regex);
                                 Matcher matcher = pattern.matcher(orgunitname);
                                 if (!matcher.matches())
@@ -489,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
                                     .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
                                     .one().blockingGet().displayName();
-                            String regex = "^[a-zA-Z0-9]+$";
+                            String regex = "^[0-9a-zA-Z \\/_?:.,\\s-]+$";
                             Pattern pattern = Pattern.compile(regex);
                             Matcher matcher = pattern.matcher(orgunitname);
                             if (!matcher.matches())

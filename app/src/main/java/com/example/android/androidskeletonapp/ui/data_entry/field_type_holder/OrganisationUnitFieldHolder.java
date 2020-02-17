@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -64,6 +65,9 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
                         valueSavedListener.onValueSaved(fieldUid, optionList.get(i - 1).uid());
                 } else if (fieldCurrentValue != null)
                     valueSavedListener.onValueSaved(fieldUid, null);
+
+                TextView textView = (TextView) view;
+                ((TextView) adapterView.getChildAt(0)).setTextSize(20);
             }
 
             @Override

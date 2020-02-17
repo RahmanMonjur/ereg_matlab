@@ -13,16 +13,20 @@ public class UserListFields {
 
     public static final String USER_CREDENTIALS = "userCredentials";
     public static final String ORGANISATION_UNITS = "organisationUnits";
+    public static final String USER_GROUPS = "userGroups";
 
     public static final Field<UserList, String> uid = Field.create(BaseIdentifiableObject.UID);
     public static final NestedField<UserList, UserCredentials> userCredentials
             = NestedField.create(USER_CREDENTIALS);
     public static final NestedField<UserList, OrganisationUnit> organisationUnits
             = NestedField.create(ORGANISATION_UNITS);
+    public static final NestedField<UserList, UserGroup> userGroups
+            = NestedField.create(USER_GROUPS);
 
     public static final Fields<UserList> allFields = Fields.<UserList>builder().fields(
             uid, userCredentials.with(UserCredentialsFields.allFields),
-            organisationUnits.with(OrganisationUnitFields.fieldsInUserCall)
+            organisationUnits.with(OrganisationUnitFields.fieldsInUserCall),
+            userGroups.with(UserGroupFields.allfields)
     ).build();
 
     private UserListFields() {

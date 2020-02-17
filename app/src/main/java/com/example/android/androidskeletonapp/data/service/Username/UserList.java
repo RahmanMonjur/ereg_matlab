@@ -1,21 +1,18 @@
 package com.example.android.androidskeletonapp.data.service.Username;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
 
-import org.hisp.dhis.android.core.common.BaseIdentifiableObject;
-import org.hisp.dhis.android.core.common.CoreObject;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
-import org.hisp.dhis.android.core.user.User;
 import org.hisp.dhis.android.core.user.UserCredentials;
 
 import java.util.List;
 
 public class UserList {
     private String uid;
-
     private UserCredentials userCredentials;
     private List<OrganisationUnit> organisationUnits;
+    private List<UserGroup> userGroups;
+
 
     @JsonProperty(value = "id")
     public String getUid() {
@@ -45,6 +42,16 @@ public class UserList {
     @JsonProperty(value = "organisationUnits")
     public void setOrganisationUnits(List<OrganisationUnit> organisationUnits) {
         this.organisationUnits = organisationUnits;
+    }
+
+    @JsonProperty(value = "userGroups")
+    public List<UserGroup> getUserGroups() {
+        return userGroups;
+    }
+
+    @JsonProperty(value = "userGroups")
+    public void setUserGroups(List<UserGroup> userGroups) {
+        this.userGroups = userGroups;
     }
 
 }
