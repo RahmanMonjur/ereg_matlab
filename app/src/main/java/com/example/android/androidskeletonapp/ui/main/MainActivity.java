@@ -533,8 +533,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public boolean isNetworkConnected() {
         try {
-            InetAddress ipAddr = InetAddress.getByName("google.com");
-            return !ipAddr.equals("");
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
         } catch (Exception e) {
             return false;
         }

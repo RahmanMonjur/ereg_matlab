@@ -74,25 +74,31 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
         //holder.subtitle2.setText(optionCombo(event.attributeOptionCombo()).displayName());
         holder.rightText.setText(DateFormatHelper.getDateAsSystemFormat(event.eventDate()));
         holder.icon.setImageResource(R.drawable.ic_programs_black_24dp);
-        holder.delete.setVisibility(View.VISIBLE);
-        holder.delete.setOnClickListener(view -> {
-            new AlertDialog.Builder(this.activity)
-                    .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
-                    .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
-                    .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            try {
-                                Sdk.d2().eventModule().events().uid(event.uid()).blockingDelete();
-                                invalidateSource();
-                                notifyDataSetChanged();
-                            } catch (D2Error d2Error) {
-                                d2Error.printStackTrace();
+        if (event.state().equals(State.TO_POST)) {
+            holder.delete.setVisibility(View.VISIBLE);
+            holder.delete.setOnClickListener(view -> {
+                new AlertDialog.Builder(this.activity)
+                        .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
+                        .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
+                        .setIcon(android.R.drawable.ic_delete)
+                        .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    Sdk.d2().eventModule().events().uid(event.uid()).blockingDelete();
+                                    invalidateSource();
+                                    notifyDataSetChanged();
+                                } catch (D2Error d2Error) {
+                                    d2Error.printStackTrace();
+                                }
                             }
-                        }})
-                    .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
+                        })
+                        .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
 
-        });
+            });
+        }
+        else {
+            holder.delete.setVisibility(View.GONE);
+        }
 
         /*
         if(event.state().equals(State.TO_POST) || event.state().equals(State.TO_UPDATE)) {

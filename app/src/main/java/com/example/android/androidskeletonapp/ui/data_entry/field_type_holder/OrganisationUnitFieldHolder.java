@@ -34,6 +34,7 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        spinner.setOnItemSelectedListener(null);
         globalVars = (GlobalClass) itemView.getContext().getApplicationContext();
         fieldUid = fieldItem.getUid();
         fieldCurrentValue = fieldItem.getValue();
@@ -45,14 +46,14 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
     }
 
     private void setUpSpinner(String optionSetUid) {
-        optionList = Sdk.d2().organisationUnitModule().organisationUnits().byLevel().eq(5).blockingGet();
-
-
+        List<OrganisationUnit> optionList1 = Sdk.d2().organisationUnitModule().organisationUnits().byLevel().eq(5).blockingGet();
+        optionList = new ArrayList<>();
         List<String> optionListNames = new ArrayList<>();
         optionListNames.add(globalVars.getTranslatedWord("Please select from list"));
         //optionListNames.add(label.getText().toString());
-        for (OrganisationUnit option : optionList) {
+        for (OrganisationUnit option : optionList1) {
             if (!option.uid().equals("JoBQEuzxohv") && !option.uid().equals("NzTpSVrwBcE") && !option.uid().equals("RAI8qgDClSr")) {
+                optionList.add(option);
                 optionListNames.add(option.displayName());
             }
         }

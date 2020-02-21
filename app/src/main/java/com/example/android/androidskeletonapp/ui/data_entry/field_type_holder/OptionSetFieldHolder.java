@@ -34,6 +34,7 @@ class OptionSetFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        spinner.setOnItemSelectedListener(null);
         fieldUid = fieldItem.getUid();
         fieldCurrentValue = fieldItem.getValue();
 

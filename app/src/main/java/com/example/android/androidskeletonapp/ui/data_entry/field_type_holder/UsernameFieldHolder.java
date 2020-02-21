@@ -43,6 +43,8 @@ public class UsernameFieldHolder extends FieldHolder {
 
     void bind(FormField fieldItem) {
         super.bind(fieldItem);
+        spinner.setOnItemSelectedListener(null);
+
         globalVars = (GlobalClass) itemView.getContext().getApplicationContext();
         fieldUid = fieldItem.getUid();
         fieldCurrentValue = fieldItem.getValue();
@@ -60,74 +62,75 @@ public class UsernameFieldHolder extends FieldHolder {
 
         FileInputStream fis;
         try {
-            fis = itemView.getContext().openFileInput("fwalist.txt");
-            InputStreamReader inputStreamReader = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String receiveString = "";
-            while ( (receiveString = bufferedReader.readLine()) != null ) {
-                if (receiveString != ""){
-                    String[] userData = receiveString.split("~");
-                    if(userData.length>2) {
-                        String[] orgs = userData[2].split("/");
-                        if (orgs.length > 5) {
-                            if (EnrollmentFormService.getInstance() != null) {
-                                TrackedEntityAttributeValueObjectRepository valueRepository =
-                                        Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
-                                                .value("OhmSPuuHj53",
-                                                        Sdk.d2().enrollmentModule().enrollments().uid(
-                                                                EnrollmentFormService.getInstance().getEnrollmentUid()).blockingGet().trackedEntityInstance());
-                                if ((valueRepository.blockingExists() ? valueRepository.blockingGet().value() : "null").equals(orgs[5])) {
-                                    optionList.put(userData[0], userData[1]);
+            if (EnrollmentFormService.getInstance() != null) {
+                TrackedEntityAttributeValueObjectRepository valueRepository =
+                        Sdk.d2().trackedEntityModule()
+                                .trackedEntityAttributeValues()
+                                .value("OhmSPuuHj53",
+                                        Sdk.d2().enrollmentModule().enrollments().uid(
+                                                EnrollmentFormService.getInstance().getEnrollmentUid()).blockingGet().trackedEntityInstance());
+                if (valueRepository.blockingExists()) {
+                    fis = itemView.getContext().openFileInput("fwalist.txt");
+                    InputStreamReader inputStreamReader = new InputStreamReader(fis);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    String receiveString = "";
+                    while ((receiveString = bufferedReader.readLine()) != null) {
+                        if (receiveString != "") {
+                            String[] userData = receiveString.split("~");
+                            if (userData.length > 2) {
+                                String[] orgs = userData[2].split("/");
+                                if (orgs.length > 5) {
+                                    if (valueRepository.blockingGet().value().equals(orgs[5])) {
+                                        optionList.put(userData[0], userData[1]);
+                                    }
                                 }
-                            } else {
-                                //optionList.put(userData[0], userData[1]);
                             }
                         }
                     }
                 }
             }
+
+            /*
             if (optionList.size()<1){
                 return;
             }
+            */
             for(String key: optionList.keySet()){
                 optionListNames.add(optionList.get(key));
             }
+
+            spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
+                    R.layout.spinner_row, optionListNames));
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (i > 0) {
+                        if (fieldCurrentValue == null || !Objects.equals(fieldCurrentValue, getKey(optionList, spinner.getSelectedItem().toString())))
+                            valueSavedListener.onValueSaved(fieldUid, getKey(optionList, spinner.getSelectedItem().toString()));
+                    } else if (fieldCurrentValue != null)
+                        valueSavedListener.onValueSaved(fieldUid, null);
+
+                    TextView textView = (TextView) view;
+                    ((TextView) adapterView.getChildAt(0)).setTextSize(20);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
 
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
         //optionList = Sdk.d2().organisationUnitModule().organisationUnits().byLevel().eq(5).blockingGet();
-
-
 
         //optionListNames.add(label.getText().toString());
         //for (OrganisationUnit option : optionList) optionListNames.add(option.displayName());
 
-        spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
-                R.layout.spinner_row, optionListNames));
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i > 0) {
-                    if (fieldCurrentValue == null || !Objects.equals(fieldCurrentValue, getKey(optionList, spinner.getSelectedItem().toString())))
-                        valueSavedListener.onValueSaved(fieldUid, getKey(optionList, spinner.getSelectedItem().toString()));
-                } else if (fieldCurrentValue != null)
-                    valueSavedListener.onValueSaved(fieldUid, null);
 
-                TextView textView = (TextView) view;
-                ((TextView) adapterView.getChildAt(0)).setTextSize(20);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
     }
 
     private void setInitialValue(String selectedCode) {

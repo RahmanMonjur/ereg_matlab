@@ -84,25 +84,31 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
         //holder.subtitle2.setText(setSubtitle2(values, trackedEntityInstance));
         holder.rightText.setText(DateFormatHelper.getDateAsSystemFormat(trackedEntityInstance.created()));
         setImage(trackedEntityInstance, holder);
-        holder.delete.setVisibility(View.VISIBLE);
-        holder.delete.setOnClickListener(view -> {
-            new AlertDialog.Builder(this.activity)
-                    .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
-                    .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
-                    .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            try {
-                                Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(trackedEntityInstance.uid()).blockingDelete();
-                                invalidateSource();
-                                notifyDataSetChanged();
-                            } catch (D2Error d2Error) {
-                                d2Error.printStackTrace();
+        if (trackedEntityInstance.state().equals(State.TO_POST)) {
+            holder.delete.setVisibility(View.VISIBLE);
+            holder.delete.setOnClickListener(view -> {
+                new AlertDialog.Builder(this.activity)
+                        .setTitle(globalVars.getTranslatedWord("Delete Confirmation"))
+                        .setMessage(globalVars.getTranslatedWord("Do you really want to delete?"))
+                        .setIcon(android.R.drawable.ic_delete)
+                        .setPositiveButton(globalVars.getTranslatedWord("Yes, I want to delete"), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    Sdk.d2().trackedEntityModule().trackedEntityInstances().uid(trackedEntityInstance.uid()).blockingDelete();
+                                    invalidateSource();
+                                    notifyDataSetChanged();
+                                } catch (D2Error d2Error) {
+                                    d2Error.printStackTrace();
+                                }
                             }
-                        }})
-                    .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
+                        })
+                        .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
 
-        });
+            });
+        }
+        else {
+            holder.delete.setVisibility(View.GONE);
+        }
         /*
         if (trackedEntityInstance.state() == State.TO_POST ||
                 trackedEntityInstance.state() == State.TO_UPDATE) {
@@ -253,8 +259,8 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
 
     public boolean isNetworkConnected() {
         try {
-            InetAddress ipAddr = InetAddress.getByName("google.com");
-            return !ipAddr.equals("");
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
         } catch (Exception e) {
             return false;
         }
