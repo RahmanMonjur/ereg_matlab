@@ -51,7 +51,7 @@ class OptionSetFieldHolder extends FieldHolder {
         //optionListNames.add(label.getText().toString());
         for (Option option : optionList) optionListNames.add(option.displayName());
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
-                android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));
+                R.layout.spinner_row, optionListNames));
 
         spinner.setOnItemSelectedListener(null);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

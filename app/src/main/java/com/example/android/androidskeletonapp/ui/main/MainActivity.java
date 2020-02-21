@@ -3,6 +3,7 @@ package com.example.android.androidskeletonapp.ui.main;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +49,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -162,29 +164,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         syncMetadataButton = findViewById(R.id.syncMetadataButton);
         syncDataButton = findViewById(R.id.syncDataButton);
         uploadDataButton = findViewById(R.id.uploadDataButton);
-        ((TextView)findViewById(R.id.syncMetadataText)).setText(globalVars.getTranslatedWord("Update metadata and data"));
-        ((TextView)findViewById(R.id.syncDataText)).setText(globalVars.getTranslatedWord("Download data"));
-        ((TextView)findViewById(R.id.uploadDataText)).setText(globalVars.getTranslatedWord("Upload data"));
+        ((TextView) findViewById(R.id.syncMetadataText)).setText(globalVars.getTranslatedWord("Update metadata and data"));
+        ((TextView) findViewById(R.id.syncDataText)).setText(globalVars.getTranslatedWord("Download data"));
+        ((TextView) findViewById(R.id.uploadDataText)).setText(globalVars.getTranslatedWord("Upload data"));
 
         syncStatusText = findViewById(R.id.notificator);
         progressBar = findViewById(R.id.syncProgressBar);
 
-        if(SyncStatusHelper.programCount() + SyncStatusHelper.trackedEntityInstanceCount() == 0){
+        if (SyncStatusHelper.programCount() + SyncStatusHelper.trackedEntityInstanceCount() == 0) {
             downloadMetadataAndData();
         }
 
         syncMetadataButton.setOnClickListener(view -> {
-            setSyncing();
-            /*
-            Snackbar.make(view, globalVars.getTranslatedWord("Updating metadata…"), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.syncing_metadata)));
-            syncMetadata();
-            */
-            Snackbar.make(view, globalVars.getTranslatedWord("Downloading metadata and data..."), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
-            downloadMetadataAndData();
+            if (isNetworkConnected()) {
+                setSyncing();
+                Snackbar.make(view, globalVars.getTranslatedWord("Downloading metadata and data..."), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
+                downloadMetadataAndData();
+            } else {
+                Toast.makeText(this, globalVars.getTranslatedWord("You do not have stable internet connection now.\nplease try later."), Toast.LENGTH_LONG).show();
+            }
         });
 
         syncDataButton.setOnClickListener(view -> {
@@ -196,11 +196,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         uploadDataButton.setOnClickListener(view -> {
-            setSyncing();
-            Snackbar.make(view, globalVars.getTranslatedWord("Uploading data…"), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.uploading_data)));
-            uploadData();
+            if (isNetworkConnected()) {
+                setSyncing();
+                Snackbar.make(view, globalVars.getTranslatedWord("Uploading data…"), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                syncStatusText.setText(globalVars.getTranslatedWord(getResources().getString(R.string.uploading_data)));
+                uploadData();
+            } else {
+                Toast.makeText(this, globalVars.getTranslatedWord("You do not have stable internet connection now.\nplease try later."), Toast.LENGTH_LONG).show();
+            }
         });
     }
 
@@ -336,16 +340,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void downloadMetadataAndData(){
         setSyncing();
-        //syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
-        compositeDisposable.add(
-                downloadMetadata()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnComplete(() -> {
-                            downloadDataMain();
-                        })
-                        .doOnError(Throwable::printStackTrace)
-                        .subscribe());
+            //syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
+            compositeDisposable.add(
+                    downloadMetadata()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnComplete(() -> {
+                                downloadDataMain();
+                            })
+                            .doOnError(Throwable::printStackTrace)
+                            .subscribe());
+
     }
 
     private void downloadDataMain() {
@@ -524,5 +529,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = findViewById(R.id.drawerLayout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public boolean isNetworkConnected() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            return !ipAddr.equals("");
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

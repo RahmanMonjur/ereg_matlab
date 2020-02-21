@@ -1,9 +1,13 @@
 package com.example.android.androidskeletonapp.ui.events;
 
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -21,7 +25,9 @@ import com.example.android.androidskeletonapp.ui.data_entry.EventFormActivity;
 import com.example.android.androidskeletonapp.ui.main.GlobalClass;
 import com.example.android.androidskeletonapp.ui.tracker_import_conflicts.TrackerImportConflictsAdapter;
 
+import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.category.CategoryOptionCombo;
+import org.hisp.dhis.android.core.common.State;
 import org.hisp.dhis.android.core.event.Event;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
@@ -29,7 +35,13 @@ import org.hisp.dhis.android.core.program.ProgramStageDataElement;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setBackgroundColor;
 import static com.example.android.androidskeletonapp.data.service.StyleBinderHelper.setState;
@@ -81,9 +93,38 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
                     .setNegativeButton(globalVars.getTranslatedWord("No"), null).show();
 
         });
-        setBackgroundColor(R.color.colorAccentDark, holder.icon);
-        setState(event.state(), holder.syncIcon);
-        setConflicts(event.uid(), holder);
+
+        /*
+        if(event.state().equals(State.TO_POST) || event.state().equals(State.TO_UPDATE)) {
+            holder.syncIcon.setOnClickListener(view -> {
+                RotateAnimation rotateAnim = new RotateAnimation(0f, 359f,
+                        Animation.RELATIVE_TO_SELF, 0.5f,
+                        Animation.RELATIVE_TO_SELF, 0.5f);
+                rotateAnim.setDuration(6500);
+                rotateAnim.setRepeatMode(Animation.INFINITE);
+                holder.syncIcon.startAnimation(rotateAnim);
+
+                Disposable disposable = syncEvent(event.uid())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        data -> {
+
+                                        },
+                                        Throwable::printStackTrace,
+                                        () -> {
+                                            invalidateSource();
+                                            Toast.makeText(this.activity,"Synced",Toast.LENGTH_LONG).show();
+                                        }
+                                );
+
+
+            });
+        }
+        else {
+            holder.syncIcon.setOnClickListener(null);
+        }
+        */
 
         holder.lnkDetail.setOnClickListener(view->{
             ActivityStarter.startActivity(
@@ -98,6 +139,16 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
                     ),false
             );
         });
+
+        setBackgroundColor(R.color.colorAccentDark, holder.icon);
+        setState(event.state(), holder.syncIcon);
+        setConflicts(event.uid(), holder);
+    }
+
+    private Observable<D2Progress> syncEvent(String event) {
+        return Sdk.d2().eventModule().events()
+                .byUid().eq(event)
+                .upload();
     }
 
     private OrganisationUnit orgUnit(String orgUnitUid) {
@@ -133,7 +184,11 @@ public class EventAdapter extends PagedListAdapter<Event, SimpleListWithSyncHold
     }
 
     public void invalidateSource() {
-        source.invalidate();
+        try {
+            source.invalidate();
+        } catch (Exception ex){
+
+        }
     }
 
 

@@ -76,8 +76,9 @@ public class GlobalClass extends Application {
         translatedWords.put("This is a mandatory field. Please input a value.","এটি বাধ্যতামূলক। ডাটা ইনপুট করুন।");
         translatedWords.put("You did not fill up some mandatory fields","কিছু বাধ্যতামূলক ডাটা দেওয়া হয়নি");
         translatedWords.put("Something went wrong with the Element application. Please check.","এলিমেন্ট অ্যাপ্লিকেশনটিতে কিছু ভুল হয়েছে। চেক করুন।");
-        translatedWords.put("You can change the program by clicking the dropdown below","নোট: নিচের লিস্ট বাটন এ ক্লিক করে প্রোগ্রাম পরিবর্তন করুন");
+        translatedWords.put("You can change the program by clicking below","নোট: নিচের লিস্ট বাটন এ ক্লিক করে প্রোগ্রাম পরিবর্তন করুন");
         translatedWords.put("Do not forget to enroll in the MCH program","নোট: MCH প্রোগ্রাম এ রেজিস্ট্রেশন করতে ভুলবেন না");
+        translatedWords.put("You do not have stable internet connection now.\nplease try later.","এখন আপনার ইন্টারনেট কানেকশন নেই।\nপরে চেষ্টা করুন।");
         //translatedWords.put("","");
 
         return  translatedWords;

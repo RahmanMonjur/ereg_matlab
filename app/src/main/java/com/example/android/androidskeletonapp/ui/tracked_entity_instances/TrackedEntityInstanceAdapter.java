@@ -1,7 +1,9 @@
 package com.example.android.androidskeletonapp.ui.tracked_entity_instances;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValue;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 
+import java.net.InetAddress;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -134,9 +137,10 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
 
         // Assigning Sync button's functionalities to Sync Icon, and will ignore Sync button
         holder.sync.setVisibility(View.GONE);
-        if (trackedEntityInstance.state() == State.TO_POST ||
-                trackedEntityInstance.state() == State.TO_UPDATE) {
+        if (trackedEntityInstance.state().equals(State.TO_POST) ||
+                trackedEntityInstance.state().equals(State.TO_UPDATE)) {
             holder.syncIcon.setOnClickListener(v -> {
+                if(isNetworkConnected()){
                 RotateAnimation rotateAnim = new RotateAnimation(0f, 359f,
                         Animation.RELATIVE_TO_SELF, 0.5f,
                         Animation.RELATIVE_TO_SELF, 0.5f);
@@ -154,8 +158,12 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
                                 () -> {
                                     holder.syncIcon.clearAnimation();
                                     invalidateSource();
+                                    Toast.makeText(this.activity,"Synced",Toast.LENGTH_LONG).show();
                                 }
                         );
+                } else {
+                    Toast.makeText(this.activity, globalVars.getTranslatedWord("You do not have stable internet connection now.\nplease try later."), Toast.LENGTH_LONG).show();
+                }
             });
         } else {
             holder.syncIcon.setOnClickListener(null);
@@ -240,6 +248,15 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
             source.invalidate();
         } catch (Exception ex){
 
+        }
+    }
+
+    public boolean isNetworkConnected() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            return !ipAddr.equals("");
+        } catch (Exception e) {
+            return false;
         }
     }
 }

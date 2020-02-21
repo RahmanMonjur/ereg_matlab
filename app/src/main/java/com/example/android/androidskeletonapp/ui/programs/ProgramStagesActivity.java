@@ -88,7 +88,7 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
 
         listProgram = (Spinner)findViewById(R.id.listProgram);
         listProgram.setAdapter(new ArrayAdapter<SpinnerItems>(this,
-                android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, getPrograms()));
+                R.layout.spinner_row, getPrograms()));
 
         listProgram.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -135,6 +135,8 @@ public class EventsActivity extends ListActivity {
                 }
         );
 
+
+
     }
 
     private void observeEvents() {

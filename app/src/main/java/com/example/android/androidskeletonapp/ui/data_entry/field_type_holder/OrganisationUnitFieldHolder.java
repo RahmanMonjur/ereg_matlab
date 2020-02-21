@@ -57,7 +57,7 @@ public class OrganisationUnitFieldHolder extends FieldHolder {
             }
         }
         spinner.setAdapter(new ArrayAdapter<>(itemView.getContext(),
-                android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, optionListNames));
+                R.layout.spinner_row, optionListNames));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
