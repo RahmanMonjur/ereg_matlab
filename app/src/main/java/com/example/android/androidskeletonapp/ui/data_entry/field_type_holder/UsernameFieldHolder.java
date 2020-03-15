@@ -77,6 +77,7 @@ public class UsernameFieldHolder extends FieldHolder {
                     while ((receiveString = bufferedReader.readLine()) != null) {
                         if (receiveString != "") {
                             String[] userData = receiveString.split("~");
+
                             if (userData.length > 2) {
                                 String[] orgs = userData[2].split("/");
                                 if (orgs.length > 5) {
@@ -85,6 +86,11 @@ public class UsernameFieldHolder extends FieldHolder {
                                     }
                                 }
                             }
+                            /*
+                            if (userData.length > 0) {
+                                optionList.put(userData[0], userData[1]);
+                            }
+                            */
                         }
                     }
                 }
@@ -137,7 +143,8 @@ public class UsernameFieldHolder extends FieldHolder {
         String value = optionList.get(selectedCode);
         ArrayAdapter<String> spinnerAdap = (ArrayAdapter<String>) spinner.getAdapter();
         int spinnerPosition = spinnerAdap.getPosition(value);
-        spinner.setSelection(spinnerPosition);
+        if (spinnerPosition > -1 )
+            spinner.setSelection(spinnerPosition);
     }
 
     private <K, V> K getKey(Map<K, V> map, V value) {

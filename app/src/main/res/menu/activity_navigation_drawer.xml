@@ -9,10 +9,13 @@
             android:icon="@drawable/ic_programs_black_24dp"
             android:title="Client Register Program" />
         <item
+            android:id="@+id/navOrgUnit"
+            android:icon="@drawable/ic_mobile_clinic_positive"
+            android:title="Organisation Unit" />
+        <item
             android:id="@+id/navD2Errors"
             android:icon="@drawable/ic_error_outline_black_24dp"
             android:title="@string/title_activity_d2_errors" />
-        
     </group>
 
     <item android:title="@string/data_management">

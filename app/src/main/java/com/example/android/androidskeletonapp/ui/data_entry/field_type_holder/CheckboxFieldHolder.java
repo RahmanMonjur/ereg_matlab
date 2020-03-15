@@ -15,10 +15,12 @@ import org.hisp.dhis.android.core.common.ValueType;
 public class CheckboxFieldHolder extends FieldHolder {
 
     private final CheckBox checkBox;
+    private boolean controlsEnable;
 
-    CheckboxFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    CheckboxFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener, boolean controlsEnable) {
         super(itemView, valueSavedListener);
         this.checkBox = itemView.findViewById(R.id.checkBox);
+        this.controlsEnable = controlsEnable;
     }
 
     void bind(FormField fieldItem) {
@@ -33,6 +35,8 @@ public class CheckboxFieldHolder extends FieldHolder {
         }
 
         setCheckBox(fieldItem.getUid());
+
+        checkBox.setEnabled(controlsEnable);
     }
 
     void setCheckBox(String field){

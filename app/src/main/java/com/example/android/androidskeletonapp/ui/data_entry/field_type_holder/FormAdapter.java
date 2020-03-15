@@ -23,6 +23,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
     private final OnImageSelectionClick imageSelectionListener;
     private boolean isListingRendering = true;
     private int textSize;
+    private boolean controlsEnable = true;
 
     private List<FormField> fields;
 
@@ -45,7 +46,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
     public FieldHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == OPTIONSET) {
             return new OptionSetFieldHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_field_optionset, parent, false), valueSavedListener);
+                    .inflate(R.layout.item_field_optionset, parent, false), valueSavedListener, controlsEnable);
         } else if (viewType == OPTIONSETIMAGE) {
             return new OptionSetImageFieldHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_field_optionset_image, parent, false), valueSavedListener);
@@ -53,16 +54,16 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
             switch (ValueType.values()[viewType]) {
                 case DATE:
                     return new DateFieldHolder(LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_date_field, parent, false), valueSavedListener);
+                            .inflate(R.layout.item_date_field, parent, false), valueSavedListener, controlsEnable);
                 case AGE:
                     return new AgeFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_age_field, parent, false), valueSavedListener);
                 case BOOLEAN:
                     return new BooleanFieldHolder(LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_boolean_field, parent, false), valueSavedListener);
+                            .inflate(R.layout.item_boolean_field, parent, false), valueSavedListener, controlsEnable);
                 case TRUE_ONLY:
                     return new CheckboxFieldHolder(LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_checkbox_field, parent, false), valueSavedListener);
+                            .inflate(R.layout.item_checkbox_field, parent, false), valueSavedListener, controlsEnable);
                 case IMAGE:
                     return new ImageFieldHolder(LayoutInflater.from(parent.getContext())
                             .inflate(R.layout.item_image_field, parent, false), valueSavedListener,
@@ -75,7 +76,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
                             .inflate(R.layout.item_field_optionset, parent, false), valueSavedListener);
                 default:
                     return new TextFieldHolder(LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_field, parent, false), valueSavedListener);
+                            .inflate(R.layout.item_field, parent, false), valueSavedListener, controlsEnable);
             }
         }
     }
@@ -83,6 +84,7 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
     @Override
     public void onBindViewHolder(@NonNull FieldHolder holder, int position) {
         holder.bind(fields.get(position));
+
     }
 
     @Override
@@ -138,6 +140,10 @@ public class FormAdapter extends RecyclerView.Adapter<FieldHolder> {
     public void setTextSizes(int textSize) {
         this.textSize = textSize;
         //notifyDataSetChanged();
+    }
+
+    public void setEnable(boolean yesno){
+        controlsEnable = yesno;
     }
 
     public void setListingRendering(boolean isListingRendering) {

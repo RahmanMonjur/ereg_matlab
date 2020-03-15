@@ -26,10 +26,12 @@ class OptionSetFieldHolder extends FieldHolder {
     private String fieldUid;
     private String fieldCurrentValue;
     GlobalClass globalVars;
+    private boolean controlsEnable;
 
-    OptionSetFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    OptionSetFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener, boolean controlsEnable) {
         super(itemView, valueSavedListener);
         this.spinner = itemView.findViewById(R.id.spinner);
+        this.controlsEnable = controlsEnable;
     }
 
     void bind(FormField fieldItem) {
@@ -73,6 +75,7 @@ class OptionSetFieldHolder extends FieldHolder {
 
             }
         });
+        spinner.setEnabled(controlsEnable);
     }
 
     private void setInitialValue(String selectedCode) {

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -258,8 +260,21 @@ public class TrackedEntityInstanceAdapter extends PagedListAdapter<TrackedEntity
     }
 
     public boolean isNetworkConnected() {
+        /*
+        boolean connected = false;
         try {
-            String command = "ping -c 1 google.com";
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+        */
+
+        try {
+            String command = "ping -c 1 eregistries.mohfw.gov.bd";
             return (Runtime.getRuntime().exec(command).waitFor() == 0);
         } catch (Exception e) {
             return false;

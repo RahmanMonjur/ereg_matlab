@@ -17,10 +17,12 @@ class BooleanFieldHolder extends FieldHolder {
 
     private final RadioGroup radioGroup;
     GlobalClass globalVars;
+    private boolean controlsEnable;
 
-    BooleanFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    BooleanFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener, boolean controlsEnable) {
         super(itemView, valueSavedListener);
         this.radioGroup = itemView.findViewById(R.id.radioGroup);
+        this.controlsEnable = controlsEnable;
     }
 
     void bind(FormField fieldItem) {
@@ -57,5 +59,8 @@ class BooleanFieldHolder extends FieldHolder {
 
             valueSavedListener.onValueSaved(fieldItem.getUid(), value);
         });
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            radioGroup.getChildAt(i).setEnabled(controlsEnable);
+        }
     }
 }

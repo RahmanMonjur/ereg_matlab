@@ -20,10 +20,12 @@ class DateFieldHolder extends FieldHolder {
 
     private final Button dateButton;
     GlobalClass globalVars;
+    private boolean controlsEnable;
 
-    DateFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    DateFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener, boolean controlsEnable) {
         super(itemView, valueSavedListener);
         this.dateButton = itemView.findViewById(R.id.dateButton);
+        this.controlsEnable = controlsEnable;
     }
 
     void bind(FormField fieldItem) {
@@ -60,6 +62,8 @@ class DateFieldHolder extends FieldHolder {
         else {
             dateButton.setTextColor(Color.DKGRAY);
         }
+
+        dateButton.setEnabled(controlsEnable);
     }
 
 

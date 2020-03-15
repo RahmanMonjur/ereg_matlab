@@ -15,10 +15,12 @@ import java.util.Objects;
 class TextFieldHolder extends FieldHolder {
 
     private final TextInputEditText editText;
+    private boolean controlsEnable;
 
-    TextFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener) {
+    TextFieldHolder(@NonNull View itemView, FormAdapter.OnValueSaved valueSavedListener, boolean controlsEnable) {
         super(itemView, valueSavedListener);
         this.editText = itemView.findViewById(R.id.inputEditText);
+        this.controlsEnable = controlsEnable;
     }
 
     void bind(FormField fieldItem) {
@@ -59,5 +61,7 @@ class TextFieldHolder extends FieldHolder {
                     valueSavedListener.onValueSaved(fieldItem.getUid(), editText.getText().toString());
             }
         });
+
+        editText.setEnabled(controlsEnable);
     }
 }

@@ -36,5 +36,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_send_black_24dp" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="65dp"
+            android:layout_marginRight="@dimen/fab_margin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_execute_code" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

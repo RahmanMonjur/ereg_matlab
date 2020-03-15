@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -22,6 +24,12 @@ import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
+import com.example.android.androidskeletonapp.data.service.Username.SpecificUser;
+import com.example.android.androidskeletonapp.data.service.Username.SpecificUserFields;
+import com.example.android.androidskeletonapp.data.service.Username.SpecificUserService;
+import com.example.android.androidskeletonapp.data.service.Username.UserCredent;
+import com.example.android.androidskeletonapp.data.service.Username.UserCredentFields;
+import com.example.android.androidskeletonapp.data.service.Username.UserCredentialService;
 import com.example.android.androidskeletonapp.data.service.Username.UserGroup;
 import com.example.android.androidskeletonapp.data.service.Username.UserList;
 import com.example.android.androidskeletonapp.data.service.Username.UserListFields;
@@ -44,6 +52,8 @@ import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.user.User;
 import org.hisp.dhis.android.core.user.UserCredentials;
 import org.hisp.dhis.android.core.user.UserRole;
+import org.hisp.dhis.android.core.user.internal.UserCredentialsFields;
+import org.hisp.dhis.android.core.user.internal.UserFields;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -318,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         TextView firstName = headerView.findViewById(R.id.firstName);
         TextView email = headerView.findViewById(R.id.email);
-        firstName.setText(user.firstName());
+        firstName.setText(user.surname());
         email.setText(user.email());
     }
 
@@ -379,6 +389,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                             myInternalFile = new File(this.getFilesDir(), filename);
 
+                            UserCredentialService userservice = Sdk.d2().retrofit().create(UserCredentialService.class);
+                            Call<Payload<UserCredent>> call = userservice.getUsernames(UserCredentFields.allFields, false);
+                            call.enqueue(new Callback<Payload<UserCredent>>() {
+                                @Override
+                                public void onResponse(Call<Payload<UserCredent>> call, Response<Payload<UserCredent>> response) {
+
+
+                                    List<UserCredent> users = response.body().items();
+                                    for (UserCredent uc : users) {
+                                        List<UserRole> urs = uc.getUserRoles();
+                                        for (UserRole ur : urs) {
+                                            if (ur.uid().equals("lItc9BR90WI")) {
+                                                SpecificUserService specUserService = Sdk.d2().retrofit().create(SpecificUserService.class);
+                                                Call<SpecificUser> call1 = specUserService.getUsers(uc.getUserInfo().getUid(), SpecificUserFields.someFields, false);
+                                                call1.enqueue(new Callback<SpecificUser>() {
+                                                    @Override
+                                                    public void onResponse(Call<SpecificUser> call1, Response<SpecificUser> response1) {
+
+                                                        try {
+                                                            BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
+                                                            List<OrganisationUnit> ous1 = response1.body().getOrganisationUnits();
+                                                            String union = (ous1.size() > 0) ? ous1.get(0).path() : "";
+                                                            List<UserGroup> ugs1 = response1.body().getUserGroups();
+                                                            for (UserGroup grp : ugs1) {
+                                                                if (grp.getUid().equals("ow22Lm7dg4l")) {
+
+                                                                    buf.append(uc.getUsername() + '~' + uc.getDisplayName() + '~' + union);
+                                                                    buf.newLine();
+
+                                                                }
+                                                            }
+                                                            buf.close();
+                                                        } catch (Exception ex) {
+
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<SpecificUser> call1, Throwable t1) {
+                                                        Toast.makeText(MainActivity.this, t1.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onFailure(Call<Payload<UserCredent>> call, Throwable t) {
+                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            /*
                             UserListService usernameService = Sdk.d2().retrofit().create(UserListService.class);
                             Call<Payload<UserList>> call = usernameService.getUsernames(UserListFields.allFields, false);
                             call.enqueue(new Callback<Payload<UserList>>() {
@@ -414,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-
+                            */
 
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
@@ -517,6 +582,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     TrackedEntityInstancesActivity
                             .getTrackedEntityInstancesActivityIntent(this, "ZBIqxwVixn8"),
                     false);
+        } else if (id == R.id.navOrgUnit) {
+            ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
         } else if (id == R.id.navD2Errors) {
             ActivityStarter.startActivity(this, D2ErrorActivity.getIntent(this), false);
         }  else if (id == R.id.navWipeData) {
@@ -532,11 +599,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public boolean isNetworkConnected() {
+        /*
+        boolean connected = false;
         try {
-            String command = "ping -c 1 google.com";
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            connected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return connected;
+        } catch (Exception e) {
+            Log.e("Connectivity Exception", e.getMessage());
+        }
+        return connected;
+        */
+
+        try {
+            String command = "ping -c 1 eregistries.mohfw.gov.bd";
             return (Runtime.getRuntime().exec(command).waitFor() == 0);
         } catch (Exception e) {
             return false;
         }
+
+
     }
 }

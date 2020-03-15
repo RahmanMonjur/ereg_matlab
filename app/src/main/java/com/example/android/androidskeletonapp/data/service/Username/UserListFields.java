@@ -24,7 +24,13 @@ public class UserListFields {
             = NestedField.create(USER_GROUPS);
 
     public static final Fields<UserList> allFields = Fields.<UserList>builder().fields(
-            uid, userCredentials.with(UserCredentialsFields.allFields),
+            uid,
+            userCredentials.with(UserCredentialsFields.allFields),
+            organisationUnits.with(OrganisationUnitFields.fieldsInUserCall),
+            userGroups.with(UserGroupFields.allfields)
+    ).build();
+
+    public static final Fields<UserList> someFields = Fields.<UserList>builder().fields(
             organisationUnits.with(OrganisationUnitFields.fieldsInUserCall),
             userGroups.with(UserGroupFields.allfields)
     ).build();

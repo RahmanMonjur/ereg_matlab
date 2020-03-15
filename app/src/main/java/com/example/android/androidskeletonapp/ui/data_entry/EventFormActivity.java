@@ -26,6 +26,7 @@ import com.example.android.androidskeletonapp.BuildConfig;
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+import com.example.android.androidskeletonapp.data.service.forms.EnrollmentFormService;
 import com.example.android.androidskeletonapp.data.service.forms.EventFormService;
 import com.example.android.androidskeletonapp.data.service.forms.FormField;
 import com.example.android.androidskeletonapp.data.service.forms.RuleEngineService;
@@ -38,6 +39,7 @@ import org.hisp.dhis.android.core.arch.helpers.FileResizerHelper;
 import org.hisp.dhis.android.core.arch.helpers.FileResourceDirectoryHelper;
 import org.hisp.dhis.android.core.common.ObjectStyle;
 import org.hisp.dhis.android.core.common.ValueType;
+import org.hisp.dhis.android.core.event.EventStatus;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 import org.hisp.dhis.rules.RuleEngine;
@@ -122,6 +124,8 @@ public class EventFormActivity extends AppCompatActivity {
 
         adapter = new FormAdapter(getValueListener(), getImageListener());
         binding.buttonEnd.setOnClickListener(this::finishEnrollment);
+        binding.buttonEdit.setOnClickListener(this::enableForm);
+        binding.buttonEdit.setVisibility(View.GONE);
         binding.formRecycler.setAdapter(adapter);
         DividerItemDecoration itemDecor = new DividerItemDecoration(binding.formRecycler.getContext(), OrientationHelper.VERTICAL);
         binding.formRecycler.addItemDecoration(itemDecor);
@@ -137,6 +141,13 @@ public class EventFormActivity extends AppCompatActivity {
                 getIntent().getStringExtra(IntentExtra.PROGRAM_STAGE_UID.name()),
                 getIntent().getStringExtra(IntentExtra.ENROLLMENT_UID.name()) ))
             this.engineService = new RuleEngineService();
+
+        if (Sdk.d2().eventModule().events().uid(EventFormService.getInstance().getEventUid()).blockingGet().status() == EventStatus.COMPLETED){
+            binding.buttonEnd.setVisibility(View.GONE);
+            binding.buttonEdit.setVisibility(View.VISIBLE);
+            adapter.setEnable(false);
+            binding.buttonEdit.setOnClickListener(this::enableForm);
+        }
 
     }
 
@@ -243,6 +254,8 @@ public class EventFormActivity extends AppCompatActivity {
                                 Throwable::printStackTrace
                         )
         );
+
+
     }
 
     private List<FormField> applyEffects(Map<String, FormField> fields,
@@ -396,16 +409,58 @@ public class EventFormActivity extends AppCompatActivity {
     private void finishEnrollment(View view) {
         if (checkMandatory(fieldsFinal) == true) {
             new AlertDialog.Builder(this)
-                    .setMessage(globalVars.getTranslatedWord("You did not fill up some mandatory fields"))
+                    .setMessage(globalVars.getTranslatedWord("You did not fill up some mandatory fields."))
                     .setCancelable(false)
-                    .setPositiveButton(globalVars.getTranslatedWord("Yes"), new DialogInterface.OnClickListener() {
+                    .setPositiveButton(globalVars.getTranslatedWord("Let me check"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
                         }}).show();
         } else {
-            setResult(RESULT_OK);
-            finish();
+
+            new AlertDialog.Builder(this)
+                    .setMessage(globalVars.getTranslatedWord("Do you want to complete the stage?"))
+                    .setCancelable(false)
+                    .setPositiveButton(globalVars.getTranslatedWord("Complete"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            try {
+                                Sdk.d2().eventModule().events().uid(EventFormService.getInstance().getEventUid()).setStatus(EventStatus.COMPLETED);
+                            } catch (D2Error d2Error){
+
+                            }
+                            setResult(RESULT_OK);
+                            finish();
+                        }})
+                    .setNegativeButton(globalVars.getTranslatedWord("Not now"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            setResult(RESULT_OK);
+                            finish();
+                        }})
+                    .setCancelable(true)
+                    .show();
+
+            //setResult(RESULT_OK);
+            //finish();
         }
+    }
+
+    private void enableForm(View view) {
+        new AlertDialog.Builder(this)
+                .setMessage(globalVars.getTranslatedWord("Do you want to edit the stage?"))
+                .setCancelable(false)
+                .setPositiveButton(globalVars.getTranslatedWord("Yes"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        adapter.setEnable(true);
+                        binding.buttonEdit.setVisibility(View.GONE);
+                        binding.buttonEnd.setVisibility(View.VISIBLE);
+                        adapter.notifyDataSetChanged();
+                    }})
+                .setNegativeButton(globalVars.getTranslatedWord("No"), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                    }})
+                .setCancelable(true)
+                .show();
+
     }
 
     @Override
