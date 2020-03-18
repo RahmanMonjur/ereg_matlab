@@ -452,7 +452,8 @@ public class EventFormActivity extends AppCompatActivity {
                         adapter.setEnable(true);
                         binding.buttonEdit.setVisibility(View.GONE);
                         binding.buttonEnd.setVisibility(View.VISIBLE);
-                        adapter.notifyDataSetChanged();
+                        //adapter.notifyDataSetChanged();
+                        binding.formRecycler.setAdapter(adapter);
                     }})
                 .setNegativeButton(globalVars.getTranslatedWord("No"), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
