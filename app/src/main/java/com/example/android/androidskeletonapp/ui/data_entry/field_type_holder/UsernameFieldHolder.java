@@ -86,11 +86,6 @@ public class UsernameFieldHolder extends FieldHolder {
                                     }
                                 }
                             }
-                            /*
-                            if (userData.length > 0) {
-                                optionList.put(userData[0], userData[1]);
-                            }
-                            */
                         }
                     }
                 }

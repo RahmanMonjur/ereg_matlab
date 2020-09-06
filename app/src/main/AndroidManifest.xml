@@ -51,6 +51,10 @@
             android:label="Choose organisation unit"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".ui.main.PreglistActivity"
+            android:label="Pregnancy List"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ui.tracked_entity_instances.TrackedEntityInstancesActivity"
             android:label="@string/title_activity_tracked_entity_instances"
             android:theme="@style/AppTheme.NoActionBar" />

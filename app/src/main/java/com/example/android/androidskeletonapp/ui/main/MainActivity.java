@@ -413,8 +413,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                             String union = (ous1.size() > 0) ? ous1.get(0).path() : "";
                                                             List<UserGroup> ugs1 = response1.body().getUserGroups();
                                                             for (UserGroup grp : ugs1) {
+                                                                //Extracting FWA users only
                                                                 if (grp.getUid().equals("ow22Lm7dg4l")) {
-
                                                                     buf.append(uc.getUsername() + '~' + uc.getDisplayName() + '~' + union);
                                                                     buf.newLine();
 
@@ -584,6 +584,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     false);
         } else if (id == R.id.navOrgUnit) {
             ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
+        } else if (id == R.id.navPregList) {
+            ActivityStarter.startActivity(this, PreglistActivity.getPreglistIntent(this), false);
         } else if (id == R.id.navD2Errors) {
             ActivityStarter.startActivity(this, D2ErrorActivity.getIntent(this), false);
         }  else if (id == R.id.navWipeData) {

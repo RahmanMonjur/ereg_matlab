@@ -13,6 +13,14 @@
             android:icon="@drawable/ic_mobile_clinic_positive"
             android:title="Organisation Unit" />
         <item
+            android:id="@+id/navPregList"
+            android:icon="@drawable/ic_pregnant_32w_positive"
+            android:title="Current Pregnancies" />
+        <item
+            android:id="@+id/navDashboard"
+            android:icon="@drawable/ic_view_list_black_24dp"
+            android:title="Dashboard" />
+        <item
             android:id="@+id/navD2Errors"
             android:icon="@drawable/ic_error_outline_black_24dp"
             android:title="@string/title_activity_d2_errors" />

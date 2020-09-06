@@ -5,7 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
@@ -21,13 +23,31 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
     private final OnProgramStageSelectionListener programStageSelectionListener;
     private final String programUid;
     private final String trackedEntityInstanceUid;
+    private final PagedList<ProgramStage> programStages;
 
-    ProgramStagesAdapter(OnProgramStageSelectionListener programStageSelectionListener, String programUid, String teiUid) {
-        super(new DiffByIdItemCallback<>());
+    ProgramStagesAdapter(OnProgramStageSelectionListener programStageSelectionListener, String programUid, String teiUid, PagedList<ProgramStage> pstages) {
+        //super(new DiffByIdItemCallback<>());
+        super(DIFF_CALLBACK);
         this.programStageSelectionListener = programStageSelectionListener;
         this.programUid = programUid;
         this.trackedEntityInstanceUid = teiUid;
+        this.programStages = pstages;
     }
+
+    public static final DiffUtil.ItemCallback<ProgramStage> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<ProgramStage>() {
+                @Override
+                public boolean areItemsTheSame(
+                        @NonNull ProgramStage oldInstance, @NonNull ProgramStage newInstance) {
+                    return oldInstance == newInstance;
+                }
+                @Override
+                public boolean areContentsTheSame(
+                        @NonNull ProgramStage oldInstance, @NonNull ProgramStage newInstance) {
+                    return oldInstance.id().equals(newInstance.id());
+
+                }
+            };
 
     @NonNull
     @Override
@@ -38,7 +58,14 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
     }
 
     @Override
+    public int getItemCount() {
+        //returns the number of elements the RecyclerView will display
+        return programStages.size();
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
+
         ProgramStage programStage = getItem(position);
         holder.title.setText(programStage.displayName());
         holder.title.setTextSize(20);
@@ -47,16 +74,17 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
                 .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
                 .blockingCount();
 
-        if (programStageInstancesCount>1)
+        if (programStageInstancesCount > 1)
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
         else
             holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");
         holder.subtitle1.setTextSize(16);
-        //holder.subtitle1.setText(program.programType() == ProgramType.WITH_REGISTRATION ?
-        //        "Program with registration" : "Program without registration");
-        StyleBinderHelper.bindStyle(holder, programStage.style());
+        //StyleBinderHelper.bindStyle(holder, programStage.style());
 
         holder.cardSimple.setOnClickListener(view -> programStageSelectionListener
                 .onProgramStageSelected(programUid, programStage.uid(), trackedEntityInstanceUid));
+
     }
+
+
 }
