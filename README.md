@@ -1,7 +1,7 @@
 ### eRegistry Project, Matlab
 ---
 
-This app is developed on the top of DHIS2 Android Skeleton app, and very much focused on the workflow of eRegistry project, run by icddr,b. 
+This app is developed on the top of DHIS2 Android Skeleton app (developed by the Android team, University of Oslo), and very much focused on the workflow of eRegistry project, run by icddr,b. 
 
 In the project with the app, health care provider provide services and store information of 
 *. identification and enrollment of pregnant women, 
