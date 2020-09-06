@@ -5,7 +5,7 @@ This app is developed on the top of DHIS2 Android Skeleton app (developed by the
 
 In the project with the app, health care provider provide services and store information of 
 *. identification and enrollment of pregnant women, 
-*. vaccinate if required, 
+*. vaccination (if administered), 
 *. antenatal care services,
 *. delivery care services,
 *. and, postnatal care services.
