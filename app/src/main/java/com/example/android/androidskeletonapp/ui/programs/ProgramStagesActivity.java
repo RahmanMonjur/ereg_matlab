@@ -161,7 +161,6 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
     private void observeProgramStages(String programUid, String teiUid) {
         Sdk.d2().programModule().programStages()
                 .byProgramUid().eq(programUid)
-                .orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
                 .getPaged(20).observe(this, programStagePagedList -> {
             ProgramStagesAdapter adapter = new ProgramStagesAdapter(this, programUid, teiUid, programStagePagedList);
             adapter.submitList(programStagePagedList);

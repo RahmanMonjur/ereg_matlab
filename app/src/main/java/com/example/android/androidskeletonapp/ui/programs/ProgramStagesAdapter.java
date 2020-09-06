@@ -18,12 +18,16 @@ import com.google.common.collect.Lists;
 
 import org.hisp.dhis.android.core.program.ProgramStage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListItemWithCardHolder> {
 
     private final OnProgramStageSelectionListener programStageSelectionListener;
     private final String programUid;
     private final String trackedEntityInstanceUid;
     private final PagedList<ProgramStage> programStages;
+    private ArrayList<String> pstagelist;
 
     ProgramStagesAdapter(OnProgramStageSelectionListener programStageSelectionListener, String programUid, String teiUid, PagedList<ProgramStage> pstages) {
         //super(new DiffByIdItemCallback<>());
@@ -32,6 +36,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
         this.programUid = programUid;
         this.trackedEntityInstanceUid = teiUid;
         this.programStages = pstages;
+        pstagelist = new ArrayList<String>();
     }
 
     public static final DiffUtil.ItemCallback<ProgramStage> DIFF_CALLBACK =
@@ -59,7 +64,6 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
 
     @Override
     public int getItemCount() {
-        //returns the number of elements the RecyclerView will display
         return programStages.size();
     }
 
@@ -67,22 +71,29 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
 
         ProgramStage programStage = getItem(position);
-        holder.title.setText(programStage.displayName());
-        holder.title.setTextSize(20);
-        Integer programStageInstancesCount = Sdk.d2().eventModule().events()
-                .byProgramStageUid().eq(programStage.uid())
-                .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
-                .blockingCount();
+        if (pstagelist.indexOf(programStage.uid()) < 0) {
+            pstagelist.add(programStage.uid());
+            holder.title.setText(programStage.displayName());
+            holder.title.setTextSize(20);
+            Integer programStageInstancesCount = Sdk.d2().eventModule().events()
+                    .byProgramStageUid().eq(programStage.uid())
+                    .byTrackedEntityInstanceUids(Lists.newArrayList(trackedEntityInstanceUid))
+                    .blockingCount();
 
-        if (programStageInstancesCount > 1)
-            holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
-        else
-            holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");
-        holder.subtitle1.setTextSize(16);
-        //StyleBinderHelper.bindStyle(holder, programStage.style());
+            if (programStageInstancesCount > 1)
+                holder.subtitle1.setText(programStageInstancesCount.toString() + " instances");
+            else
+                holder.subtitle1.setText(programStageInstancesCount.toString() + " instance");
+            holder.subtitle1.setTextSize(16);
+            //StyleBinderHelper.bindStyle(holder, programStage.style());
 
-        holder.cardSimple.setOnClickListener(view -> programStageSelectionListener
-                .onProgramStageSelected(programUid, programStage.uid(), trackedEntityInstanceUid));
+            holder.cardSimple.setOnClickListener(view -> programStageSelectionListener
+                    .onProgramStageSelected(programUid, programStage.uid(), trackedEntityInstanceUid));
+        } else {
+            //holder.itemView.setVisibility(View.INVISIBLE);
+            holder.itemView.invalidate();
+        }
+
 
     }
 
