@@ -22,14 +22,17 @@ import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepo
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class PreglistAdapter extends PagedListAdapter<TrackedEntityInstance, ListItemWithCardHolder> {
 
+    private final ArrayList<String> teilist;
 
-    PreglistAdapter(){
+    PreglistAdapter(ArrayList<String> teilist){
         super(new DiffByIdItemCallback<>());
+        this.teilist = teilist;
     }
 
     @NonNull
@@ -43,36 +46,41 @@ public class PreglistAdapter extends PagedListAdapter<TrackedEntityInstance, Lis
     @Override
     public void onBindViewHolder(@NonNull ListItemWithCardHolder holder, int position) {
         TrackedEntityInstance tei = getItem(position);
-        List<TrackedEntityAttributeValue> values = Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
+        if (teilist.indexOf(tei.uid()) > -1) {
+            List<TrackedEntityAttributeValue> values = Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
                     .byTrackedEntityInstance().eq(tei.uid()).blockingGet();
 
-        String pregident = Sdk.d2().eventModule().events().byProgramStageUid().eq("Ty22Qt2u4QL")
-                .byTrackedEntityInstanceUids(Arrays.asList(tei.uid())).one().blockingGet().uid();
+            String pregident = Sdk.d2().eventModule().events().byProgramStageUid().eq("Ty22Qt2u4QL")
+                    .byTrackedEntityInstanceUids(Arrays.asList(tei.uid())).one().blockingGet().uid();
 
-        TrackedEntityDataValueObjectRepository valueRep =
-                Sdk.d2().trackedEntityModule().trackedEntityDataValues()
-                        .value(
-                                pregident,
-                                "MKBM582qYs3"
-                        );
+            TrackedEntityDataValueObjectRepository valueRep =
+                    Sdk.d2().trackedEntityModule().trackedEntityDataValues()
+                            .value(
+                                    pregident,
+                                    "MKBM582qYs3"
+                            );
 
-        String lmp = valueRep.blockingExists() ? valueRep.blockingGet().value() : "No LMP";
+            String lmp = valueRep.blockingExists() ? valueRep.blockingGet().value() : "No LMP";
 
-        if (values != null){
-            holder.title.setText(valueAt(values, "QWTcaK2mXeD") + " - " + valueAt(values, "etJ8MaVKH2g"));
-            holder.subtitle1.setText(
-                    valueAt(values, "TolBbVqMWdR") + " - " +
-                    valueAt(values, "N8skKU3roph") + " - " +
-                    valueAt(values, "KSSF2lnMKca") + " - " + lmp
-                    );
+            if (values != null) {
+                holder.title.setText(valueAt(values, "QWTcaK2mXeD") + " - " + valueAt(values, "etJ8MaVKH2g"));
+                holder.subtitle1.setText(
+                        valueAt(values, "TolBbVqMWdR") + " - " +
+                                valueAt(values, "N8skKU3roph") + " - " +
+                                valueAt(values, "KSSF2lnMKca") + " - " + lmp
+                );
+            } else {
+                holder.title.setText(tei.uid());
+                holder.subtitle1.setText(DateFormatHelper.formatDate(tei.created()));
+            }
+            StyleBinderHelper.bindStyle(holder, null);
         } else {
-            holder.title.setText(tei.uid());
-            holder.subtitle1.setText(DateFormatHelper.formatDate(tei.created()));
+            //holder.itemView.setVisibility(View.INVISIBLE);
+            //holder.itemView.invalidate();
+            holder.title.setText("");
+            holder.subtitle1.setText("");
+            StyleBinderHelper.bindStyle(holder, null);
         }
-
-
-        StyleBinderHelper.bindStyle(holder, null);
-
 
     }
 
