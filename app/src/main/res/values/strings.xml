@@ -12,8 +12,8 @@
     <string name="login_failed">"Login failed"</string>
     <!-- Strings related to autoFill -->
     <string name="auto_fill_url">"https://eregistriestraining.mohfw.gov.bd/dhistr"</string>
-    <string name="auto_fill_username">"monjur11"</string>
-    <string name="auto_fill_password">"Monjur11#1"</string>
+    <string name="auto_fill_username">"lipi11"</string>
+    <string name="auto_fill_password">"Asdf#1"</string>
     <!-- Strings related to list item -->
     <string name="sync_icon">Sync icon</string>
     <string name="item_icon">Icon</string>

@@ -168,21 +168,6 @@ public class ProgramStagesActivity extends ListActivity implements OnProgramStag
             findViewById(R.id.programStageNotificator).setVisibility(
                     programStagePagedList.isEmpty() ? View.VISIBLE : View.GONE);
         });
-        /*
-        disposable = Sdk.d2().organisationUnitModule().organisationUnits().get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(organisationUnitUids -> Sdk.d2().programModule().programStages()
-                        .byProgramUid().eq(programUid)
-                        .orderBySortOrder(RepositoryScope.OrderByDirection.ASC)
-                        .getPaged(20))
-                .subscribe(programStages -> programStages.observe(this, programStagePagedList -> {
-                    adapter.submitList(programStagePagedList);
-                    findViewById(R.id.programStageNotificator).setVisibility(
-                            programStagePagedList.isEmpty() ? View.VISIBLE : View.GONE);
-
-                }));
-        */
     }
 
     private String valueAt(List<TrackedEntityAttributeValue> values, String attributeUid) {
