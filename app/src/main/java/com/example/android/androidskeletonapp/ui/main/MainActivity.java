@@ -23,6 +23,9 @@ import com.example.android.androidskeletonapp.R;
 import com.example.android.androidskeletonapp.data.Sdk;
 import com.example.android.androidskeletonapp.data.service.ActivityStarter;
 import com.example.android.androidskeletonapp.data.service.DateFormatHelper;
+import com.example.android.androidskeletonapp.data.service.Preglist.Tei;
+import com.example.android.androidskeletonapp.data.service.Preglist.TeiFields;
+import com.example.android.androidskeletonapp.data.service.Preglist.TeiService;
 import com.example.android.androidskeletonapp.data.service.SyncStatusHelper;
 import com.example.android.androidskeletonapp.data.service.Username.SpecificUser;
 import com.example.android.androidskeletonapp.data.service.Username.SpecificUserFields;
@@ -49,6 +52,7 @@ import org.hisp.dhis.android.core.arch.api.payload.internal.Payload;
 import org.hisp.dhis.android.core.arch.call.D2Progress;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.android.core.user.User;
 import org.hisp.dhis.android.core.user.UserCredentials;
 import org.hisp.dhis.android.core.user.UserRole;
@@ -61,6 +65,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -216,6 +222,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, globalVars.getTranslatedWord("You do not have stable internet connection now.\nplease try later."), Toast.LENGTH_LONG).show();
             }
         });
+
+        try {
+            Sdk.d2().databaseAdapter().database().execSQL("CREATE TABLE IF NOT EXISTS NewUserGroups(UserUid VARCHAR, UserName VARCHAR, UserGroups VARCHAR);");
+        } catch (Exception ex){
+            Log.d("TAG","errrrrrrrrr");
+        }
+
     }
 
     private void downloadInitialMetadata(){
@@ -351,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void downloadMetadataAndData(){
         setSyncing();
             //syncStatusText.setText(globalVars.getTranslatedWord("Downloading metadata and data..."));
-            compositeDisposable.add(
+                compositeDisposable.add(
                     downloadMetadata()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -388,13 +401,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 boolean deleted = myInternalFile.delete();
                             }
                             myInternalFile = new File(this.getFilesDir(), filename);
-
+                            Log.d("MainActivity","Started first service");
                             UserCredentialService userservice = Sdk.d2().retrofit().create(UserCredentialService.class);
                             Call<Payload<UserCredent>> call = userservice.getUsernames(UserCredentFields.allFields, false);
                             call.enqueue(new Callback<Payload<UserCredent>>() {
                                 @Override
                                 public void onResponse(Call<Payload<UserCredent>> call, Response<Payload<UserCredent>> response) {
-
 
                                     List<UserCredent> users = response.body().items();
                                     for (UserCredent uc : users) {
@@ -417,10 +429,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                                 if (grp.getUid().equals("ow22Lm7dg4l")) {
                                                                     buf.append(uc.getUsername() + '~' + uc.getDisplayName() + '~' + union);
                                                                     buf.newLine();
-
+                                                                    try {
+                                                                        Sdk.d2().databaseAdapter().database().execSQL("INSERT INTO NewUserGroups(UserUid, UserName , UserGroups ) VALUES ('"+uc.getUsername()+"', '"+uc.getDisplayName()+"','"+union+"' );");
+                                                                    } catch (Exception ex){
+                                                                        Log.d("TAG","errrrrrrrrr");
+                                                                    }
                                                                 }
                                                             }
                                                             buf.close();
+                                                            Log.d("MainActivity","Finished first service");
                                                         } catch (Exception ex) {
 
                                                         }
@@ -434,8 +451,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             }
                                         }
                                     }
-
-
                                 }
 
                                 @Override
@@ -443,43 +458,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            /*
-                            UserListService usernameService = Sdk.d2().retrofit().create(UserListService.class);
-                            Call<Payload<UserList>> call = usernameService.getUsernames(UserListFields.allFields, false);
-                            call.enqueue(new Callback<Payload<UserList>>() {
-                                @Override
-                                public void onResponse(Call<Payload<UserList>> call, Response<Payload<UserList>> response) {
-                                    try {
-                                        BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
-                                        List<UserList> users = response.body().items();
-                                        for (UserList user : users) {
-                                            UserCredentials uc = user.getUserCredentials();
-                                            List<OrganisationUnit> ous = user.getOrganisationUnits();
-                                            List<UserGroup> ugs = user.getUserGroups();
-                                            List<UserRole> urs = uc.userRoles();
-                                            for(UserGroup grp: ugs) {
-                                                if (grp.getUid().equals("ow22Lm7dg4l")) {
-                                                    for (UserRole ur : urs) {
-                                                        if (ur.uid().equals("lItc9BR90WI")) {
-                                                            buf.append(uc.username() + '~' + uc.displayName() + '~' + ((ous.size() > 0) ? ous.get(0).path() : ""));
-                                                            buf.newLine();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        buf.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
 
+                            Log.d("MainActivity","Started second service");
+                            String org = Sdk.d2().organisationUnitModule().organisationUnits()
+                                    .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                                    .one().blockingGet().path().split("/")[5];
+                            ArrayList<String> teiuids = new ArrayList<>();
+                            TeiService teiservice = Sdk.d2().retrofit().create(TeiService.class);
+                            Call<Payload<Tei>> callt = teiservice.getTrackedEntityInstances(TeiFields.allFields, false,org,"DESCENDANTS","ZBIqxwVixn8","2018-10-13");
+                            callt.enqueue(new Callback<Payload<Tei>>() {
                                 @Override
-                                public void onFailure(Call<Payload<UserList>> call, Throwable t) {
+                                public void onResponse(Call<Payload<Tei>> call, Response<Payload<Tei>> response) {
+                                    List<Tei> teis = response.body().items();
+                                    for (Tei tei : teis) {
+                                        teiuids.add(tei.getUid());
+                                        //Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().eq(tei.getUid()).blockingDownload();
+                                    }
+                                    /*
+                                    try {
+                                        Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().in(teiuids).blockingDownload();
+                                    } catch (Exception ex) {
+                                        Log.d("ERROR",ex.getMessage());
+                                    }
+                                    */
+
+                                    Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().in(teiuids).download()
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .doOnComplete(() -> {Log.d("MainActivity","TEI downloaded");})
+                                            .doOnError(Throwable::printStackTrace)
+                                            .subscribe();
+
+                                }
+                                @Override
+                                public void onFailure(Call<Payload<Tei>> call, Throwable t) {
                                     Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            */
 
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
@@ -513,7 +528,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete(() -> {
-
                             String locale = "en";
                             String orgunitname = Sdk.d2().organisationUnitModule().organisationUnits()
                                     .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
@@ -538,6 +552,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .limit(1000)
                 .limitByOrgunit(false).limitByProgram(false).download();
     }
+
+    /*
+    private Observable<D2Progress> downloadTrackedEntityInstancesBySearchScopes() {
+        String org = Sdk.d2().organisationUnitModule().organisationUnits()
+                .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                .one().blockingGet().path().split("/")[5];
+        ArrayList<String> teiuids = new ArrayList<>();
+        TeiService teiservice = Sdk.d2().retrofit().create(TeiService.class);
+        Call<Payload<TrackedEntityInstance>> callt = teiservice.getTrackedEntityInstances(TeiFields.allFields, false,org,"DESCENDANTS","ZBIqxwVixn8","2018-10-13");
+        callt.enqueue(new Callback<Payload<TrackedEntityInstance>>() {
+            @Override
+            public void onResponse(Call<Payload<TrackedEntityInstance>> call, Response<Payload<TrackedEntityInstance>> response) {
+                List<TrackedEntityInstance> teis = response.body().items();
+                for (TrackedEntityInstance tei : teis) {
+                    teiuids.add(tei.uid());
+                }
+            }
+            @Override
+            public void onFailure(Call<Payload<TrackedEntityInstance>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return Sdk.d2().trackedEntityModule()
+                .trackedEntityInstanceDownloader()
+                .byUid().in(teiuids).download();
+    }
+    */
 
     private Observable<D2Progress> downloadSingleEvents() {
         return Sdk.d2().eventModule().eventDownloader()
@@ -574,9 +615,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.navPrograms) {
+        int id = item.getItemId();if (id == R.id.navPrograms) {
             //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
             ActivityStarter.startActivity(this,
                     TrackedEntityInstancesActivity

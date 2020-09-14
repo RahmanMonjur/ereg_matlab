@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.androidskeletonapp.R;
@@ -64,7 +65,12 @@ public class PreglistActivity extends ListActivity {
         recyclerSetup(R.layout.activity_preglist, R.id.programsToolbar, R.id.programsRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
         getSupportActionBar().setTitle("Pregnant women list");
-        loadPreglist();
+        if (Sdk.d2().userModule().userRoles().byUid().eq("OGnAUcsRIIb").blockingCount() > 0) {
+            loadPreglist();
+        } else {
+            ((TextView)findViewById(R.id.programsNotificator)).setText(globalVars.getTranslatedWord("Sorry, you're allowed to see this page"));
+        }
+
     }
 
     private void loadPreglist() {

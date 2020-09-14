@@ -17,8 +17,11 @@ import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValue;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityDataValueObjectRepository;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class PreglistsAdapter extends RecyclerView.Adapter<ListItemWithCardHolder> {
@@ -52,14 +55,22 @@ public class PreglistsAdapter extends RecyclerView.Adapter<ListItemWithCardHolde
                                 "MKBM582qYs3"
                         );
 
-        String lmp = valueRep.blockingExists() ? valueRep.blockingGet().value() : "No LMP";
+        String lmp = valueRep.blockingExists() ? valueRep.blockingGet().value() : "";
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(DateFormatHelper.parseDateAutoFormat(lmp));
+        } catch (Exception ex) {
+
+        }
+        c.add(Calendar.DAY_OF_MONTH, 280);
+        String edd = DateFormatHelper.getDateAsSystemFormat(c.getTime());
 
         if (values != null) {
             holder.title.setText(valueAt(values, "QWTcaK2mXeD") + " - " + valueAt(values, "etJ8MaVKH2g"));
             holder.subtitle1.setText(
                     valueAt(values, "TolBbVqMWdR") + " - " +
                             valueAt(values, "N8skKU3roph") + " - " +
-                            valueAt(values, "KSSF2lnMKca") + " - " + lmp
+                            valueAt(values, "KSSF2lnMKca") + " - " + edd
             );
         } else {
             holder.title.setText(tei.uid());

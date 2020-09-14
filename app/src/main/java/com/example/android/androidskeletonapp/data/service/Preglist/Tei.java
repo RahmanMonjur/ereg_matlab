@@ -1,21 +1,16 @@
-package com.example.android.androidskeletonapp.data.service.Username;
-
-import androidx.annotation.Nullable;
+package com.example.android.androidskeletonapp.data.service.Preglist;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UserGroup {
-
+public class Tei {
     private String uid;
-
-    @JsonProperty(value = "id")
+    @JsonProperty(value = "trackedEntityInstance")
     public String getUid() {
         return uid;
     }
 
-    @JsonProperty(value = "id")
+    @JsonProperty(value = "trackedEntityInstance")
     public void setUid(String uid) {
         this.uid = uid;
     }
-
 }

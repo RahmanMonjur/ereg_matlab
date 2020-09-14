@@ -79,6 +79,8 @@ public class GlobalClass extends Application {
         translatedWords.put("You can change the program by clicking below","নোট: নিচের লিস্ট বাটন এ ক্লিক করে প্রোগ্রাম পরিবর্তন করুন");
         translatedWords.put("Do not forget to enroll in the MCH program","নোট: MCH প্রোগ্রাম এ রেজিস্ট্রেশন করতে ভুলবেন না");
         translatedWords.put("You do not have stable internet connection now.\nplease try later.","এখন আপনার ইন্টারনেট কানেকশন নেই।\nপরে চেষ্টা করুন।");
+        translatedWords.put("Sorry, you're allowed to see this page","আপনি এই তালিকা দেখতে পাবেন না।");
+        translatedWords.put("Pregnant women list","");
         //translatedWords.put("","");
 
         return  translatedWords;

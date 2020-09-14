@@ -38,6 +38,7 @@ import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceCreateProje
 import org.hisp.dhis.android.core.trackedentity.search.TrackedEntityInstanceQueryCollectionRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -201,6 +202,8 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         });
     }
 
+
+    /*
     private TrackedEntityInstanceQueryCollectionRepository getTeiRepository() {
         TrackedEntityInstanceQueryCollectionRepository teiRepository =
                 Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
@@ -211,27 +214,26 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
             return teiRepository;
         }
     }
+    */
 
-    /*
+
     private TrackedEntityInstanceCollectionRepository getTeiRepository() {
         Date date = new Date();
-        try{
-            date = DateFormatHelper.parseDateAutoFormat("2017-10-13");
-        } catch (Exception e){};
+        try {
+            date = DateFormatHelper.parseDateAutoFormat("2018-10-13");
+        } catch (Exception e) {
+        }
 
         TrackedEntityInstanceCollectionRepository teiRepository =
                 Sdk.d2().trackedEntityModule().trackedEntityInstances()
                         .byCreated().after(date)
                         .withTrackedEntityAttributeValues();
         if (!isEmpty(selectedProgram)) {
-            List<String> programUids = new ArrayList<>();
-            programUids.add(selectedProgram);
-            return teiRepository.byProgramUids(programUids);
-        } else {
-            return teiRepository;
+            return teiRepository.byProgramUids(Arrays.asList(selectedProgram));
         }
+        return teiRepository;
     }
-    */
+
     private LiveData<PagedList<TrackedEntityInstance>> getTrackedEntityInstanceQuery() {
         adapter = new TrackedEntityInstanceAdapter( this,this, selectedProgram);
         recyclerView.setAdapter(adapter);

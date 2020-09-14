@@ -90,7 +90,7 @@ public class ProgramStagesAdapter extends PagedListAdapter<ProgramStage, ListIte
             holder.cardSimple.setOnClickListener(view -> programStageSelectionListener
                     .onProgramStageSelected(programUid, programStage.uid(), trackedEntityInstanceUid));
         } else {
-            //holder.itemView.setVisibility(View.INVISIBLE);
+            holder.itemView.setVisibility(View.INVISIBLE);
             holder.itemView.invalidate();
         }
 

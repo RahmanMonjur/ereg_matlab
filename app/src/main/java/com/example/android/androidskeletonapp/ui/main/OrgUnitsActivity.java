@@ -60,24 +60,12 @@ public class OrgUnitsActivity extends ListActivity implements OnOrgUnitSelection
 
         Sdk.d2().organisationUnitModule().organisationUnits()
                 .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
+                .byRootOrganisationUnit(true)
                 .getPaged(20).observe(this, orgsPagedList -> {
             adapter.submitList(orgsPagedList);
             findViewById(R.id.programsNotificator).setVisibility(
                     orgsPagedList.isEmpty() ? View.VISIBLE : View.GONE);
         });
-        /*
-        disposable = Sdk.d2().organisationUnitModule().organisationUnits().get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(organisationUnitUids -> Sdk.d2().organisationUnitModule().organisationUnits()
-                        .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
-                        .getPaged(20))
-                .subscribe(orgs -> orgs.observe(this, orgsPagedList -> {
-                    adapter.submitList(orgsPagedList);
-                    findViewById(R.id.programsNotificator).setVisibility(
-                            orgsPagedList.isEmpty() ? View.VISIBLE : View.GONE);
-                }));
-         */
     }
 
     @Override
