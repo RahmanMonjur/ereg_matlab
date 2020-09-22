@@ -119,19 +119,35 @@ public class EnrollmentFormActivity extends AppCompatActivity {
         String elementId = null;
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        if(clipboard != null) {
-            if(clipboard.hasPrimaryClip()){
-                if(clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11){
+        if (clipboard != null) {
+            if (clipboard.hasPrimaryClip()) {
+                if (clipboard.getPrimaryClip().getItemAt(0).getText().length() == 11) {
                     String regex = "^[0-9]+$";
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(clipboard.getPrimaryClip().getItemAt(0).getText());
                     if (matcher.matches()) {
                         elementId = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
-                        ClipData clip = ClipData.newPlainText("","");
+                        ClipData clip = ClipData.newPlainText("", "");
                         clipboard.setPrimaryClip(clip);
                     }
                 }
             }
+        }
+
+        TrackedEntityAttributeValueObjectRepository valueRepository =
+                Sdk.d2().trackedEntityModule().trackedEntityAttributeValues()
+                        .value(
+                                "aQEvaiBpohU",
+                                getIntent().getStringExtra(IntentExtra.TEI_UID.name()
+                                )
+                        );
+        String elemidexist = valueRepository.blockingExists() ?
+                valueRepository.blockingGet().value() : "";
+        try {
+            if (elemidexist.equals(""))
+                valueRepository.blockingSet(elementId != null ? elementId : "");
+        } catch (D2Error d2Error) {
+            d2Error.printStackTrace();
         }
 
         if (EnrollmentFormService.getInstance().init(globalVars,

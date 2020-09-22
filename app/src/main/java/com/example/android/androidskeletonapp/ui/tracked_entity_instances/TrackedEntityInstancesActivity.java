@@ -237,9 +237,13 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
     private LiveData<PagedList<TrackedEntityInstance>> getTrackedEntityInstanceQuery() {
         adapter = new TrackedEntityInstanceAdapter( this,this, selectedProgram);
         recyclerView.setAdapter(adapter);
-        return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
-                .byQuery().like(etFirstName.getText().toString())
-                .offlineFirst().getPaged(15);
+        if (!etFirstName.getText().toString().equals("")) {
+            return Sdk.d2().trackedEntityModule().trackedEntityInstanceQuery()
+                    .byQuery().like(etFirstName.getText().toString()).offlineOnly()
+                    .getPaged(15);
+        } else {
+            return getTeiRepository().getPaged(15);
+        }
     }
 
     @Override

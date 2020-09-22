@@ -40,6 +40,14 @@ import com.example.android.androidskeletonapp.data.service.Username.UserListServ
 import com.example.android.androidskeletonapp.data.service.Username.Username;
 import com.example.android.androidskeletonapp.data.service.Username.UsernameFields;
 import com.example.android.androidskeletonapp.data.service.Username.UsernameService;
+import com.example.android.androidskeletonapp.data.service.dashboards.Dashboard;
+import com.example.android.androidskeletonapp.data.service.dashboards.DashboardFields;
+import com.example.android.androidskeletonapp.data.service.dashboards.DashboardItem;
+import com.example.android.androidskeletonapp.data.service.dashboards.DashboardService;
+import com.example.android.androidskeletonapp.data.service.dashboards.ReportTable;
+import com.example.android.androidskeletonapp.data.service.dashboards.ReportTableData;
+import com.example.android.androidskeletonapp.data.service.dashboards.ReportTableHeader;
+import com.example.android.androidskeletonapp.data.service.dashboards.ReportTableService;
 import com.example.android.androidskeletonapp.ui.code_executor.CodeExecutorActivity;
 import com.example.android.androidskeletonapp.ui.d2_errors.D2ErrorActivity;
 import com.example.android.androidskeletonapp.ui.foreign_key_violations.ForeignKeyViolationsActivity;
@@ -223,12 +231,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        /*
         try {
-            Sdk.d2().databaseAdapter().database().execSQL("CREATE TABLE IF NOT EXISTS NewUserGroups(UserUid VARCHAR, UserName VARCHAR, UserGroups VARCHAR);");
+            Sdk.d2().databaseAdapter().execSQL("CREATE TABLE IF NOT EXISTS NewUserGroups(UserUid VARCHAR, UserName VARCHAR, UserGroups VARCHAR);");
+
         } catch (Exception ex){
             Log.d("TAG","errrrrrrrrr");
         }
-
+        */
     }
 
     private void downloadInitialMetadata(){
@@ -401,13 +411,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 boolean deleted = myInternalFile.delete();
                             }
                             myInternalFile = new File(this.getFilesDir(), filename);
-                            Log.d("MainActivity","Started first service");
+                            Log.d("MainActivity", "Started first service");
                             UserCredentialService userservice = Sdk.d2().retrofit().create(UserCredentialService.class);
                             Call<Payload<UserCredent>> call = userservice.getUsernames(UserCredentFields.allFields, false);
                             call.enqueue(new Callback<Payload<UserCredent>>() {
                                 @Override
                                 public void onResponse(Call<Payload<UserCredent>> call, Response<Payload<UserCredent>> response) {
-
                                     List<UserCredent> users = response.body().items();
                                     for (UserCredent uc : users) {
                                         List<UserRole> urs = uc.getUserRoles();
@@ -418,26 +427,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 call1.enqueue(new Callback<SpecificUser>() {
                                                     @Override
                                                     public void onResponse(Call<SpecificUser> call1, Response<SpecificUser> response1) {
-
                                                         try {
+                                                            //Sdk.d2().databaseAdapter().delete("NewUserGroups");
+
                                                             BufferedWriter buf = new BufferedWriter(new FileWriter(myInternalFile, true));
                                                             List<OrganisationUnit> ous1 = response1.body().getOrganisationUnits();
                                                             String union = (ous1.size() > 0) ? ous1.get(0).path() : "";
                                                             List<UserGroup> ugs1 = response1.body().getUserGroups();
+
                                                             for (UserGroup grp : ugs1) {
                                                                 //Extracting FWA users only
                                                                 if (grp.getUid().equals("ow22Lm7dg4l")) {
                                                                     buf.append(uc.getUsername() + '~' + uc.getDisplayName() + '~' + union);
                                                                     buf.newLine();
-                                                                    try {
-                                                                        Sdk.d2().databaseAdapter().database().execSQL("INSERT INTO NewUserGroups(UserUid, UserName , UserGroups ) VALUES ('"+uc.getUsername()+"', '"+uc.getDisplayName()+"','"+union+"' );");
-                                                                    } catch (Exception ex){
-                                                                        Log.d("TAG","errrrrrrrrr");
-                                                                    }
+
+                                                                    //Sdk.d2().databaseAdapter().execSQL("INSERT INTO NewUserGroups(UserUid, UserName , UserGroups ) VALUES ('"+uc.getUsername()+"', '"+uc.getDisplayName()+"','' )");
                                                                 }
                                                             }
+
                                                             buf.close();
-                                                            Log.d("MainActivity","Finished first service");
                                                         } catch (Exception ex) {
 
                                                         }
@@ -459,42 +467,82 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             });
 
-                            Log.d("MainActivity","Started second service");
+                            Log.d("MainActivity", "Started second service");
                             String org = Sdk.d2().organisationUnitModule().organisationUnits()
                                     .byOrganisationUnitScope(OrganisationUnit.Scope.SCOPE_DATA_CAPTURE)
                                     .one().blockingGet().path().split("/")[5];
                             ArrayList<String> teiuids = new ArrayList<>();
                             TeiService teiservice = Sdk.d2().retrofit().create(TeiService.class);
-                            Call<Payload<Tei>> callt = teiservice.getTrackedEntityInstances(TeiFields.allFields, false,org,"DESCENDANTS","ZBIqxwVixn8","2018-10-13");
+                            Call<Payload<Tei>> callt = teiservice.getTrackedEntityInstances(TeiFields.allFields, false, org, "DESCENDANTS", "ZBIqxwVixn8", "2018-10-13");
                             callt.enqueue(new Callback<Payload<Tei>>() {
                                 @Override
                                 public void onResponse(Call<Payload<Tei>> call, Response<Payload<Tei>> response) {
                                     List<Tei> teis = response.body().items();
                                     for (Tei tei : teis) {
                                         teiuids.add(tei.getUid());
-                                        //Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().eq(tei.getUid()).blockingDownload();
                                     }
-                                    /*
-                                    try {
-                                        Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().in(teiuids).blockingDownload();
-                                    } catch (Exception ex) {
-                                        Log.d("ERROR",ex.getMessage());
-                                    }
-                                    */
-
                                     Sdk.d2().trackedEntityModule().trackedEntityInstanceDownloader().byUid().in(teiuids).download()
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .doOnComplete(() -> {Log.d("MainActivity","TEI downloaded");})
+                                            .doOnComplete(() -> {
+                                                Log.d("MainActivity", "TEI downloaded");
+                                            })
                                             .doOnError(Throwable::printStackTrace)
                                             .subscribe();
-
                                 }
                                 @Override
                                 public void onFailure(Call<Payload<Tei>> call, Throwable t) {
                                     Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                            List<List<String>> tables = new ArrayList<>();
+                            DashboardService dashservice = Sdk.d2().retrofit().create(DashboardService.class);
+                            Call<Payload<Dashboard>> dashcall = dashservice.getDashboards(DashboardFields.allFields, false);
+                            dashcall.enqueue(new Callback<Payload<Dashboard>>() {
+                                @Override
+                                public void onResponse(Call<Payload<Dashboard>> call, Response<Payload<Dashboard>> response) {
+                                    List<Dashboard> dashboards = response.body().items();
+                                    for (Dashboard dashboard : dashboards) {
+                                        for (DashboardItem dashboardItem : dashboard.getDashboardItems()) {
+                                            ReportTable rtable = dashboardItem.getReportTable();
+                                            if (rtable != null) {
+                                                ReportTableService rtableservice = Sdk.d2().retrofit().create(ReportTableService.class);
+                                                Call<ReportTableData> rtablecall = rtableservice.getReportTableData(rtable.getUid(), false);
+                                                rtablecall.enqueue(new Callback<ReportTableData>() {
+                                                    @Override
+                                                    public void onResponse(Call<ReportTableData> call, Response<ReportTableData> response) {
+                                                        ReportTableData rtdata = response.body();
+                                                        if (rtdata != null){
+                                                            List<ReportTableHeader> headers = rtdata.getHeaders();
+                                                            for (List<String> rows : rtdata.getRows()) {
+                                                                List<String> tableCells = new ArrayList<>();
+                                                                for (int i = 0; i < headers.size(); i++) {
+                                                                    ReportTableHeader header = headers.get(i);
+                                                                    if (!header.getHidden()) {
+                                                                        tableCells.add(rows.get(i));
+                                                                    }
+                                                                }
+                                                                tables.add(tableCells);
+                                                            }
+                                                        }
+                                                        Log.d("MainActivity", String.valueOf(tables.size()));
+                                                    }
+                                                    @Override
+                                                    public void onFailure(Call<ReportTableData> call, Throwable t) {
+                                                        Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<Payload<Dashboard>> call, Throwable t) {
+                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
 
                             if (globalVars.getOrgUid() == null) {
                                 ActivityStarter.startActivity(this, OrgUnitsActivity.getOrgUnitIntent(this), false);
