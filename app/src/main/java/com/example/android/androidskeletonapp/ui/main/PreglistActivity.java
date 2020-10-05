@@ -64,7 +64,7 @@ public class PreglistActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         recyclerSetup(R.layout.activity_preglist, R.id.programsToolbar, R.id.programsRecyclerView);
         globalVars = (GlobalClass) getApplicationContext();
-        getSupportActionBar().setTitle("Pregnant women list");
+        getSupportActionBar().setTitle(globalVars.getTranslatedWord("Pregnant women list"));
         if (Sdk.d2().userModule().userRoles().byUid().eq("OGnAUcsRIIb").blockingCount() > 0) {
             loadPreglist();
         } else {

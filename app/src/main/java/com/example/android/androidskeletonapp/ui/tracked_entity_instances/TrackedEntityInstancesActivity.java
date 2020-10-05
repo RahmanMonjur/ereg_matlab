@@ -30,6 +30,7 @@ import com.example.android.androidskeletonapp.ui.main.OrgUnitsActivity;
 import com.example.android.androidskeletonapp.ui.programs.ProgramStagesActivity;
 
 import org.hisp.dhis.android.core.D2Manager;
+import org.hisp.dhis.android.core.arch.repositories.scope.RepositoryScope;
 import org.hisp.dhis.android.core.maintenance.D2Error;
 import org.hisp.dhis.android.core.organisationunit.OrganisationUnit;
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance;
@@ -227,6 +228,7 @@ public class TrackedEntityInstancesActivity extends ListActivity  implements OnT
         TrackedEntityInstanceCollectionRepository teiRepository =
                 Sdk.d2().trackedEntityModule().trackedEntityInstances()
                         .byCreated().after(date)
+                        .orderByCreated(RepositoryScope.OrderByDirection.DESC)
                         .withTrackedEntityAttributeValues();
         if (!isEmpty(selectedProgram)) {
             return teiRepository.byProgramUids(Arrays.asList(selectedProgram));

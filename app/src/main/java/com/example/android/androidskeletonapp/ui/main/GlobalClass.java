@@ -80,7 +80,13 @@ public class GlobalClass extends Application {
         translatedWords.put("Do not forget to enroll in the MCH program","নোট: MCH প্রোগ্রাম এ রেজিস্ট্রেশন করতে ভুলবেন না");
         translatedWords.put("You do not have stable internet connection now.\nplease try later.","এখন আপনার ইন্টারনেট কানেকশন নেই।\nপরে চেষ্টা করুন।");
         translatedWords.put("Sorry, you're allowed to see this page","আপনি এই তালিকা দেখতে পাবেন না।");
-        translatedWords.put("Pregnant women list","");
+        translatedWords.put("Pregnant women list","গর্ভবতীর তালিকা");
+        translatedWords.put("Client Register Program","ক্লায়েন্ট রেজিস্টার প্রোগ্রাম");
+        translatedWords.put("Organisation Unit","কর্মস্থল নির্বাচন");
+        translatedWords.put("Current Pregnancies","গর্ভবতীর তালিকা (৩২ সপ্তাহের অধিক)");
+        translatedWords.put("Dashboard","ড্যাশবোর্ড");
+        translatedWords.put("","");
+        translatedWords.put("","");
         //translatedWords.put("","");
 
         return  translatedWords;

@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -231,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        //For Victor or Luis
         /*
         try {
             Sdk.d2().databaseAdapter().execSQL("CREATE TABLE IF NOT EXISTS NewUserGroups(UserUid VARCHAR, UserName VARCHAR, UserGroups VARCHAR);");
@@ -342,6 +344,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navView);
+        Menu menu = navigationView.getMenu();
+        MenuItem nav_program = menu.findItem(R.id.navPrograms);
+        nav_program.setTitle(globalVars.getTranslatedWord("Client Register Program"));
+        MenuItem nav_org = menu.findItem(R.id.navOrgUnit);
+        nav_org.setTitle(globalVars.getTranslatedWord("Organisation Unit"));
+        MenuItem nav_preglist = menu.findItem(R.id.navPregList);
+        nav_preglist.setTitle(globalVars.getTranslatedWord("Current Pregnancies"));
+        MenuItem nav_dash = menu.findItem(R.id.navDashboard);
+        nav_dash.setTitle(globalVars.getTranslatedWord("Dashboard"));
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -441,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                                     buf.append(uc.getUsername() + '~' + uc.getDisplayName() + '~' + union);
                                                                     buf.newLine();
 
+                                                                    //For Victor or Luis
                                                                     //Sdk.d2().databaseAdapter().execSQL("INSERT INTO NewUserGroups(UserUid, UserName , UserGroups ) VALUES ('"+uc.getUsername()+"', '"+uc.getDisplayName()+"','' )");
                                                                 }
                                                             }
@@ -663,8 +676,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();if (id == R.id.navPrograms) {
-            //ActivityStarter.startActivity(this, ProgramsActivity.getProgramActivityIntent(this), false);
+        int id = item.getItemId();
+        if (id == R.id.navPrograms) {
             ActivityStarter.startActivity(this,
                     TrackedEntityInstancesActivity
                             .getTrackedEntityInstancesActivityIntent(this, "ZBIqxwVixn8"),
